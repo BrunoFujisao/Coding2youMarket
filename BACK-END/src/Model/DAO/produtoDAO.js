@@ -1,7 +1,7 @@
-const pool = require('../../Config/Db/mysqlConnect');
+const pool = require('./db');
 
 class Produto {
-  constructor(id_produto, nome, descricao, categoria, preco, unidade, imagem, ativo) {
+  constructor(id_produto, nome, descricao, categoria, preco, unidade, imagem, ativo, estoque, estoqueMinimo) {
     this.id_produto = id_produto;
     this.nome = nome;
     this.descricao = descricao;
@@ -9,9 +9,9 @@ class Produto {
     this.preco = preco;
     this.unidade = unidade;
     this.imagem = imagem;
-    this.ativo = ativo;
     this.estoque = estoque;
     this.estoqueMinimo = estoqueMinimo;
+    this.ativo = ativo;
   }
 }
 
@@ -33,7 +33,7 @@ async function insertProduto(nome, descricao, categoria, preco, unidade, imagem)
     VALUES ($1, $2, $3, $4, $5, $6, true)
     RETURNING *
     `,
-    [nome, descricao, categoria, preco, unidade, imagem, ativo]
+    [nome, descricao, categoria, preco, unidade, imagem]
   );
 
   return result.rows[0];
@@ -60,6 +60,15 @@ async function getProdutosByCategoria(categoria) {
   );
 
   return rows; // retorna TODOS da categoria
+}
+
+//LISTA CATEGORIAS
+
+async function getCategorias() {
+  const { rows } = await pool.query(
+    "SELECT DISTINCT categoria FROM produtos WHERE ativo = true ORDER BY categoria"
+  );
+  return rows.map(row => row.categoria);
 }
 
 // UPDATE
@@ -107,6 +116,5 @@ async function deleteProduto(id_produto) {
 //EXPORTS 
 
 module.exports = {
-  Produto, insertProduto, getProdutos, getProdutosByCategoria, editProduto, deleteProduto
+  Produto, insertProduto, getProdutos, getProdutosByCategoria, editProduto, deleteProduto, getCategorias
 };
-s
