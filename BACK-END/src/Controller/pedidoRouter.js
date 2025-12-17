@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const {insertPedido, getPedidos, getPedidoPorId, getPedidosPorUsuario, getPedidosAtivos, updateStatusPedido, updateDatasPedido, deletePedido, cancelarPedido
-} = require("../Model/DAO/pedidoDAO");
+} = require("../Model/DAO/pedidoDao");
 
 
 //READ POR PEDIDOS ATIVOS
