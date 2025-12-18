@@ -1,4 +1,4 @@
-const pool = require('./db');
+const pool = require('../../Config/Db/db');
 
 class Cliente {
     constructor(id, nome, email, cpf, telefone, senha, clubMember, dataCadastroClub, dataCadastro, ativo) {

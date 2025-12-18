@@ -1,4 +1,4 @@
-const pool = require('./db');
+const pool = require('../../Config/Db/db');
 
 class Endereco {
   constructor(id, usuarioId, cep, rua, numero, complemento, bairro, cidade, estado, apelido, principal) {
