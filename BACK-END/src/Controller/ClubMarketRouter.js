@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const {insertClubMarket, getClubMarkets, getClubMarketPorUsuario, getClubMarketPorId, updateStatusClubMarket,updateValorMensal,
-  deleteClubMarket
-} = require('../Model/DAO/clubMarketDao');
+const { insertClubMarket, getClubMarkets, getClubMarketPorUsuario, getClubMarketPorId, updateStatusClubMarket, deleteClubMarket } = require('../Model/DAO/clubMarketDao');
 
 //READ TODOS
 router.get('/club-market', async (req, res) => {
@@ -18,40 +16,6 @@ router.get('/club-market', async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Erro ao buscar Club Market',
-      error: error.message
-    });
-  }
-});
-
-//READ POR ID
-router.get('/club-market/:id', async (req, res) => {
-  try {
-    const id = Number(req.params.id);
-
-    if (!id) {
-      return res.status(400).json({
-        success: false,
-        message: 'ID inválido'
-      });
-    }
-
-    const clube = await getClubMarketPorId(id);
-
-    if (!clube) {
-      return res.status(404).json({
-        success: false,
-        message: 'Assinatura não encontrada'
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      clube
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: 'Erro ao buscar assinatura',
       error: error.message
     });
   }
@@ -86,6 +50,40 @@ router.get('/club-market/usuario/:usuarioId', async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Erro ao buscar assinatura do usuário',
+      error: error.message
+    });
+  }
+});
+
+//READ POR ID
+router.get('/club-market/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID inválido'
+      });
+    }
+
+    const clube = await getClubMarketPorId(id);
+
+    if (!clube) {
+      return res.status(404).json({
+        success: false,
+        message: 'Assinatura não encontrada'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      clube
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Erro ao buscar assinatura',
       error: error.message
     });
   }
@@ -235,6 +233,12 @@ router.delete('/club-market/:id', async (req, res) => {
       error: error.message
     });
   }
+});
+
+// Atalho para cancelar 
+router.patch('/club-market/:id/cancelar', async (req, res) => {
+  const clube = await updateStatusClubMarket(id, 'cancelada');
+  return res.json({ success: true, clube });
 });
 
 module.exports = router;

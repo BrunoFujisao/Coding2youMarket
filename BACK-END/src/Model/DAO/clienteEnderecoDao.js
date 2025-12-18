@@ -1,4 +1,4 @@
-const pool = require('../../Config/Db/mysqlConnect');
+const pool = require('../../Config/Db/db');
 
 class ClienteEndereco {
   constructor(id, usuarioId, enderecoId, ativo, principal, dataVinculo, dataDesvinculo) {

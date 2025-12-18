@@ -1,4 +1,4 @@
-const pool = require('../../Config/Db/mysqlConnect');
+const pool = require('../../Config/Db/db');
 
 class CartaoCredito {
   constructor(id, usuarioId, tokenCartao, bandeira, ultimos4Digitos, nomeImpresso, principal, isDebito) {
@@ -18,14 +18,14 @@ class CartaoCredito {
 
 async function insertCartaoCredito(usuarioId, tokenCartao, bandeira, ultimos4Digitos, nomeImpresso, principal, isDebito) {
 
-  if ( !usuarioId || !tokenCartao || !bandeira || !ultimos4Digitos || !nomeImpresso) {
+  if (!usuarioId || !tokenCartao || !bandeira || !ultimos4Digitos || !nomeImpresso) {
     console.error("Falha ao inserir cartão: campos obrigatórios ausentes.");
     return false;
   }
 
   const result = await pool.query(
     `
-    INSERT INTO cartao (
+    INSERT INTO cartao_credito (
       usuarioId,
       tokenCartao,
       bandeira,
@@ -47,7 +47,7 @@ async function insertCartaoCredito(usuarioId, tokenCartao, bandeira, ultimos4Dig
 
 // READ TODOS
 async function getCartoesCredito() {
-  const { rows } = await pool.query("SELECT * FROM cartao");
+  const { rows } = await pool.query("SELECT * FROM cartao_credito");
   return rows;
 }
 
@@ -60,15 +60,24 @@ async function getCartoesPorUsuario(usuarioId) {
   }
 
   const { rows } = await pool.query(
-    "SELECT * FROM cartao WHERE usuarioId = $1",
+    "SELECT * FROM cartao_credito WHERE usuarioId = $1",
     [usuarioId]
   );
 
   return rows;
 }
 
-// UPDATE 
+// READ POR ID
+async function getCartaoById(id) {
+  if (!id) return false;
+  const { rows } = await pool.query(
+    "SELECT * FROM cartoes_credito WHERE id = $1",
+    [id]
+  );
+  return rows[0];
+}
 
+// UPDATE 
 async function editCartaoCredito(
   id,
   bandeira,
@@ -76,22 +85,20 @@ async function editCartaoCredito(
   principal,
   isDebito
 ) {
-  if (!id || !bandeira || !nomeImpresso) {
+  if (!id || !nomeImpresso) {
     console.error("Falha ao editar cartão: campos obrigatórios ausentes.");
     return false;
   }
 
   const result = await pool.query(
     `
-    UPDATE cartao
-    SET bandeira = $1,
-        nomeImpresso = $2,
-        principal = $3,
-        isDebito = $4
-    WHERE id = $5
+    UPDATE cartao_credito
+    SET nomeImpresso = $1,
+        principal = $2
+    WHERE id = $3
     RETURNING *
     `,
-    [bandeira, nomeImpresso, principal, isDebito, id]
+    [nomeImpresso, principal, id]
   );
 
   if (result.rows.length === 0) return false;
@@ -108,7 +115,7 @@ async function deleteCartaoCredito(id) {
 
   const result = await pool.query(
     `
-    DELETE FROM cartao
+    DELETE FROM cartao_credito
     WHERE id = $1
     RETURNING id
     `,
@@ -121,5 +128,5 @@ async function deleteCartaoCredito(id) {
 // EXPORTS 
 
 module.exports = {
-  CartaoCredito, insertCartaoCredito, getCartoesCredito, getCartoesPorUsuario, editCartaoCredito,deleteCartaoCredito
+  CartaoCredito, insertCartaoCredito, getCartoesCredito, getCartoesPorUsuario, getCartaoById, editCartaoCredito, deleteCartaoCredito
 };

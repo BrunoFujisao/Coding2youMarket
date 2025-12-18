@@ -1,4 +1,4 @@
-const pool = require('../../Config/Db/mysqlConnect');
+const pool = require('../../Config/Db/db');
 
 class ClubMarket {
   constructor(id, usuarioId, dataInicio, status, valorMensal) {
@@ -93,23 +93,6 @@ async function updateStatusClubMarket(id, status) {
   return rows[0] || false;
 }
 
-// UPDATE VALOR MENSAL
-async function updateValorMensal(id, valorMensal) {
-  if (!id || valorMensal == null) return false;
-
-  const { rows } = await pool.query(
-    `
-    UPDATE club_market
-    SET valorMensal = $1
-    WHERE id = $2
-    RETURNING *
-    `,
-    [valorMensal, id]
-  );
-
-  return rows[0] || false;
-}
-
 //DELETE
 async function deleteClubMarket(id) {
   if (!id) return false;
@@ -124,6 +107,5 @@ async function deleteClubMarket(id) {
 
 //EXPORTS
 module.exports = {
-  ClubMarket, insertClubMarket, getClubMarkets, getClubMarketPorUsuario, getClubMarketPorId, updateStatusClubMarket,
-  updateValorMensal, deleteClubMarket
+  ClubMarket, insertClubMarket, getClubMarkets, getClubMarketPorUsuario, getClubMarketPorId, updateStatusClubMarket, deleteClubMarket
 };

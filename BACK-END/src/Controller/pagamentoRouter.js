@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+//const authMiddleware = require('../middlewares/authMiddleware');
 
 const {
   insertPagamento,
@@ -7,7 +8,6 @@ const {
   getPagamentoPorId,
   getPagamentosPorUsuario,
   getPagamentosPorPedidoId,
-  getPagamentosPorAssinaturaId,
   updateStatusPagamento
 } = require("../Model/DAO/pagamentoDAO");
 
@@ -77,36 +77,6 @@ router.get("/pagamentos/usuario/:usuarioId", async (req, res) => {
   }
 });
 
-
-//READ POR ASSINATURA ID 
-router.get("/pagamentos/assinatura/:assinaturaId", async (req, res) => {
-  try {
-    const { assinaturaId } = req.params;
-
-    const pagamentos = await getPagamentosPorAssinaturaId(assinaturaId);
-
-    if (!pagamentos || pagamentos.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Nenhum pagamento encontrado para esta assinatura"
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      pagamentos
-    });
-
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Erro ao buscar pagamentos da assinatura",
-      error: error.message
-    });
-  }
-});
-
-
 //READ TODOS
 router.get("/pagamentos", async (req, res) => {
   try {
@@ -123,7 +93,6 @@ router.get("/pagamentos", async (req, res) => {
     });
   }
 });
-
 
 //READ POR ID
 router.get("/pagamentos/:id", async (req, res) => {
@@ -164,7 +133,7 @@ router.get("/pagamentos/:id", async (req, res) => {
 //CREATE
 router.post("/pagamentos", async (req, res) => {
   try {
-    const { assinaturaId, usuarioId, cartaoId, valor } = req.body;
+    const { usuarioId, cartaoId, valor } = req.body;
 
     if (!usuarioId || !cartaoId || valor == null) {
       return res.status(400).json({
@@ -174,7 +143,6 @@ router.post("/pagamentos", async (req, res) => {
     }
 
     const pagamento = await insertPagamento(
-      assinaturaId,
       usuarioId,
       cartaoId,
       valor

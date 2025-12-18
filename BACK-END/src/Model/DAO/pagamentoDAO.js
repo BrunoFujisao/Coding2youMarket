@@ -1,22 +1,22 @@
-const pool = require('../../Config/Db/mysqlConnect');
+const pool = require('../../Config/Db/db');
 
 class Pagamento {
-  constructor(id,pedidoId, assinaturaId,usuarioId, cartaoId, valor, status, dataPagamento) {
+  constructor(id, pedidoId, usuarioId, cartaoId, valor, status, dataPagamento, transacaoId, dataVencimento) {
     this.id = id;
     this.pedidoId = pedidoId;
-    this.assinaturaId = assinaturaId;
     this.usuarioId = usuarioId;
     this.cartaoId = cartaoId;
     this.valor = valor;
     this.status = status;
+    this.transacaoId = transacaoId;
     this.dataPagamento = dataPagamento;
+    this.dataVencimento = dataVencimento;
   }
 }
 
 //CREATE
 async function insertPagamento({
   pedidoId,
-  assinaturaId,
   usuarioId,
   cartaoId,
   valor
@@ -30,26 +30,25 @@ async function insertPagamento({
 
   const { rows } = await pool.query(
     `
-    INSERT INTO pagamento (
+    INSERT INTO pagamentos (
       pedidoId,
-      assinaturaId,
       usuarioId,
       cartaoId,
       valor,
       status,
       dataPagamento
     )
-    VALUES ($1, $2, $3, $4, $5, $6, NOW())
+    VALUES ($1, $2, $3, $4, $5, NOW())
     RETURNING *
     `,
-    [pedidoId, assinaturaId, usuarioId, cartaoId, valor, status]
+    [pedidoId, usuarioId, cartaoId, valor, status]
   );
 
   return rows[0];
 }
 //READ
 async function getPagamentos() {
-  const { rows } = await pool.query('SELECT * FROM pagamento');
+  const { rows } = await pool.query('SELECT * FROM pagamentos');
   return rows;
 }
 
@@ -58,7 +57,7 @@ async function getPagamentoPorId(id) {
   if (!id) return false;
 
   const { rows } = await pool.query(
-    'SELECT * FROM pagamento WHERE id = $1',
+    'SELECT * FROM pagamentos WHERE id = $1',
     [id]
   );
 
@@ -70,7 +69,7 @@ async function getPagamentosPorUsuario(usuarioId) {
   if (!usuarioId) return false;
 
   const { rows } = await pool.query(
-    'SELECT * FROM pagamento WHERE usuarioId = $1',
+    'SELECT * FROM pagamentos WHERE usuarioId = $1',
     [usuarioId]
   );
 
@@ -82,20 +81,8 @@ async function getPagamentosPorPedidoId(pedidoId) {
   if (!pedidoId) return false;
 
   const { rows } = await pool.query(
-    'SELECT * FROM pagamento WHERE pedidoId = $1',
+    'SELECT * FROM pagamentos WHERE pedidoId = $1',
     [pedidoId]
-  );
-
-  return rows;
-}
-
-//READ POR ASSINATURA ID
-async function getPagamentosPorAssinaturaId(assinaturaId) {
-  if (!assinaturaId) return false;
-
-  const { rows } = await pool.query(
-    'SELECT * FROM pagamento WHERE assinaturaId = $1',
-    [assinaturaId]
   );
 
   return rows;
@@ -109,7 +96,7 @@ async function updateStatusPagamento(id, status) {
 
   const { rows } = await pool.query(
     `
-    UPDATE pagamento
+    UPDATE pagamentos
     SET status = $1
     WHERE id = $2
     RETURNING *
@@ -125,7 +112,7 @@ async function deletePagamento(id) {
   if (!id) return false;
 
   const { rowCount } = await pool.query(
-    'DELETE FROM pagamento WHERE id = $1',
+    'DELETE FROM pagamentos WHERE id = $1',
     [id]
   );
 
@@ -133,6 +120,6 @@ async function deletePagamento(id) {
 }
 
 module.exports = {
-  Pagamento, insertPagamento, getPagamentos, getPagamentoPorId, getPagamentosPorUsuario, 
-  getPagamentosPorPedidoId, getPagamentosPorAssinaturaId, updateStatusPagamento, deletePagamento
+  Pagamento, insertPagamento, getPagamentos, getPagamentoPorId, getPagamentosPorUsuario,
+  getPagamentosPorPedidoId, updateStatusPagamento, deletePagamento
 };

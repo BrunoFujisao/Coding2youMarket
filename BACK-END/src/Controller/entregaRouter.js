@@ -1,13 +1,28 @@
 const express = require('express');
 const router = express.Router();
 
-const {insertEntrega, getEntregas, getEntregaPorId, getEntregasPorPedido, editStatusEntrega, confirmarEntrega,
+const { insertEntrega, getEntregas, getEntregaPorId, getEntregasPorPedido, editStatusEntrega, confirmarEntrega,
   registrarProblemaEstoque, deleteEntrega
-} = require('../Model/DAO/entregaDao'); 
+} = require('../Model/DAO/entregaDao');
 
+
+// READ - POR PEDIDO
+router.get('/entregas/pedido/:pedidoId', async (req, res) => {
+  try {
+    const entregas = await getEntregasPorPedido(req.params.pedidoId);
+
+    if (!entregas) {
+      return res.status(404).json({ message: 'Nenhuma entrega encontrada' });
+    }
+
+    res.json(entregas);
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao buscar entregas do pedido' });
+  }
+});
 
 // CREATE
-router.post('/', async (req, res) => {
+router.post('/entregas', async (req, res) => {
   try {
     const {
       pedidoId,
@@ -31,7 +46,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Erro ao criar entrega' });
     }
 
-    res.status(201).json(entrega);
+    res.status(201).json({ success: true, message: 'Criado!', entrega });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Erro interno do servidor' });
@@ -39,7 +54,7 @@ router.post('/', async (req, res) => {
 });
 
 // READ - TODAS
-router.get('/', async (req, res) => {
+router.get('/entregas', async (req, res) => {
   try {
     const entregas = await getEntregas();
     res.json(entregas);
@@ -48,8 +63,9 @@ router.get('/', async (req, res) => {
   }
 });
 
+
 // READ - POR ID
-router.get('/:id', async (req, res) => {
+router.get('/entregas/:id', async (req, res) => {
   try {
     const entrega = await getEntregaPorId(req.params.id);
 
@@ -63,23 +79,8 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// READ - POR PEDIDO
-router.get('/pedido/:pedidoId', async (req, res) => {
-  try {
-    const entregas = await getEntregasPorPedido(req.params.pedidoId);
-
-    if (!entregas) {
-      return res.status(404).json({ message: 'Nenhuma entrega encontrada' });
-    }
-
-    res.json(entregas);
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao buscar entregas do pedido' });
-  }
-});
-
 // UPDATE - STATUS
-router.put('/:id/status', async (req, res) => {
+router.put('/entregas/:id/status', async (req, res) => {
   try {
     const { status } = req.body;
 
@@ -96,7 +97,7 @@ router.put('/:id/status', async (req, res) => {
 });
 
 // UPDATE - CONFIRMAR ENTREGA
-router.put('/:id/confirmar', async (req, res) => {
+router.put('/entregas/:id/confirmar', async (req, res) => {
   try {
     const entrega = await confirmarEntrega(req.params.id);
 
@@ -111,7 +112,7 @@ router.put('/:id/confirmar', async (req, res) => {
 });
 
 // UPDATE - PROBLEMA DE ESTOQUE
-router.put('/:id/problema-estoque', async (req, res) => {
+router.put('/entregas/:id/problema-estoque', async (req, res) => {
   try {
     const { observacoes } = req.body;
 
@@ -131,7 +132,7 @@ router.put('/:id/problema-estoque', async (req, res) => {
 });
 
 // DELETE
-router.delete('/:id', async (req, res) => {
+router.delete('/entregas/:id', async (req, res) => {
   try {
     const sucesso = await deleteEntrega(req.params.id);
 
