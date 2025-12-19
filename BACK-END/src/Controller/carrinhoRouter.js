@@ -1,47 +1,27 @@
 const express = require("express");
 const router = express.Router();
 
+const auth = require("../middlewares/authJwt.middleware");
+
 const {
   insertCarrinho,
-  getCarrinho,
   getCarrinhoPorUsuario,
   limparCarrinho,
   editCarrinho,
   deleteCarrinho
 } = require("../Model/DAO/carrinhoDAO");
 
-// READ - Todos os carrinhos (Admin)
+// 🔐 TODAS as rotas abaixo exigem login
+router.use(auth);
+
+// READ 
 router.get("/carrinho", async (req, res) => {
   try {
-    const carrinhos = await getCarrinho();
+    const usuarioId = req.usuario.userId;
 
-    return res.status(200).json(carrinhos);
+    const carrinho = await getCarrinhoPorUsuario(usuarioId);
 
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Erro ao buscar carrinhos",
-      error: error.message
-    });
-  }
-});
-
-// READ - Item específico por ID
-router.get("/carrinho/:id", async (req, res) => {
-  try {
-    const id = Number(req.params.id);
-    const carrinhos = await getCarrinho();
-    const carrinho = carrinhos.find(c => c.id === id);
-
-    if (!carrinho) {
-      return res.status(404).json({
-        success: false,
-        message: "Item do carrinho não encontrado"
-      });
-    }
-
-    return res.status(200).json(carrinho);
-
+    return res.status(200).json(carrinho || []);
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -51,47 +31,25 @@ router.get("/carrinho/:id", async (req, res) => {
   }
 });
 
-// READ - Carrinho por usuário
-router.get("/carrinho/usuario/:usuarioId", async (req, res) => {
-  try {
-    const usuarioId = Number(req.params.usuarioId);
-
-    if (!usuarioId) {
-      return res.status(400).json({
-        success: false,
-        message: "usuarioId inválido"
-      });
-    }
-
-    const carrinho = await getCarrinhoPorUsuario(usuarioId);
-
-    if (!carrinho || carrinho.length === 0) {
-      return res.status(200).json([]); // Retorna array vazio, não erro
-    }
-
-    return res.status(200).json(carrinho);
-
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Erro ao buscar carrinho do usuário",
-      error: error.message
-    });
-  }
-});
-// CREATE - Adicionar produto ao carrinho
+// CREATE 
 router.post("/carrinho", async (req, res) => {
   try {
-    const { usuarioId, produtoId, quantidade, observacao } = req.body;
+    const usuarioId = req.usuario.userId;
+    const { produtoId, quantidade, observacao } = req.body;
 
-    if (!usuarioId || !produtoId || quantidade == null) {
+    if (!produtoId || quantidade == null) {
       return res.status(400).json({
         success: false,
-        message: "usuarioId, produtoId e quantidade são obrigatórios"
+        message: "produtoId e quantidade são obrigatórios"
       });
     }
 
-    const result = await insertCarrinho(usuarioId, produtoId, quantidade, observacao);
+    const result = await insertCarrinho(
+      usuarioId,
+      produtoId,
+      quantidade,
+      observacao
+    );
 
     return res.status(201).json({
       success: true,
@@ -108,7 +66,7 @@ router.post("/carrinho", async (req, res) => {
   }
 });
 
-// UPDATE - Atualizar quantidade do item
+// UPDATE
 router.put("/carrinho/:id", async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -145,7 +103,7 @@ router.put("/carrinho/:id", async (req, res) => {
   }
 });
 
-// DELETE - Remover item específico
+// DELETE
 router.delete("/carrinho/:id", async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -172,18 +130,10 @@ router.delete("/carrinho/:id", async (req, res) => {
   }
 });
 
-// DELETE - Limpar todo o carrinho do usuário
-
-router.delete("/carrinho/limpar/:usuarioId", async (req, res) => {
+// DELETE
+router.delete("/carrinho/limpar", async (req, res) => {
   try {
-    const usuarioId = Number(req.params.usuarioId);
-
-    if (!usuarioId) {
-      return res.status(400).json({
-        success: false,
-        message: "usuarioId inválido"
-      });
-    }
+    const usuarioId = req.usuario.userId;
 
     const result = await limparCarrinho(usuarioId);
 
