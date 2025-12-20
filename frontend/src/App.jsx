@@ -1,18 +1,7 @@
-import BotaoVerde from "./components/botaoVerde";
+import Login from "./pages/Login";
 
 function App() {
-  function handleLogin() {
-    alert("Login clicado");
-  }
-
-  return (
-    <div style={{ maxWidth: "300px", margin: "100px auto" }}>
-      <BotaoVerde
-        mensagem="Fazer Login"
-        onClick={handleLogin}
-      />
-    </div>
-  );
+  return <Login />;
 }
 
 export default App;
