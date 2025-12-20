@@ -1,33 +1,75 @@
-import { Link } from "react-router-dom"; 
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom"; 
 import BotaoVerde from "../components/botaoVerde";
 import { FcGoogle } from "react-icons/fc";
-import { LuEye } from "react-icons/lu"; 
+import { LuEye, LuEyeOff } from "react-icons/lu"; 
+import { login } from "../api/auth";
 
 export default function Login() {
+  
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState("");
+  const [verSenha, setVerSenha] = useState(false);
+  
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    if (!email || !senha) {
+      setErro("Informe e-mail e senha.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setErro("");
+      await login(email, senha);
+      
+      // colocar a pagina de home quando ela estiver pronta 
+      //navigate("/confirmacaoEmail"); 
+
+    } catch (error) {
+      setErro(error.message || "Erro ao fazer login.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div style={styles.container}>
-      {/* LADO ESQUERDO: FORMULÁRIO */}
       <div style={styles.left}>
         <div style={styles.form}>
           <span style={styles.logo}>☕ Subscrivery</span>
-
           <h1 style={styles.title}>Faça Login</h1>
-
           <p style={styles.subtitle}>
             Ainda não possui uma conta?{" "}
-            {/* O 'to' deve bater com o path definido no seu App.jsx */}
-            <Link to="/register" style={styles.link}>
-              Criar Conta
-            </Link>
+            <Link to="/register" style={styles.link}>Criar Conta</Link>
           </p>
 
+          {erro && <p style={{ color: "red", fontSize: "12px" }}>{erro}</p>}
+
           <label style={styles.label}>E-mail</label>
-          <input type="email" placeholder="example@gmail.com" style={styles.input} />
+          <input 
+            type="email" 
+            placeholder="example@gmail.com" 
+            style={styles.input}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)} 
+          />
 
           <label style={styles.label}>Senha</label>
           <div style={styles.passwordWrapper}>
-            <input type="password" placeholder="********" style={styles.inputPassword} />
-            <LuEye style={styles.eyeIcon} />
+            <input 
+              type={verSenha ? "text" : "password"} 
+              placeholder="********" 
+              style={styles.inputPassword}
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+            />
+            <div onClick={() => setVerSenha(!verSenha)} style={styles.eyeIcon}>
+               {verSenha ? <LuEyeOff /> : <LuEye />}
+            </div>
           </div>
 
           <div style={styles.row}>
@@ -35,15 +77,14 @@ export default function Login() {
               <input type="checkbox" style={styles.checkboxInput} />
               <span style={{ fontSize: "13px", color: "#666" }}>Lembre-se de mim</span>
             </label>
-
-            
-            <Link to="/confirmacaoEmail" style={styles.linkSmall}>
-              Esqueceu a senha?
-            </Link>
+            <Link to="/confirmacaoEmail" style={styles.linkSmall}>Esqueceu a senha?</Link>
           </div>
           
           <div style={{ marginTop: "10px" }}>
-            <BotaoVerde mensagem="Fazer Login" />
+            <BotaoVerde 
+              mensagem={loading ? "Carregando..." : "Fazer Login"} 
+              onClick={handleLogin} 
+            />
           </div>
 
           <div style={styles.divider}>
@@ -53,25 +94,20 @@ export default function Login() {
           </div>
 
           <button style={styles.googleBtn}>
-            <FcGoogle size={18} />
-            Continuar com o Google
+            <FcGoogle size={18} /> Continuar com o Google
           </button>
         </div>
       </div>
 
-      {/* LADO DIREITO: HERO SECTION */}
       <div style={styles.right}>
         <div style={styles.blob}></div>
-        <div style={styles.support}>
-          🌐 <span>Suporte</span>
-        </div>
-        <h2 style={styles.heroText}>
-          O essencial,<br /> sempre em dia.
-        </h2>
+        <div style={styles.support}>🌐 <span>Suporte</span></div>
+        <h2 style={styles.heroText}>O essencial,<br /> sempre em dia.</h2>
       </div>
     </div>
   );
 }
+
 
 const styles = {
   container: {

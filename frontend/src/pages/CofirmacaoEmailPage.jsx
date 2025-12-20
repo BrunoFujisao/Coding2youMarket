@@ -1,50 +1,73 @@
-import React, { useState } from "react"; 
+import React, { useState } from "react";
 import BotaoVerde from "../components/botaoVerde";
-import { Link, useNavigate } from "react-router-dom"; 
+import { Link, useNavigate } from "react-router-dom";
+import { solicitarCodigoVerificacao } from "../api/auth";
 
 export default function ConfirmacaoEmailPage() {
   const navigate = useNavigate();
-  
-  const [email, setEmail] = useState("");
 
-  const handleEnviarCodigo = () => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState("");
+
+  const handleEnviarCodigo = async () => {
     if (!email) {
-      alert("Por favor, insira um e-mail válido.");
+      setErro("Informe um e-mail válido.");
       return;
     }
-  //entegrar com o back
 
-    
-    console.log("Enviando código para:", email);
-    
-    navigate("/confirmacaoEmailCode");
+    try {
+      setLoading(true);
+      setErro("");
+
+      //CHAMANDO A FUNÇÃO PARA MANDAR EMAIL
+      await solicitarCodigoVerificacao(email);
+
+      
+      navigate("/confirmacaoEmailCode", {
+        state: { email }
+      });
+
+    } catch (error) {
+      setErro(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
+
   return (
     <div style={styles.container}>
-      
       <div style={styles.left}>
         <div style={styles.form}>
           <span style={styles.logo}>☕ Subscrivery</span>
 
-          <h1 style={styles.title}>Recuperar conta</h1>
+          <h1 style={styles.title}>Recuperar Senha</h1>
 
           <p style={styles.subtitle}>
-            Insira o e-mail associado à sua conta. Enviaremos um código de 
+            Insira o e-mail associado à sua conta. Enviaremos um código de
             confirmação para você validar seu acesso.
           </p>
 
           <label style={styles.label}>E-mail institucional ou pessoal</label>
-          <input 
-            type="email" 
-            placeholder="exemplo@email.com" 
-            style={styles.input} 
+          <input
+            type="email"
+            placeholder="exemplo@email.com"
+            style={styles.input}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
 
+          {erro && (
+            <p style={{ color: "red", fontSize: "13px" }}>
+              {erro}
+            </p>
+          )}
+
           <div style={{ marginTop: "16px" }}>
-           
-            <BotaoVerde 
-              mensagem="Enviar Código" 
-              onClick={handleEnviarCodigo} 
+            <BotaoVerde
+              mensagem={loading ? "Enviando..." : "Enviar Código"}
+              onClick={handleEnviarCodigo}
+              disabled={loading}
             />
           </div>
 
@@ -56,6 +79,7 @@ export default function ConfirmacaoEmailPage() {
         </div>
       </div>
 
+      
       <div style={styles.right}>
         <div style={styles.blob}></div>
         <div style={styles.support}>

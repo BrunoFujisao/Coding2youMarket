@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { enviarEmailCodigo } = require("../Services/emailService");
-const { insertCliente, getClientes,getClienteByEmail, editCliente, deleteCliente } = require("../Model/DAO/clienteDAO");
-
+const { insertCliente, getClientes, editCliente, deleteCliente } = require("../Model/DAO/clienteDAO");
 const auth = require("../Middleware/authJWTMid");
 
 router.use(auth);
@@ -175,48 +173,6 @@ router.delete("/clientes/me", async (req, res) => {
   }
 });
 
-//MANDAR EMAIL
-router.post("/verificar-email", async (req, res) => {
-  try {
-    const { email } = req.body;
 
-    
-    if (!email) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "O campo e-mail é obrigatório." 
-      });
-    }
-
-    const cliente = await getClienteByEmail(email);
-
-    if (!cliente) {
-      return res.status(404).json({ success: false, message: "E-mail não cadastrado." });
-    }
-  
-    const codigo = Math.floor(100000 + Math.random() * 900000).toString();
-    
-    await enviarEmailCodigo(email, codigo);
-
-    // 5. IMPORTANTE: Salvar o código temporariamente
-    // Aqui você deve salvar o código no banco ou em um objeto para validar na próxima tela.
-    // Exemplo: await codigoDAO.salvar(email, codigo);
-
-    console.log(`✅ Código ${codigo} enviado para ${email}`);
-
-    return res.status(200).json({
-      success: true,
-      message: "Código de verificação enviado para o seu e-mail!"
-    });
-
-  } catch (error) {
-    console.error("❌ Erro na rota de verificação:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Erro ao processar solicitação de e-mail.",
-      error: error.message
-    });
-  }
-});
 
 module.exports = router;

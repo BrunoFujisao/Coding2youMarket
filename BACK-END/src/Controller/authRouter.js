@@ -1,11 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const geraToken = require('../Utils/geraToken')
 
-const { insertCliente, getClientes } = require("../Model/DAO/clienteDAO");
+const geraToken = require("../Utils/geraToken");
+const { salvarCodigo } = require("../Utils/codigoMemoria");
+const { enviarEmailCodigo } = require("../Services/emailService");
+const { getClienteByEmail, insertCliente, getClientes } = require("../Model/DAO/clienteDAO");
 
-// REGISTER
-router.post("/auth/register", async (req, res) => {
+
+//REGISTER
+router.post("/register", async (req, res) => {
   try {
     const { nome, email, cpf, telefone, senha } = req.body;
 
@@ -19,31 +22,23 @@ router.post("/auth/register", async (req, res) => {
       });
     }
 
-    const result = await insertCliente(nome, email, cpf, telefone, senha);
-
-    if (!result) {
-      return res.status(500).json({
-        success: false,
-        message: "Erro ao cadastrar"
-      });
-    }
+    await insertCliente(nome, email, cpf, telefone, senha);
 
     return res.status(201).json({
       success: true,
-      message: "Cadastro realizado com sucesso! Faça login."
+      message: "Cadastro realizado com sucesso!"
     });
 
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Erro ao cadastrar cliente",
-      error: error.message
+      message: "Erro ao cadastrar cliente"
     });
   }
 });
 
-// LOGIN
-router.post("/auth/login", async (req, res) => {
+//LOGIN
+router.post("/login", async (req, res) => {
   try {
     const { email, senha } = req.body;
 
@@ -71,12 +66,10 @@ router.post("/auth/login", async (req, res) => {
       });
     }
 
-    //GERA TOKEN COM FUNÇÃO PADRÃO
     const token = geraToken(usuario);
-
     const { senha: _, ...usuarioSemSenha } = usuario;
 
-    return res.status(200).json({
+    return res.json({
       success: true,
       message: "Login realizado com sucesso!",
       data: {
@@ -88,10 +81,80 @@ router.post("/auth/login", async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Erro ao fazer login",
-      error: error.message
+      message: "Erro ao fazer login"
     });
   }
 });
+
+
+//VERIFICA EMAIL PARA RECUPERAR SENHA
+router.post("/verificar-email", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "O campo e-mail é obrigatório."
+      });
+    }
+
+    const cliente = await getClienteByEmail(email);
+
+    if (!cliente) {
+      return res.status(404).json({
+        success: false,
+        message: "E-mail não cadastrado."
+      });
+    }
+
+    const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+
+    salvarCodigo(email, codigo);
+    await enviarEmailCodigo(email, codigo);
+
+    return res.json({
+      success: true,
+      message: "Código de verificação enviado para o e-mail."
+    });
+
+  } catch (error) {
+    console.error("Erro verificar-email:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Erro ao enviar código."
+    });
+  }
+});
+
+//VALIDA CODIGO
+const { validarCodigo } = require("../Utils/codigoMemoria");
+
+router.post("/validar-codigo", (req, res) => {
+  const { email, codigo } = req.body;
+
+  // validação básica
+  if (!email || !codigo) {
+    return res.status(400).json({
+      success: false,
+      message: "E-mail e código são obrigatórios."
+    });
+  }
+
+  const valido = validarCodigo(email, codigo);
+
+  if (!valido) {
+    return res.status(400).json({
+      success: false,
+      message: "Código inválido ou expirado."
+    });
+  }
+
+  return res.json({
+    success: true,
+    message: "Código validado com sucesso."
+  });
+});
+
 
 module.exports = router;

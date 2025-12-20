@@ -6,6 +6,7 @@ import ConfirmacaoEmailCode from "./pages/ConfirmacaoEmailCode";
 
 function App() {
   return (
+
     <Router>
       <Routes>
     
@@ -19,6 +20,7 @@ function App() {
         
       </Routes>
     </Router>
+
   );
 }
 

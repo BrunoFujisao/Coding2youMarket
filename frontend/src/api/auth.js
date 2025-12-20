@@ -28,32 +28,6 @@ export const login = async (email, senha) => {
     }
 };
 
-//MANDAR EMAIL (FUNÇÃO ESTA NO CLIENTE ROUTRER)
-export const solicitarCodigoVerificacao = async (email) => {
-    try {
-        const response = await fetch(`${API_URL}/api/clientes/verificar-email`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json' 
-            },
-            body: JSON.stringify({ email })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-
-            throw new Error(data.message || 'Erro ao processar solicitação');
-        }
-
-        console.log('✅ Solicitação enviada com sucesso:', data.message);
-        return data; 
-    } catch (error) {
-        console.error('❌ Erro ao solicitar código:', error.message);
-        throw error;
-    }
-};
-
 // CADASTRO 
 export const cadastrar = async (nome, email, cpf, telefone, senha) => {
     try {
@@ -99,3 +73,46 @@ export const getUsuarioLogado = () => {
 export const getToken = () => {
     return localStorage.getItem('token');
 };
+
+//MANDAR EMAIL 
+export const solicitarCodigoVerificacao = async (email) => {
+  try {
+    const response = await fetch(`${API_URL}/auth/verificar-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Erro ao processar solicitação');
+    }
+
+    console.log('✅ Solicitação enviada com sucesso:', data.message);
+    return data;
+  } catch (error) {
+    console.error('❌ Erro ao solicitar código:', error.message);
+    throw error;
+  }
+};
+
+//VALIDAR CODIGO NO EMAIL
+export const validarCodigoVerificacao = async (email, codigo) => {
+  const response = await fetch(`${API_URL}/auth/validar-codigo`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, codigo })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message);
+  }
+
+  return data;
+};
+
