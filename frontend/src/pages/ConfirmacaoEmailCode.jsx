@@ -1,24 +1,7 @@
-import React, { useState } from "react"; 
 import BotaoVerde from "../components/botaoVerde";
-import { Link, useNavigate } from "react-router-dom"; 
+import { Link } from "react-router-dom"; // Se estiver usando roteamento
 
-export default function ConfirmacaoEmailPage() {
-  const navigate = useNavigate();
-  
-  const [email, setEmail] = useState("");
-
-  const handleEnviarCodigo = () => {
-    if (!email) {
-      alert("Por favor, insira um e-mail válido.");
-      return;
-    }
-  //entegrar com o back
-
-    
-    console.log("Enviando código para:", email);
-    
-    navigate("/confirmacaoEmailCode");
-  };
+export default function ConfirmacaoEmailCode() {
   return (
     <div style={styles.container}>
       
@@ -26,27 +9,29 @@ export default function ConfirmacaoEmailPage() {
         <div style={styles.form}>
           <span style={styles.logo}>☕ Subscrivery</span>
 
-          <h1 style={styles.title}>Recuperar conta</h1>
+          <h1 style={styles.title}>Verifique seu e-mail</h1>
 
           <p style={styles.subtitle}>
-            Insira o e-mail associado à sua conta. Enviaremos um código de 
-            confirmação para você validar seu acesso.
+            Enviamos um código de confirmação para o seu e-mail. 
+            Por favor, insira-o abaixo para ativar sua conta.
           </p>
 
-          <label style={styles.label}>E-mail institucional ou pessoal</label>
+          <label style={styles.label}>Código de Verificação</label>
           <input 
-            type="email" 
-            placeholder="exemplo@email.com" 
+            type="text" 
+            placeholder="000-000" 
             style={styles.input} 
+            maxLength={7}
           />
 
           <div style={{ marginTop: "16px" }}>
-           
-            <BotaoVerde 
-              mensagem="Enviar Código" 
-              onClick={handleEnviarCodigo} 
-            />
+            <BotaoVerde mensagem="Confirmar Conta" />
           </div>
+
+          <p style={styles.resendText}>
+            Não recebeu o código?{" "}
+            <a href="#" style={styles.link}>Reenviar e-mail</a>
+          </p>
 
           <div style={styles.backToLogin}>
             <Link to="/" style={styles.linkSmall}>
@@ -56,13 +41,14 @@ export default function ConfirmacaoEmailPage() {
         </div>
       </div>
 
+      {/* LADO DIREITO: PADRÃO HERO */}
       <div style={styles.right}>
         <div style={styles.blob}></div>
         <div style={styles.support}>
           🌐 <span>Suporte</span>
         </div>
         <h2 style={styles.heroText}>
-          Sua jornada,<br /> sob controle.
+          O essencial,<br /> sempre em dia.
         </h2>
       </div>
     </div>
@@ -122,8 +108,22 @@ const styles = {
     backgroundColor: "#F8FAFC",
     padding: "0 12px",
     outline: "none",
-    fontSize: "15px",
+    fontSize: "16px",
     color: "#1A1A1A",
+    textAlign: "center",
+    letterSpacing: "4px"
+  },
+  resendText: {
+    fontSize: "13px",
+    color: "#666",
+    marginTop: "20px",
+    textAlign: "center"
+  },
+  link: {
+    color: "#2F6B4F",
+    textDecoration: "underline",
+    fontWeight: "600",
+    cursor: "pointer"
   },
   linkSmall: {
     color: "#64748B",

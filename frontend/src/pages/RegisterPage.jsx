@@ -1,6 +1,7 @@
 import BotaoVerde from "../components/botaoVerde";
 import { FcGoogle } from "react-icons/fc";
-import { LuEye } from "react-icons/lu"; // Ícone de olho para senha
+import { LuEye } from "react-icons/lu"; 
+import { Link } from "react-router-dom"; 
 
 export default function Cadastro() {
   return (
@@ -13,7 +14,9 @@ export default function Cadastro() {
 
           <p style={styles.subtitle}>
             Já possui uma conta?{" "}
-            <a href="#" style={styles.link}>Fazer Login</a>
+             <Link to="/" style={styles.link}>
+              Fazer Login
+            </Link>
           </p>
 
           <label style={styles.label}>E-mail</label>

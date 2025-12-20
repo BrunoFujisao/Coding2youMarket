@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"; // Import necessário para o Vite
+import { Link } from "react-router-dom"; 
 import BotaoVerde from "../components/botaoVerde";
 import { FcGoogle } from "react-icons/fc";
 import { LuEye } from "react-icons/lu"; 
