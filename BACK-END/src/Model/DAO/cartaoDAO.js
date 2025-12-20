@@ -45,6 +45,39 @@ async function insertCartaoCredito(usuarioId, tokenCartao, bandeira, ultimos4Dig
   return result.rows[0];
 }
 
+//SALVAR CARTÃO TOKENIZADO (MERCADO PAGO)
+async function salvarCartaoTokenizado({
+  usuarioId,
+  tokenCartao,
+  bandeira,
+  ultimos4Digitos,
+  nomeImpresso,
+  principal,
+  isDebito
+}) {
+  if (!usuarioId || !tokenCartao) {
+    console.error("Falha ao salvar token: usuarioId ou tokenCartao ausentes.");
+    return false;
+  }
+  const result = await pool.query(
+    `
+    INSERT INTO cartoes_credito (
+      usuarioid,
+      tokencartao,
+      bandeira,
+      ultimos4digitos,
+      nomeimpresso,
+      principal,
+      isdebito
+    )
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    RETURNING *
+    `,
+    [usuarioId, tokenCartao, bandeira, ultimos4Digitos, nomeImpresso, principal, isDebito]
+  );
+  return result.rows[0];
+}
+
 // READ TODOS
 async function getCartoesCredito() {
   const { rows } = await pool.query("SELECT * FROM cartoes_credito");
@@ -128,5 +161,5 @@ async function deleteCartaoCredito(id) {
 // EXPORTS 
 
 module.exports = {
-  CartaoCredito, insertCartaoCredito, getCartoesCredito, getCartoesPorUsuario, getCartaoById, editCartaoCredito, deleteCartaoCredito
+  CartaoCredito, insertCartaoCredito, salvarCartaoTokenizado, getCartoesCredito, getCartoesPorUsuario, getCartaoById, editCartaoCredito, deleteCartaoCredito
 };

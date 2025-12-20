@@ -46,6 +46,38 @@ async function insertPagamento({
 
   return rows[0];
 }
+
+// CREATE COM MERCADO 
+async function insertPagamentoMercadoPago({
+  usuarioId,
+  cartaoId,
+  valor,
+  status,
+  transacaoId
+}) {
+  if (!usuarioId || valor == null) {
+    console.error('Falha ao inserir pagamento: dados inválidos.');
+    return false;
+  }
+  const { rows } = await pool.query(
+    `
+    INSERT INTO pagamentos (
+      usuarioId,
+      cartaoId,
+      valor,
+      status,
+      transacaoId,
+      dataPagamento
+    )
+    VALUES ($1, $2, $3, $4, $5, NOW())
+    RETURNING *
+    `,
+    [usuarioId, cartaoId, valor, status, transacaoId]
+  );
+  return rows[0];
+}
+
+
 //READ
 async function getPagamentos() {
   const { rows } = await pool.query('SELECT * FROM pagamentos');
@@ -120,6 +152,6 @@ async function deletePagamento(id) {
 }
 
 module.exports = {
-  Pagamento, insertPagamento, getPagamentos, getPagamentoPorId, getPagamentosPorUsuario,
+  Pagamento, insertPagamento, insertPagamentoMercadoPago, getPagamentos, getPagamentoPorId, getPagamentosPorUsuario,
   getPagamentosPorPedidoId, updateStatusPagamento, deletePagamento
 };
