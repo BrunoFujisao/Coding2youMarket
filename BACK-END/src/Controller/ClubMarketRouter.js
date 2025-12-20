@@ -4,7 +4,7 @@ const router = express.Router();
 const { insertClubMarket, getClubMarkets, getClubMarketPorUsuario, getClubMarketPorId, updateStatusClubMarket,
   deleteClubMarket } = require('../Model/DAO/clubMarketDao');
 
-const { updateClubMember } = require('../Model/DAO/clienteDAO');
+const { updateClubMember } = require('../Model/DAO/clienteDao');
 const auth = require('../Middleware/authJWTMid');
 
 const { MercadoPagoConfig, PreApproval } = require('mercadopago');
@@ -125,6 +125,7 @@ router.post('/club-market', async (req, res) => {
         const preapproval = await preApprovalClient.create({
           body: {
             reason: "Club Market - Benefícios exclusivos",
+            external_reference: `club_${usuarioId}`,
             auto_recurring: {
               frequency: 1,
               frequency_type: "months",
@@ -153,6 +154,7 @@ router.post('/club-market', async (req, res) => {
     const preapproval = await preApprovalClient.create({
       body: {
         reason: "Club Market - Benefícios exclusivos",
+        external_reference: `club_${usuarioId}`,
         auto_recurring: {
           frequency: 1,
           frequency_type: "months",

@@ -4,7 +4,7 @@ const router = express.Router();
 const geraToken = require("../Utils/geraToken");
 const { salvarCodigo } = require("../Utils/codigoMemoria");
 const { enviarEmailCodigo } = require("../Services/emailService");
-const { getClienteByEmail, insertCliente, getClientes } = require("../Model/DAO/clienteDAO");
+const { getClienteByEmail, insertCliente, getClientes } = require("../Model/DAO/clienteDao")
 
 
 //REGISTER

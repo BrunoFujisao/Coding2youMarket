@@ -114,10 +114,10 @@ async function editCliente(id, nome, email, cpf, telefone, senha, clubMember, at
 // Buscar cliente por email específico
 async function getClienteByEmail(email) {
     if (!email) return null;
-    
+
     try {
         const { rows } = await pool.query(
-            "SELECT * FROM usuarios WHERE email = $1", 
+            "SELECT * FROM usuarios WHERE email = $1",
             [email]
         );
 
@@ -156,4 +156,4 @@ async function deleteCliente(id) {
     return false;
 }
 
-module.exports = { Cliente,getClienteByEmail, getClientes, insertCliente, editCliente, updateClubMember, deleteCliente };
+module.exports = { Cliente, getClienteByEmail, getClientes, insertCliente, editCliente, updateClubMember, deleteCliente };

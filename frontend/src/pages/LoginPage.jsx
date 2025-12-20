@@ -1,18 +1,18 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; 
+import { Link, useNavigate } from "react-router-dom";
 import BotaoVerde from "../components/botaoVerde";
 import { FcGoogle } from "react-icons/fc";
-import { LuEye, LuEyeOff } from "react-icons/lu"; 
+import { LuEye, LuEyeOff } from "react-icons/lu";
 import { login } from "../api/auth";
 
 export default function Login() {
-  
+
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
   const [verSenha, setVerSenha] = useState(false);
-  
+
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -25,11 +25,12 @@ export default function Login() {
       setLoading(true);
       setErro("");
       await login(email, senha);
-      
+
       // colocar a pagina de home quando ela estiver pronta 
       //navigate("/confirmacaoEmail"); 
 
     } catch (error) {
+      console.log("ERROOOOOOOO")
       setErro(error.message || "Erro ao fazer login.");
     } finally {
       setLoading(false);
@@ -50,25 +51,25 @@ export default function Login() {
           {erro && <p style={{ color: "red", fontSize: "12px" }}>{erro}</p>}
 
           <label style={styles.label}>E-mail</label>
-          <input 
-            type="email" 
-            placeholder="example@gmail.com" 
+          <input
+            type="email"
+            placeholder="example@gmail.com"
             style={styles.input}
             value={email}
-            onChange={(e) => setEmail(e.target.value)} 
+            onChange={(e) => setEmail(e.target.value)}
           />
 
           <label style={styles.label}>Senha</label>
           <div style={styles.passwordWrapper}>
-            <input 
-              type={verSenha ? "text" : "password"} 
-              placeholder="********" 
+            <input
+              type={verSenha ? "text" : "password"}
+              placeholder="********"
               style={styles.inputPassword}
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
             />
             <div onClick={() => setVerSenha(!verSenha)} style={styles.eyeIcon}>
-               {verSenha ? <LuEyeOff /> : <LuEye />}
+              {verSenha ? <LuEyeOff /> : <LuEye />}
             </div>
           </div>
 
@@ -79,11 +80,11 @@ export default function Login() {
             </label>
             <Link to="/confirmacaoEmail" style={styles.linkSmall}>Esqueceu a senha?</Link>
           </div>
-          
+
           <div style={{ marginTop: "10px" }}>
-            <BotaoVerde 
-              mensagem={loading ? "Carregando..." : "Fazer Login"} 
-              onClick={handleLogin} 
+            <BotaoVerde
+              mensagem={loading ? "Carregando..." : "Fazer Login"}
+              onClick={handleLogin}
             />
           </div>
 
