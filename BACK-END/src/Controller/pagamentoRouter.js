@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { salvarCartaoTokenizado } = require("../Model/DAO/cartaoDAO");
+const { salvarCartaoTokenizado } = require("../Model/DAO/cartaoDao");
 const { insertPagamento, insertPagamentoMercadoPago, getPagamentos, getPagamentoPorId, getPagamentosPorUsuario, updateStatusPagamento } = require("../Model/DAO/pagamentoDAO");
 const { getClubMarketPorUsuario, updateStatusClubMarket } = require('../Model/DAO/clubMarketDao');
 const { updateClubMember } = require('../Model/DAO/clienteDao');

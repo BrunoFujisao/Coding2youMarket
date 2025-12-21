@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const { insertCartaoCredito, getCartoesCredito, getCartoesPorUsuario, getCartaoById, editCartaoCredito,
-  deleteCartaoCredito } = require("../Model/DAO/cartaoDAO");
+  deleteCartaoCredito } = require("../Model/DAO/cartaoDao");
 
 const auth = require("../Middleware/authJWTMid");
 
