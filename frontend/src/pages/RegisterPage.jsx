@@ -40,6 +40,8 @@ export default function Cadastro() {
     try {
       setLoading(true);
       await cadastrar(nome, email, cpf, telefone, senha);
+
+      
       navigate("/");
     } catch (error) {
       setErro(error?.message || "Erro ao cadastrar.");

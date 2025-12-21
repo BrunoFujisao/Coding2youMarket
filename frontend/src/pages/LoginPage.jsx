@@ -4,9 +4,9 @@ import BotaoVerde from "../components/botaoVerde";
 import { FcGoogle } from "react-icons/fc";
 import { LuEye, LuEyeOff } from "react-icons/lu";
 import { login } from "../api/auth";
+import { meusEnderecos } from "../api/enderecoAPI";
 
 export default function Login() {
-
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,13 +24,21 @@ export default function Login() {
     try {
       setLoading(true);
       setErro("");
-      await login(email, senha);
 
       
-     navigate("/home");
+      const user = await login(email, senha); 
+      localStorage.setItem("token", user.token);
 
+      
+      const enderecos = await meusEnderecos(user.id);
+
+      if (enderecos && enderecos.length > 0) {
+        navigate("/home");
+      } else {
+        navigate("/novoEndereco");
+      }
     } catch (error) {
-      console.log("ERROOOOOOOO")
+      console.error("Erro ao fazer login:", error);
       setErro(error.message || "Erro ao fazer login.");
     } finally {
       setLoading(false);
@@ -85,6 +93,7 @@ export default function Login() {
             <BotaoVerde
               mensagem={loading ? "Carregando..." : "Fazer Login"}
               onClick={handleLogin}
+              disabled={loading}
             />
           </div>
 
@@ -108,7 +117,6 @@ export default function Login() {
     </div>
   );
 }
-
 
 const styles = {
   container: {
