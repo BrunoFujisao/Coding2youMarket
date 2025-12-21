@@ -3,7 +3,6 @@ const router = express.Router();
 
 const { insertClubMarket, getClubMarkets, getClubMarketPorUsuario, getClubMarketPorId, updateStatusClubMarket,
   deleteClubMarket } = require('../Model/DAO/clubMarketDao');
-
 const { updateClubMember } = require('../Model/DAO/clienteDao');
 const auth = require('../Middleware/authJWTMid');
 
