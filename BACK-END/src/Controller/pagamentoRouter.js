@@ -13,6 +13,7 @@ const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN
 });
 
+console.log("Webhook endpoint registrado SEM autenticação!");
 router.post("/pagamentos/webhook", async (req, res) => {
   try {
     console.log("Webhook recebido do Mercado Pago:", JSON.stringify(req.body, null, 2));
