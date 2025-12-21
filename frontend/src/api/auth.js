@@ -31,7 +31,7 @@ export const login = async (email, senha) => {
 // CADASTRO 
 export const cadastrar = async (nome, email, cpf, telefone, senha) => {
   try {
-    const response = await fetch(`${API_URL}/auth/register`, {
+    const response = await fetch(`${API_URL}/api/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nome, email, cpf, telefone, senha })

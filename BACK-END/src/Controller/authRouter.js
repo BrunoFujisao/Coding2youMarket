@@ -1,28 +1,48 @@
 const express = require("express");
 const router = express.Router();
-
 const geraToken = require("../Utils/geraToken");
 const { salvarCodigo } = require("../Utils/codigoMemoria");
 const { enviarEmailCodigo } = require("../Services/emailService");
-const { getClienteByEmail, insertCliente, getClientes } = require("../Model/DAO/clienteDao")
-
+const { getClienteByEmail, insertCliente, getClientes,getClienteByCpf} = require("../Model/DAO/clienteDao");
+const validarCPF = require("../Utils/validarCPF");
+const bcrypt = require("bcrypt");
 
 //REGISTER
 router.post("/register", async (req, res) => {
   try {
     const { nome, email, cpf, telefone, senha } = req.body;
 
-    const clientes = await getClientes();
-    const emailExiste = clientes.find(c => c.email === email);
+    if (!nome || !email || !cpf || !telefone || !senha) {
+      return res.status(400).json({
+        success: false,
+        message: "Campos obrigatórios não preenchidos."
+      });
+    }
 
-    if (emailExiste) {
+    if (!validarCPF(cpf)) {
+      return res.status(400).json({
+        success: false,
+        message: "CPF inválido."
+      });
+    }
+
+    if (await getClienteByEmail(email)) {
       return res.status(400).json({
         success: false,
         message: "E-mail já cadastrado!"
       });
     }
 
-    await insertCliente(nome, email, cpf, telefone, senha);
+    if (await getClienteByCpf(cpf)) {
+      return res.status(400).json({
+        success: false,
+        message: "CPF já cadastrado."
+      });
+    }
+
+    const senhaHash = await bcrypt.hash(senha, 10);
+
+    await insertCliente(nome, email, cpf, telefone, senhaHash);
 
     return res.status(201).json({
       success: true,
@@ -30,9 +50,12 @@ router.post("/register", async (req, res) => {
     });
 
   } catch (error) {
+    console.error("ERRO NO REGISTER:", error);
+
     return res.status(500).json({
       success: false,
-      message: "Erro ao cadastrar cliente"
+      message: "Erro interno ao cadastrar",
+      error: error.message
     });
   }
 });
@@ -52,7 +75,9 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    if (usuario.senha !== senha) {
+      const senhaValida = await bcrypt.compare(senha, usuario.senha);
+
+    if (!senhaValida) {
       return res.status(401).json({
         success: false,
         message: "Senha incorreta"

@@ -26,8 +26,8 @@ export default function Login() {
       setErro("");
       await login(email, senha);
 
-      // colocar a pagina de home quando ela estiver pronta 
-      //navigate("/confirmacaoEmail"); 
+      
+     navigate("/home");
 
     } catch (error) {
       console.log("ERROOOOOOOO")

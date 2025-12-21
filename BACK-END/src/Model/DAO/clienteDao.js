@@ -122,14 +122,30 @@ async function getClienteByEmail(email) {
         );
 
         if (rows.length > 0) {
-            return rows[0]; // Retorna o objeto do cliente encontrado
+            return rows[0];
         }
-        return null; // Retorna null se não encontrar nada
+        return null; 
     } catch (error) {
         console.error("Erro ao buscar cliente por email:", error);
         throw error;
     }
 }
+
+// Buscar cliente por CPF
+async function getClienteByCpf(cpf) {
+  try {
+    const [rows] = await pool.query(
+      "SELECT * FROM clientes WHERE cpf = ? LIMIT 1",
+      [cpf]
+    );
+
+    return rows.length ? rows[0] : null;
+  } catch (error) {
+    console.error("Erro ao buscar cliente por CPF:", error);
+    throw error;
+  }
+}
+
 
 // Adicionar no clienteDAO.js
 async function updateClubMember(usuarioId, clubMember) {
@@ -156,4 +172,4 @@ async function deleteCliente(id) {
     return false;
 }
 
-module.exports = { Cliente, getClienteByEmail, getClientes, insertCliente, editCliente, updateClubMember, deleteCliente };
+module.exports = { Cliente, getClienteByCpf,getClienteByEmail, getClientes, insertCliente, editCliente, updateClubMember, deleteCliente };

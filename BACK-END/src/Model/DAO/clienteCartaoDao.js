@@ -1,4 +1,5 @@
-const pool = require('../../Config/Db/mysqlConnect');
+const pool = require('../../Config/Db/db');
+
 
 class CartaoCliente {
   constructor( id, usuarioId, cartaoId, ativo, dataVinculo, dataDesvinculo) {

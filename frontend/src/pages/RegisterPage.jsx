@@ -1,9 +1,53 @@
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import BotaoVerde from "../components/botaoVerde";
 import { FcGoogle } from "react-icons/fc";
-import { LuEye } from "react-icons/lu"; 
-import { Link } from "react-router-dom"; 
+import { LuEye, LuEyeOff } from "react-icons/lu";
+import { cadastrar } from "../api/auth";
+import { validarCPF } from "../utils/validarCPF";
 
 export default function Cadastro() {
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [senha, setSenha] = useState("");
+  const [confirmarSenha, setConfirmarSenha] = useState("");
+  const [erro, setErro] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [verSenha, setVerSenha] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleCadastro = async () => {
+    setErro("");
+
+    if (!nome || !email || !cpf || !telefone || !senha || !confirmarSenha) {
+      setErro("Preencha todos os campos.");
+      return;
+    }
+
+    if (!validarCPF(cpf)) {
+      setErro("CPF inválido.");
+      return;
+    }
+
+    if (senha !== confirmarSenha) {
+      setErro("As senhas não conferem.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await cadastrar(nome, email, cpf, telefone, senha);
+      navigate("/");
+    } catch (error) {
+      setErro(error?.message || "Erro ao cadastrar.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.left}>
@@ -14,31 +58,75 @@ export default function Cadastro() {
 
           <p style={styles.subtitle}>
             Já possui uma conta?{" "}
-             <Link to="/" style={styles.link}>
-              Fazer Login
-            </Link>
+            <Link to="/" style={styles.link}>Fazer Login</Link>
           </p>
 
+          {erro && <p style={{ color: "red", fontSize: "12px" }}>{erro}</p>}
+
+          <label style={styles.label}>Nome</label>
+          <input
+            type="text"
+            style={styles.input}
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+          />
+
+          <label style={styles.label}>CPF</label>
+          <input
+            type="text"
+            style={styles.input}
+            value={cpf}
+            onChange={(e) => setCpf(e.target.value)}
+            placeholder="000.000.000-00"
+          />
+
           <label style={styles.label}>E-mail</label>
-          <input type="email" placeholder="example@gmail.com" style={styles.input} />
+          <input
+            type="email"
+            style={styles.input}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
           <label style={styles.label}>Celular</label>
-          <input type="text" placeholder="(99) 99999-9999" style={styles.input} />
+          <input
+            type="text"
+            style={styles.input}
+            value={telefone}
+            onChange={(e) => setTelefone(e.target.value)}
+            placeholder="(DDD) 00000-0000"
+          />
 
           <label style={styles.label}>Senha</label>
           <div style={styles.passwordWrapper}>
-            <input type="password" placeholder="********" style={styles.inputPassword} />
-            <LuEye style={styles.eyeIcon} />
+            <input
+              type={verSenha ? "text" : "password"}
+              style={styles.inputPassword}
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+            />
+            <div
+              onClick={() => setVerSenha(!verSenha)}
+              style={styles.eyeIcon}
+            >
+              {verSenha ? <LuEyeOff /> : <LuEye />}
+            </div>
           </div>
 
           <label style={styles.label}>Confirme a Senha</label>
-          <div style={styles.passwordWrapper}>
-            <input type="password" placeholder="********" style={styles.inputPassword} />
-            <LuEye style={styles.eyeIcon} />
-          </div>
+          <input
+            type={verSenha ? "text" : "password"}
+            style={styles.input}
+            value={confirmarSenha}
+            onChange={(e) => setConfirmarSenha(e.target.value)}
+          />
 
           <div style={{ marginTop: "10px" }}>
-            <BotaoVerde mensagem="Fazer Cadastro" />
+            <BotaoVerde
+              mensagem={loading ? "Cadastrando..." : "Fazer Cadastro"}
+              onClick={handleCadastro}
+              disabled={loading}
+            />
           </div>
 
           <div style={styles.divider}>
@@ -56,9 +144,7 @@ export default function Cadastro() {
 
       <div style={styles.right}>
         <div style={styles.blob}></div>
-        <div style={styles.support}>
-          🌐 <span>Suporte</span>
-        </div>
+        <div style={styles.support}>🌐 <span>Suporte</span></div>
         <h2 style={styles.heroText}>
           O essencial,<br /> sempre em dia.
         </h2>
@@ -93,29 +179,29 @@ const styles = {
     fontWeight: "600",
     marginBottom: "20px",
     color: "#2F6B4F",
-    fontSize: "18px"
+    fontSize: "18px",
   },
   title: {
     fontSize: "32px",
     fontWeight: "700",
     marginBottom: "4px",
-    color: "#1A1A1A"
+    color: "#1A1A1A",
   },
   subtitle: {
     fontSize: "14px",
     color: "#666",
-    marginBottom: "20px"
+    marginBottom: "20px",
   },
   link: {
     color: "#2F6B4F",
     textDecoration: "underline",
-    fontWeight: "600"
+    fontWeight: "600",
   },
   label: {
     fontSize: "13px",
     marginTop: "8px",
     color: "#444",
-    fontWeight: "500"
+    fontWeight: "500",
   },
   input: {
     height: "45px",
@@ -125,12 +211,12 @@ const styles = {
     padding: "0 12px",
     outline: "none",
     fontSize: "14px",
-    color: "#666"
+    color: "#666",
   },
   passwordWrapper: {
     position: "relative",
     display: "flex",
-    alignItems: "center"
+    alignItems: "center",
   },
   inputPassword: {
     width: "100%",
@@ -141,13 +227,13 @@ const styles = {
     padding: "0 40px 0 12px",
     outline: "none",
     fontSize: "14px",
-    color: "#666"
+    color: "#666",
   },
   eyeIcon: {
     position: "absolute",
     right: "12px",
     color: "#94A3B8",
-    cursor: "pointer"
+    cursor: "pointer",
   },
   divider: {
     display: "flex",
@@ -156,12 +242,12 @@ const styles = {
     margin: "20px 0",
     fontSize: "12px",
     color: "#94A3B8",
-    textTransform: "uppercase"
+    textTransform: "uppercase",
   },
   line: {
     flex: 1,
     height: "1px",
-    backgroundColor: "#E2E8F0"
+    backgroundColor: "#E2E8F0",
   },
   googleBtn: {
     height: "48px",
@@ -175,7 +261,7 @@ const styles = {
     justifyContent: "center",
     gap: "10px",
     fontWeight: "500",
-    fontSize: "14px"
+    fontSize: "14px",
   },
   right: {
     flex: 1,
@@ -183,7 +269,7 @@ const styles = {
     backgroundColor: "#2F6B4F",
     display: "flex",
     alignItems: "center",
-    padding: "80px"
+    padding: "80px",
   },
   support: {
     position: "absolute",
@@ -194,7 +280,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "8px",
-    opacity: 0.9
+    opacity: 0.9,
   },
   blob: {
     position: "absolute",
@@ -204,7 +290,7 @@ const styles = {
     height: "500px",
     background: "rgba(255, 255, 255, 0.08)",
     borderRadius: "50%",
-    filter: "blur(60px)"
+    filter: "blur(60px)",
   },
   heroText: {
     fontSize: "64px",
@@ -212,6 +298,8 @@ const styles = {
     lineHeight: "1.1",
     color: "#FFFFFF",
     maxWidth: "450px",
-    zIndex: 1
-  }
+    zIndex: 1,
+  },
 };
+
+
