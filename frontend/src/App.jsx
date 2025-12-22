@@ -5,6 +5,8 @@ import RegisterPage from "./pages/RegisterPage";
 import ConfirmacaoEmailCode from "./pages/ConfirmacaoEmailCode";
 import Home from "./pages/HomePage";
 import NovoEnderecoModal from "./pages/NovoEndereco";
+import RedefinirSenhaPage from "./pages/RedefinirSenhaPage"; 
+
 function App() {
   return (
     <Router>
@@ -15,6 +17,7 @@ function App() {
         <Route path="/confirmacaoEmailCode" element={<ConfirmacaoEmailCode />} />
         <Route path="/home" element={<Home />} />
         <Route path="/novoEndereco" element={<NovoEnderecoModal />} />
+        <Route path="/redefinir-senha" element={<RedefinirSenhaPage />} />
       </Routes>
     </Router>
   );

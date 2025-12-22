@@ -59,7 +59,6 @@ export default function ConfirmacaoEmailPage() {
           </div>
         </div>
       </div>
-      {/* Lado direito omitido para brevidade, mantenha seu código original */}
     </div>
   );
 }

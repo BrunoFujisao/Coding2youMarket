@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { buscarCep, criarEndereco } from '../api/enderecoAPI';
 import { getUsuarioId } from '../api/auth';
-
-// 1. Importe a imagem usando o caminho relativo correto (saindo de pages para assets)
 import fotoFundo from '../assets/01.png';
 
 export default function NovoEnderecoModal() {
@@ -91,7 +89,7 @@ export default function NovoEnderecoModal() {
     }
   };
 
-  // 2. Criamos o estilo do overlay dinâmico para incluir a URL da imagem processada pelo React
+ 
   const estiloOverlayComFundo = {
     ...styles.overlay,
     backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${fotoFundo})`,
@@ -220,7 +218,6 @@ export default function NovoEnderecoModal() {
   );
 }
 
-// Estilos padronizados
 const styles = {
   overlay: {
     width: '100%',

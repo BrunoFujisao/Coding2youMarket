@@ -28,13 +28,13 @@ export default function ConfirmacaoEmailCode() {
 
     setLoading(true);
     try {
-      
+
       const resultado = await validarCodigoVerificacao(emailUsuario, codigo);
 
       if (resultado.success) {
         setMensagem({ tipo: 'sucesso', texto: resultado.message });
         localStorage.removeItem('email_recuperacao'); 
-        setTimeout(() => navigate('/'), 1500); 
+        navigate('/redefinir-senha');
       } else {
         setMensagem({ tipo: 'erro', texto: resultado.message });
       }
