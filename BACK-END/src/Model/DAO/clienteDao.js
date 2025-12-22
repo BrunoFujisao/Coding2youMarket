@@ -26,9 +26,7 @@ class Cliente {
   }
 }
 
-/* ===========================
-   READ - LISTAR TODOS
-=========================== */
+//READ TODOS
 async function getClientes() {
   const { rows } = await pool.query(
     'SELECT * FROM usuarios ORDER BY id'
@@ -36,9 +34,7 @@ async function getClientes() {
   return rows;
 }
 
-/* ===========================
-   CREATE - INSERIR CLIENTE
-=========================== */
+//CREATE
 async function insertCliente(
   nome,
   email,
@@ -68,9 +64,7 @@ async function insertCliente(
   return result.rows.length > 0;
 }
 
-/* ===========================
-   UPDATE - EDITAR CLIENTE
-=========================== */
+//UPDATE
 async function editCliente(
   id,
   nome,
@@ -187,9 +181,7 @@ async function editCliente(
   return result.rows.length > 0;
 }
 
-/* ===========================
-   READ - POR EMAIL
-=========================== */
+// READ POR EMAIL
 async function getClienteByEmail(email) {
   if (!email) return null;
 
@@ -205,9 +197,7 @@ async function getClienteByEmail(email) {
   }
 }
 
-/* ===========================
-   READ - POR CPF
-=========================== */
+// READ POR CPF
 async function getClienteByCpf(cpf) {
   if (!cpf) return null;
 
@@ -223,9 +213,23 @@ async function getClienteByCpf(cpf) {
   }
 }
 
-/* ===========================
-   UPDATE - CLUB MEMBER
-=========================== */
+//READ POR ID 
+async function getClienteById(id) {
+  if (!id) return null;
+
+  try {
+    const { rows } = await pool.query(
+      'SELECT * FROM usuarios WHERE id = $1',
+      [id]
+    );
+    return rows.length ? rows[0] : null;
+  } catch (error) {
+    console.error('Erro ao buscar cliente por id:', error);
+    throw error;
+  }
+}
+
+// UPDATE CLUB MEMBER 
 async function updateClubMember(usuarioId, clubMember) {
   const { rows } = await pool.query(
     'UPDATE usuarios SET clubMember = $1 WHERE id = $2 RETURNING *',
@@ -234,9 +238,16 @@ async function updateClubMember(usuarioId, clubMember) {
   return rows[0];
 }
 
-/* ===========================
-   DELETE - CLIENTE
-=========================== */
+//REDEFINIR SENHA
+async function updateSenha(usuarioId, senha) {
+  const { rows } = await pool.query(
+    'UPDATE usuarios SET senha = $1 WHERE id = $2 RETURNING *',
+    [senha, usuarioId]
+  );
+  return rows[0];
+}
+
+//DELETE
 async function deleteCliente(id) {
   if (!id) {
     console.error('Falha ao remover cliente: id não informado');
@@ -259,5 +270,7 @@ module.exports = {
   getClienteByEmail,
   getClienteByCpf,
   updateClubMember,
-  deleteCliente
+  deleteCliente,
+  updateSenha,
+  getClienteById
 };

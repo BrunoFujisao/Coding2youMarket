@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { insertCliente, getClientes, editCliente, deleteCliente } = require("../Model/DAO/clienteDao");
+const { insertCliente,getClienteById ,getClientes, editCliente, deleteCliente} = require("../Model/DAO/clienteDao");
 const auth = require("../Middleware/authJWTMid");
+const bcrypt = require("bcrypt");
 
 router.use(auth);
 
@@ -96,6 +97,44 @@ router.post("/clientes", async (req, res) => {
     });
   }
 });
+
+//UPDATE BY ID 
+router.get("/clientes/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "ID do usuário é obrigatório"
+      });
+    }
+
+    const cliente = await getClienteById(id);
+
+    if (!cliente) {
+      return res.status(404).json({
+        success: false,
+        message: "Usuário não encontrado"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      usuario: cliente
+    });
+
+  } catch (error) {
+    console.error("Erro ao buscar usuário por ID:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Erro interno do servidor"
+    });
+  }
+});
+
+
+
 
 //UPDATE
 router.put("/clientes/me", async (req, res) => {
