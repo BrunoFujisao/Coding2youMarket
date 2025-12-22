@@ -109,7 +109,7 @@ export const solicitarCodigoVerificacao = async (email) => {
 
 //VALIDAR CODIGO NO EMAIL
 export const validarCodigoVerificacao = async (email, codigo) => {
-  const response = await fetch(`${API_URL}/auth/validar-codigo`, {
+  const response = await fetch(`${API_URL}/api/validar-codigo`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, codigo })

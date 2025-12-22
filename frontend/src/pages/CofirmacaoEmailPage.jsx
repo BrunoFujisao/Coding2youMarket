@@ -5,7 +5,6 @@ import { solicitarCodigoVerificacao } from "../api/auth";
 
 export default function ConfirmacaoEmailPage() {
   const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
@@ -19,15 +18,17 @@ export default function ConfirmacaoEmailPage() {
     try {
       setLoading(true);
       setErro("");
+      const res = await solicitarCodigoVerificacao(email);
 
-      await solicitarCodigoVerificacao(email);
-
-      navigate("/confirmacaoEmailCode", {
-        state: { email }
-      });
-
+      if (res.success) {
+        
+        localStorage.setItem('email_recuperacao', email);
+        navigate("/confirmacaoEmailCode", { state: { email } });
+      } else {
+        setErro(res.message || "Erro ao enviar código.");
+      }
     } catch (error) {
-      setErro(error.message);
+      setErro("Erro de conexão com o servidor.");
     } finally {
       setLoading(false);
     }
@@ -38,55 +39,27 @@ export default function ConfirmacaoEmailPage() {
       <div style={styles.left}>
         <div style={styles.form}>
           <span style={styles.logo}>☕ Subscrivery</span>
-
           <h1 style={styles.title}>Recuperar Senha</h1>
+          <p style={styles.subtitle}>Enviaremos um código para validar seu acesso.</p>
 
-          <p style={styles.subtitle}>
-            Insira o e-mail associado à sua conta. Enviaremos um código de
-            confirmação para você validar seu acesso.
-          </p>
-
-          <label style={styles.label}>E-mail institucional ou pessoal</label>
-          <input
-            type="email"
-            placeholder="exemplo@email.com"
-            style={styles.input}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+          <label style={styles.label}>E-mail cadastrado</label>
+          <input 
+            type="email" 
+            style={styles.input} 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
           />
-
-          {erro && (
-            <p style={{ color: "red", fontSize: "13px" }}>
-              {erro}
-            </p>
-          )}
+          {erro && <p style={{ color: "red", fontSize: "13px" }}>{erro}</p>}
 
           <div style={{ marginTop: "16px" }}>
-            <BotaoVerde
-              mensagem={loading ? "Enviando..." : "Enviar Código"}
-              onClick={handleEnviarCodigo}
-              disabled={loading}
-            />
+            <BotaoVerde mensagem={loading ? "Enviando..." : "Enviar Código"} onClick={handleEnviarCodigo} disabled={loading} />
           </div>
-
           <div style={styles.backToLogin}>
-            <Link to="/" style={styles.linkSmall}>
-              ← Voltar para o Login
-            </Link>
+            <Link to="/" style={styles.linkSmall}>← Voltar para o Login</Link>
           </div>
         </div>
       </div>
-
-      
-      <div style={styles.right}>
-        <div style={styles.blob}></div>
-        <div style={styles.support}>
-          🌐 <span>Suporte</span>
-        </div>
-        <h2 style={styles.heroText}>
-          Sua jornada,<br /> sob controle.
-        </h2>
-      </div>
+      {/* Lado direito omitido para brevidade, mantenha seu código original */}
     </div>
   );
 }

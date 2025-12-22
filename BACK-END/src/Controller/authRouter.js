@@ -6,6 +6,7 @@ const { enviarEmailCodigo } = require("../Services/emailService");
 const { getClienteByEmail, insertCliente, getClientes,getClienteByCpf} = require("../Model/DAO/clienteDao");
 const validarCPF = require("../Utils/validarCPF");
 const bcrypt = require("bcrypt");
+const { validarCodigo } = require("../Utils/codigoMemoria");
 
 //REGISTER
 router.post("/register", async (req, res) => {
@@ -155,8 +156,6 @@ router.post("/verificar-email", async (req, res) => {
 });
 
 //VALIDA CODIGO
-const { validarCodigo } = require("../Utils/codigoMemoria");
-
 router.post("/validar-codigo", (req, res) => {
   const { email, codigo } = req.body;
 
