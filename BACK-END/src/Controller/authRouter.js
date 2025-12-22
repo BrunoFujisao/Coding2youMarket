@@ -7,6 +7,7 @@ const { getClienteByEmail, getClienteById, insertCliente, getClientes,getCliente
 const validarCPF = require("../Utils/validarCPF");
 const bcrypt = require("bcrypt");
 const { validarCodigo } = require("../Utils/codigoMemoria");
+import validarCPF from "../Utils/validarCPF";
 
 //REGISTER
 router.post("/register", async (req, res) => {
@@ -62,6 +63,24 @@ router.post("/register", async (req, res) => {
   }
 });
 
+//VALIDAR CPF
+router.post("/validar-cpf", (req, res) => {
+  const { cpf } = req.body;
+
+  if (!cpf) {
+    return res.status(400).json({ success: false, message: "CPF é obrigatório." });
+  }
+
+  const valido = validarCPF(cpf);
+
+  if (valido) {
+    return res.json({ success: true, message: "CPF válido." });
+  } else {
+    return res.status(400).json({ success: false, message: "CPF inválido." });
+  }
+});
+
+
 //LOGIN
 router.post("/login", async (req, res) => {
   try {
@@ -114,56 +133,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-/*
-//UPDATE SENHA DO USUÁRIO
-router.put("/:id/senha", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { senha } = req.body;
 
-    if (!senha) {
-      return res.status(400).json({
-        success: false,
-        message: "A nova senha é obrigatória"
-      });
-    }
-
-    
-    const cliente = await getClienteById(id);
-
-    if (!cliente) {
-      return res.status(404).json({
-        success: false,
-        message: "Usuário não encontrado"
-      });
-    }
-
-    const senhaIgual = await bcrypt.compare(senha, cliente.senha);
-
-    if (senhaIgual) {
-      return res.status(400).json({
-        success: false,
-        message: "A nova senha não pode ser igual à senha anterior"
-      });
-    }
-
-    const senhaCriptografada = await bcrypt.hash(senha, 10);
-
-    await updateSenha(id, senhaCriptografada);
-
-    return res.status(200).json({
-      success: true,
-      message: "Senha atualizada com sucesso"
-    });
-
-  } catch (error) {
-    console.error("Erro ao atualizar senha:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Erro interno do servidor"
-    });
-  }
-});*/
 
 // ROTA: atualizar senha
 router.put("/senha", async (req, res) => {

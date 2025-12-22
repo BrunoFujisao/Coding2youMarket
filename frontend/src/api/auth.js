@@ -1,5 +1,4 @@
-const API_URL = 'https://coding2youmarket-production.up.railway.app';
- 
+const API_URL = 'http://localhost:3000';
 
 // LOGIN 
 export const login = async (email, senha) => {
@@ -25,6 +24,22 @@ export const login = async (email, senha) => {
   } catch (error) {
     console.error('Erro ao fazer login:', error);
     throw error;
+  }
+};
+
+//VALIDAR CPF
+export const verificarCPF = async (cpf) => {
+  try {
+    const res = await fetch("${API_URL}/api/validar-cpf", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cpf }),
+    });
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    return { success: false, message: "Erro ao conectar com o servidor" };
   }
 };
 
