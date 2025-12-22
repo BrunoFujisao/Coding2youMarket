@@ -10,6 +10,8 @@ import NovoEnderecoModal from "./pages/NovoEndereco";
 import HomePage from "./pages/HomePage";
 // Página de Perfil
 import PerfilPage from "./pages/PerfilPage";
+import CarrinhoPage from "./pages/CarrinhoPage";
+import PagamentoPage from './pages/PagamentoPage';
 function App() {
   return (
     <Router>
@@ -17,6 +19,8 @@ function App() {
         {/* Rota principal agora é a Home (Catálogo) */}
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
+        <Route path="/carrinho" element={<CarrinhoPage />} />
+        <Route path="/pagamento" element={<PagamentoPage />} />
         {/* Rotas de Autenticação */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -27,7 +31,7 @@ function App() {
         <Route path="/novoEndereco" element={<NovoEnderecoModal />} />
         <Route path="/perfil" element={<PerfilPage />} />
 
-        {/* Fallback 404 (Opcional, mas recomendado) */}
+        {/* Fallback 404 - pagina não encontrada */}
         <Route path="*" element={
           <div className="min-h-screen flex items-center justify-center">
             <h1 className="text-2xl font-bold text-gray-400">Página não encontrada</h1>
