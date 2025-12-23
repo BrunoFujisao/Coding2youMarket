@@ -42,7 +42,20 @@ async function insertProduto(nome, descricao, categoria, preco, unidade, imagem)
 
 async function getProdutos() {
   const { rows } = await pool.query("SELECT * FROM produtos");
-  return rows;
+
+  // Transforma os produtos para o formato esperado pelo frontend
+  return rows.map(produto => ({
+    id: produto.id_produto,  // Mapeia id_produto para id
+    nome: produto.nome,
+    descricao: produto.descricao,
+    categoria: produto.categoria,
+    preco: parseFloat(produto.preco),  // Converte string para número
+    unidade: produto.unidade,
+    imagemUrl: produto.imagem,  // Mapeia imagem para imagemUrl
+    estoque: produto.estoque || 0,
+    estoqueMinimo: produto.estoqueminimo,
+    ativo: produto.ativo
+  }));
 }
 
 //READ POR CATEGORIA 
@@ -58,7 +71,19 @@ async function getProdutosByCategoria(categoria) {
     [categoria]
   );
 
-  return rows; // retorna TODOS da categoria
+  // Aplica mesma transformação que getProdutos
+  return rows.map(produto => ({
+    id: produto.id_produto,
+    nome: produto.nome,
+    descricao: produto.descricao,
+    categoria: produto.categoria,
+    preco: parseFloat(produto.preco),
+    unidade: produto.unidade,
+    imagemUrl: produto.imagem,
+    estoque: produto.estoque || 0,
+    estoqueMinimo: produto.estoqueminimo,
+    ativo: produto.ativo
+  }));
 }
 
 //LISTA CATEGORIAS

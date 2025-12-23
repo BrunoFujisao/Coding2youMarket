@@ -23,8 +23,18 @@ router.get("/produtos", async (req, res) => {
 });
 
 router.get("/produtos/categoria/:categoria", async (req, res) => {
-  const produtos = await getProdutosByCategoria(req.params.categoria);
-  return res.json(produtos);
+  try {
+    const produtos = await getProdutosByCategoria(req.params.categoria);
+    return res.json({
+      success: true,
+      produtos: produtos
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Erro ao buscar produtos por categoria"
+    });
+  }
 });
 
 router.get("/produtos/:id", async (req, res) => {
@@ -32,15 +42,31 @@ router.get("/produtos/:id", async (req, res) => {
   const produto = produtos.find(p => p.id === Number(req.params.id));
 
   if (!produto) {
-    return res.status(404).json({ message: "Produto não encontrado" });
+    return res.status(404).json({
+      success: false,
+      message: "Produto não encontrado"
+    });
   }
 
-  res.json(produto);
+  res.json({
+    success: true,
+    produto: produto
+  });
 });
 
 router.get("/categorias", async (req, res) => {
-  const categorias = await getCategorias();
-  res.json(categorias);
+  try {
+    const categorias = await getCategorias();
+    res.json({
+      success: true,
+      categorias: categorias
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Erro ao buscar categorias"
+    });
+  }
 });
 
 // ROTAS PROTEGIDAS
