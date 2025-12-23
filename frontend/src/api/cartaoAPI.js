@@ -11,7 +11,7 @@ const getAuthHeaders = () => {
 };
 
 export const meusCartoes = async () => {
-    const response = await fetch(`${BASE_URL}cartoes/meus`, {
+    const response = await fetch(`${BASE_URL}api/cartoes/meus`, {
         headers: getAuthHeaders()  // Token JWT no header
     });
     return response.json().cartoes;

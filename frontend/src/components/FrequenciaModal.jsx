@@ -18,19 +18,19 @@ export default function FrequenciaModal({ isOpen, onClose, onConfirmar }) {
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 relative animate-fadeIn">
-                {/* Botão Fechar */}
+                
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
                 >
                     <X size={20} className="text-gray-500" />
                 </button>
-                {/* Título */}
+               
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">Assinatura</h2>
                 <p className="text-gray-600 text-sm mb-6">
                     Escolha a frequência de entrega que melhor se adapta à sua rotina
                 </p>
-                {/* Opções de Frequência */}
+                
                 <div className="space-y-3 mb-6">
                     <h3 className="font-semibold text-gray-700 mb-3">Opções de frequência</h3>
                     {opcoes.map((opcao) => (
@@ -59,7 +59,7 @@ export default function FrequenciaModal({ isOpen, onClose, onConfirmar }) {
                         </label>
                     ))}
                 </div>
-                {/* Dia Preferencial (Opcional) */}
+                
                 <div className="mb-6">
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                         Dia preferencial <span className="text-gray-400 font-normal">(opcional)</span>
@@ -77,7 +77,7 @@ export default function FrequenciaModal({ isOpen, onClose, onConfirmar }) {
                         Selecione o dia que você prefere receber suas entregas
                     </p>
                 </div>
-                {/* Botão Confirmar */}
+               
                 <button
                     onClick={handleConfirmar}
                     className="w-full py-3 bg-gray-900 text-white font-semibold rounded-full hover:bg-gray-800 transition-all shadow-lg active:scale-95"

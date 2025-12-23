@@ -1,8 +1,23 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
+import { buscarClienteDados } from "../api/clienteAPI";
 
 export default function PerfilPage() {
     const navigate = useNavigate();
+    const [cliente, setCliente] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const carregarDados = async () => {
+            const dados = await buscarClienteDados();
+            console.log("DADOS DO CLIENTE:", dados);
+            setCliente(dados);
+            setLoading(false);
+        };
+
+        carregarDados();
+    }, []);
 
     const menuItems = [
         { label: "Dados Pessoais", path: "/dados-pessoais" },
@@ -14,10 +29,8 @@ export default function PerfilPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 pb-24">
-            {/* Header Glass */}
             <Header />
 
-            {/* Banner com foto de perfil */}
             <div className="relative h-80 md:h-96 w-full mb-8 overflow-hidden">
                 <img
                     src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=1200"
@@ -26,7 +39,6 @@ export default function PerfilPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-green-900/60 to-green-800/40" />
 
-                {/* Conteúdo do Header */}
                 <div className="relative z-10 h-full flex flex-col items-center justify-center pt-16">
                     <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white/30 shadow-2xl mb-4">
                         <img
@@ -36,14 +48,14 @@ export default function PerfilPage() {
                         />
                     </div>
                     <h1 className="text-2xl font-bold text-white drop-shadow-lg">Perfil</h1>
-                    <p className="text-white/80 text-sm mt-1">Olá, Mariana!</p>
+                    <p className="text-white/80 text-sm mt-1">
+                        {loading ? "Carregando..." : `Olá, ${cliente?.nome || "Usuário"}!`}
+                    </p>
                 </div>
 
-                {/* Curva inferior */}
                 <div className="absolute bottom-0 left-0 right-0 h-8 bg-gray-50 rounded-t-3xl"></div>
             </div>
 
-            {/* Menu de opções */}
             <main className="container mx-auto px-4 md:px-8 max-w-3xl -mt-4">
                 <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
                     {menuItems.map((item, index) => (
@@ -59,7 +71,6 @@ export default function PerfilPage() {
                     ))}
                 </div>
 
-                {/* Deletar Conta */}
                 <div
                     className="mt-4 bg-white rounded-2xl shadow-lg px-5 py-4 flex justify-between items-center cursor-pointer hover:bg-red-50 transition-all"
                     onClick={() => console.log('Deletar conta')}
