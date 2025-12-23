@@ -7,7 +7,6 @@ const { getClienteByEmail, getClienteById, insertCliente, getClientes,getCliente
 const validarCPF = require("../Utils/validarCPF");
 const bcrypt = require("bcrypt");
 const { validarCodigo } = require("../Utils/codigoMemoria");
-import validarCPF from "../Utils/validarCPF";
 
 //REGISTER
 router.post("/register", async (req, res) => {
@@ -62,24 +61,6 @@ router.post("/register", async (req, res) => {
     });
   }
 });
-
-//VALIDAR CPF
-router.post("/validar-cpf", (req, res) => {
-  const { cpf } = req.body;
-
-  if (!cpf) {
-    return res.status(400).json({ success: false, message: "CPF é obrigatório." });
-  }
-
-  const valido = validarCPF(cpf);
-
-  if (valido) {
-    return res.json({ success: true, message: "CPF válido." });
-  } else {
-    return res.status(400).json({ success: false, message: "CPF inválido." });
-  }
-});
-
 
 //LOGIN
 router.post("/login", async (req, res) => {

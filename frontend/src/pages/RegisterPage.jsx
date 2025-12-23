@@ -16,33 +16,40 @@ export default function Cadastro() {
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
   const [verSenha, setVerSenha] = useState(false);
-
+  const [mensagem, setMensagem] = useState({ tipo: "", texto: "" });
   const navigate = useNavigate();
 
   const handleCadastro = async () => {
     setErro("");
+    setMensagem({ tipo: "", texto: "" }); // Limpa mensagens ao tentar novamente
 
     if (!nome || !email || !cpf || !telefone || !senha || !confirmarSenha) {
-      setErro("Preencha todos os campos.");
+      setMensagem({ tipo: "erro", texto: "Preencha todos os campos." });
       return;
     }
 
     if (!validarCPF(cpf)) {
-      setErro("CPF inválido.");
+      setMensagem({ tipo: "erro", texto: "CPF inválido." });
       return;
     }
 
     if (senha !== confirmarSenha) {
-      setErro("As senhas não conferem.");
+      setMensagem({ tipo: "erro", texto: "As senhas não conferem." });
       return;
     }
 
     try {
       setLoading(true);
-      await cadastrar(nome, email, cpf, telefone, senha);
+      const res = await cadastrar(nome, email, cpf, telefone, senha);
 
-      
-      navigate("/");
+      if (res.success) {
+        setMensagem({ tipo: "sucesso", texto: "Usuário cadastrado com sucesso!" });
+        // Pequeno delay para o usuário ler a mensagem de sucesso
+        setTimeout(() => navigate("/login"), 1500);
+      } else {
+        setMensagem({ tipo: "erro", texto: res.message || "Erro ao realizar cadastro." });
+      }
+
     } catch (error) {
       setErro(error?.message || "Erro ao cadastrar.");
     } finally {
@@ -63,7 +70,20 @@ export default function Cadastro() {
             <Link to="/" style={styles.link}>Fazer Login</Link>
           </p>
 
-          {erro && <p style={{ color: "red", fontSize: "12px" }}>{erro}</p>}
+          {/* EXIBIÇÃO DE MENSAGENS (ERRO OU SUCESSO) */}
+          {(mensagem.texto || erro) && (
+            <p style={{ 
+              color: mensagem.tipo === "sucesso" ? "#2F6B4F" : "red", 
+              fontSize: "13px", 
+              fontWeight: "600",
+              textAlign: "center",
+              backgroundColor: mensagem.tipo === "sucesso" ? "#E6FFFA" : "#FFF5F5",
+              padding: "10px",
+              borderRadius: "8px"
+            }}>
+              {mensagem.texto || erro}
+            </p>
+          )}
 
           <label style={styles.label}>Nome</label>
           <input
@@ -116,12 +136,21 @@ export default function Cadastro() {
           </div>
 
           <label style={styles.label}>Confirme a Senha</label>
-          <input
-            type={verSenha ? "text" : "password"}
-            style={styles.input}
-            value={confirmarSenha}
-            onChange={(e) => setConfirmarSenha(e.target.value)}
-          />
+          <div style={styles.passwordWrapper}>
+            <input
+              type={verSenha ? "text" : "password"}
+              style={styles.inputPassword}
+              value={confirmarSenha}
+              onChange={(e) => setConfirmarSenha(e.target.value)}
+            />
+        
+            <div
+              onClick={() => setVerSenha(!verSenha)}
+              style={styles.eyeIcon}
+            >
+              {verSenha ? <LuEyeOff /> : <LuEye />}
+            </div>
+          </div>
 
           <div style={{ marginTop: "10px" }}>
             <BotaoVerde
@@ -200,13 +229,13 @@ const styles = {
     fontWeight: "600",
   },
   label: {
-    fontSize: "13px",
+    fontSize: "11px",
     marginTop: "8px",
     color: "#444",
     fontWeight: "500",
   },
   input: {
-    height: "45px",
+    height: "40px",
     borderRadius: "8px",
     border: "1px solid #E2E8F0",
     backgroundColor: "#F8FAFC",
@@ -222,7 +251,7 @@ const styles = {
   },
   inputPassword: {
     width: "100%",
-    height: "45px",
+    height: "40px",
     borderRadius: "8px",
     border: "1px solid #E2E8F0",
     backgroundColor: "#F8FAFC",
@@ -303,5 +332,3 @@ const styles = {
     zIndex: 1,
   },
 };
-
-

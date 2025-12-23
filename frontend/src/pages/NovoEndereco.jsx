@@ -13,6 +13,7 @@ export default function NovoEnderecoModal() {
   const [cidade, setCidade] = useState("");
   const [estado, setEstado] = useState("");
   const [apelido, setApelido] = useState("");
+  const [mensagem, setMensagem] = useState({ tipo: "", texto: "" });
   
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,8 +23,9 @@ export default function NovoEnderecoModal() {
   const handleCepChange = (e) => setCep(e.target.value.replace(/\D/g, ""));
 
   const fetchCep = async () => {
+    setMensagem({ tipo: "", texto: "" }); // Limpa mensagens anteriores
     if (cep.length !== 8) {
-      setErro("Digite um CEP válido com 8 dígitos.");
+      setMensagem({ tipo: "erro", texto: "CEP inválido" });
       return;
     }
 
@@ -35,13 +37,13 @@ export default function NovoEnderecoModal() {
       if (dados && !dados.erro) {
         setRua(dados.logradouro || "");
         setBairro(dados.bairro || "");
-        setCidade(dados.localidade || "");
+        setCidade(dados.cidade || ""); 
         setEstado(dados.uf || "");
       } else {
-        setErro("CEP não encontrado.");
+        setMensagem({ tipo: "erro", texto: "CEP não encontrado" });
       }
     } catch {
-      setErro("Erro ao buscar o CEP. Tente novamente.");
+      setMensagem({ tipo: "erro", texto: "Erro ao buscar o CEP" });
     } finally {
       setBuscandoCep(false);
     }
@@ -49,8 +51,10 @@ export default function NovoEnderecoModal() {
 
   const handleSubmit = async () => {
     setErro("");
+    setMensagem({ tipo: "", texto: "" });
+
     if (!cep || !rua || !numero || !bairro || !cidade || !estado) {
-      setErro("Por favor, preencha todos os campos obrigatórios.");
+      setMensagem({ tipo: "erro", texto: "Por favor, preencha todos os campos obrigatórios" });
       return;
     }
 
@@ -58,38 +62,29 @@ export default function NovoEnderecoModal() {
       setLoading(true);
       const usuarioId = getUsuarioId();
       if (!usuarioId) {
-        setErro("Não foi possível identificar o usuário.");
+        setMensagem({ tipo: "erro", texto: "Não foi possível identificar o usuário." });
         return;
       }
 
       const novoEndereco = {
-        usuarioId,
-        cep,
-        rua,
-        numero,
-        bairro,
-        complemento,
-        cidade,
-        estado,
-        apelido,
-        principal: true
+        usuarioId, cep, rua, numero, bairro, complemento, cidade, estado, apelido, principal: true
       };
 
       const resultado = await criarEndereco(novoEndereco);
       if (!resultado.success) {
-        setErro(resultado.message || "Erro ao salvar endereço.");
+        setMensagem({ tipo: "erro", texto: "Erro ao salvar o endereço" });
         return;
       }
 
-      navigate("/home");
+      setMensagem({ tipo: "sucesso", texto: "Endereço cadastrado com sucesso" });
+      setTimeout(() => navigate("/home"), 1500); // Delay curto para o usuário ler a mensagem de sucesso
     } catch (error) {
-      setErro(error?.message || "Erro ao salvar endereço.");
+      setMensagem({ tipo: "erro", texto: error?.message || "Erro ao salvar endereço." });
     } finally {
       setLoading(false);
     }
   };
 
- 
   const estiloOverlayComFundo = {
     ...styles.overlay,
     backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${fotoFundo})`,
@@ -109,7 +104,18 @@ export default function NovoEnderecoModal() {
         </div>
 
         <div style={styles.formContent}>
-          {erro && <p style={styles.errorText}>{erro}</p>}
+          
+          {/* RENDERIZAÇÃO DA MENSAGEM */}
+          {mensagem.texto && (
+            <p style={{
+              ...styles.errorText, 
+              color: mensagem.tipo === "erro" ? "red" : "green",
+              textAlign: 'center',
+              marginBottom: '15px'
+            }}>
+              {mensagem.texto}
+            </p>
+          )}
 
           <div style={styles.inputGroup}>
             <label style={styles.label}>CEP</label>
@@ -231,6 +237,7 @@ const styles = {
     fontFamily: 'sans-serif',
     padding: '20px',
   },
+  
   modal: {
     backgroundColor: '#F8F9FA',
     width: '100%',
