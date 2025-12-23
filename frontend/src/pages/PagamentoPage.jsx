@@ -34,12 +34,12 @@ export default function PagamentoPage() {
     const handleContinuar = () => {
         console.log('Processando pagamento...');
         alert('Pagamento processado! (Demo)');
-        // navigate('/confirmacao');
+        
     };
     return (
         <div className="min-h-screen bg-gray-50 pb-24">
             <Header />
-            {/* Hero */}
+            
             <div className="relative h-48 md:h-56 w-full mb-8 overflow-hidden">
                 <img
                     src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1200"

@@ -12,6 +12,8 @@ import HomePage from "./pages/HomePage";
 import PerfilPage from "./pages/PerfilPage";
 import CarrinhoPage from "./pages/CarrinhoPage";
 import PagamentoPage from './pages/PagamentoPage';
+import MeusCartoesPage from './pages/meusCartoesPage';
+
 function App() {
   return (
     <Router>
@@ -30,6 +32,7 @@ function App() {
         {/* Rotas de Funcionalidades */}
         <Route path="/novoEndereco" element={<NovoEnderecoModal />} />
         <Route path="/perfil" element={<PerfilPage />} />
+        <Route path="/meus-cartoes" element={<MeusCartoesPage />} />
 
         {/* Fallback 404 - pagina não encontrada */}
         <Route path="*" element={
