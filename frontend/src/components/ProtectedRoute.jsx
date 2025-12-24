@@ -1,5 +1,8 @@
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 <<<<<<< HEAD
 import React from "react";
 import { Navigate } from "react-router-dom";
@@ -16,6 +19,9 @@ export default function ProtectedRoute({ children }) {
     }
     return children;
 }
+=======
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 import { Navigate } from 'react-router-dom';
@@ -73,7 +79,12 @@ export default function ProtectedRoute({ children }) {
     }
     return children;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 }
+=======
+}
+>>>>>>> e14b41b7ef44f2f7a36322787f203cc1a95e7855
+>>>>>>> Stashed changes
 =======
 }
 >>>>>>> e14b41b7ef44f2f7a36322787f203cc1a95e7855

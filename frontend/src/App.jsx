@@ -18,6 +18,7 @@ import DadosPessoaisPage from './pages/DadosPessoaisPage';
 import SuportePage from './pages/SuportePage';
 import ConfiguracoesPage from './pages/ConfiguracoesPage';
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import ProtectedRoute from './components/ProtectedRoute';
 import { CarrinhoProvider } from './context/CarrinhoContext';
 function App() {
@@ -45,6 +46,8 @@ function App() {
           <Route path="/meus-cartoes" element={<ProtectedRoute><MeusCartoesPage /></ProtectedRoute>} />
 
 =======
+=======
+>>>>>>> Stashed changes
 <<<<<<< HEAD
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -106,6 +109,9 @@ function App() {
           <Route path="/configuracoes" element={<ProtectedRoute><ConfiguracoesPage /></ProtectedRoute>} />
           <Route path="/meus-cartoes" element={<ProtectedRoute><MeusCartoesPage /></ProtectedRoute>} />
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
           <Route path="/seguranca" element={<SegurancaPage />} />
           <Route path="*" element={
@@ -116,6 +122,10 @@ function App() {
         </Routes>
       </CarrinhoProvider>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+>>>>>>> e14b41b7ef44f2f7a36322787f203cc1a95e7855
+>>>>>>> Stashed changes
 =======
 >>>>>>> e14b41b7ef44f2f7a36322787f203cc1a95e7855
 >>>>>>> Stashed changes
