@@ -1,31 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, CreditCard, Plus, ChevronLeft, ChevronRight, Trash2, Edit2, Check, X } from 'lucide-react';
+import { meusCartoes } from '../api/cartaoAPI';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 
-// Mock de cartões salvos
-const CARTOES_MOCK = [
-    {
-        id: 1,
-        numero: '1234 1234 1234 1234',
-        nome: 'SARAH ELOISA',
-        validade: '07/29',
-        bandeira: 'Visa',
-        cvv: '215'
-    },
-    {
-        id: 2,
-        numero: '5678 5678 5678 5678',
-        nome: 'SARAH ELOISA',
-        validade: '12/26',
-        bandeira: 'Mastercard',
-        cvv: '432'
-    }
-];
+// Helper to mask card number, showing only last 4 digits
+const maskNumber = (numero) => {
+    const parts = numero.split(' ');
+    return parts
+        .map((p, i) => (i === parts.length - 1 ? p : '****'))
+        .join(' ');
+};
 
 export default function MeusCartoesPage() {
     const navigate = useNavigate();
-    const [cartoes, setCartoes] = useState(CARTOES_MOCK);
+    const [cartoes, setCartoes] = useState([]);
     const [cartaoAtivo, setCartaoAtivo] = useState(0);
     const [adicionandoCartao, setAdicionandoCartao] = useState(false);
     const [novoCartao, setNovoCartao] = useState({
@@ -35,6 +24,7 @@ export default function MeusCartoesPage() {
         cvv: '',
         bandeira: 'Mastercard'
     });
+    const [loading, setLoading] = useState(true);
 
     const handleProximoCartao = () => {
         setCartaoAtivo((prev) => (prev + 1) % cartoes.length);
@@ -43,6 +33,26 @@ export default function MeusCartoesPage() {
     const handleCartaoAnterior = () => {
         setCartaoAtivo((prev) => (prev - 1 + cartoes.length) % cartoes.length);
     };
+
+    useEffect(() => {
+        const fetchCards = async () => {
+            try {
+                const response = await meusCartoes();
+                if (response && response.success) {
+                    setCartoes(response.cartoes || []);
+                } else {
+                    setCartoes([]);
+                }
+            } catch (error) {
+                console.error('Erro ao buscar cartões:', error);
+                setCartoes([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCards();
+    }, []);
+
 
     const handleAdicionarCartao = () => {
         if (novoCartao.numero && novoCartao.nome && novoCartao.validade && novoCartao.cvv) {
@@ -56,7 +66,7 @@ export default function MeusCartoesPage() {
                 bandeira: 'Mastercard'
             });
             setAdicionandoCartao(false);
-            setCartaoAtivo(cartoes.length); 
+            setCartaoAtivo(cartoes.length);
         }
     };
 
@@ -85,8 +95,8 @@ export default function MeusCartoesPage() {
     return (
         <div className="min-h-screen bg-gray-50 pb-24">
             <Header />
+            {loading && <p className="text-center py-4">Carregando cartões...</p>}
 
-            {/* Banner com imagem de fundo */}
             <div className="relative h-48 md:h-56 w-full mb-8 overflow-hidden">
                 <img
                     src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1200"
@@ -104,19 +114,19 @@ export default function MeusCartoesPage() {
             </div>
 
             <main className="container mx-auto px-4 md:px-8 max-w-3xl">
-                {/* Carousel de Cartões */}
+
                 {cartoes.length > 0 && (
                     <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
                         <div className="relative">
-                            {/* Cartão Visual 3D */}
-                            <div className="w-full aspect-[1.586] bg-gradient-to-br from-gray-900 to-gray-700 rounded-2xl p-6 text-white shadow-2xl relative overflow-hidden">
-                                {/* Chip */}
+
+                            <div className="w-full h-40 bg-gradient-to-br from-gray-900 to-gray-700 rounded-2xl p-4 text-white shadow-2xl relative overflow-hidden">
+
                                 <div className="w-12 h-10 bg-gradient-to-br from-yellow-200 to-yellow-400 rounded-lg mb-6"></div>
-                                {/* Número */}
+
                                 <p className="text-xl md:text-2xl font-mono tracking-wider mb-6">
-                                    {cartoes[cartaoAtivo].numero}
+                                    {maskNumber(cartoes[cartaoAtivo].numero)}
                                 </p>
-                                {/* Nome e Validade */}
+
                                 <div className="flex justify-between items-end">
                                     <div>
                                         <p className="text-xs text-gray-400 mb-1">Nome</p>
@@ -127,17 +137,16 @@ export default function MeusCartoesPage() {
                                         <p className="font-semibold">{cartoes[cartaoAtivo].validade}</p>
                                     </div>
                                 </div>
-                                {/* Logo Bandeira */}
+
                                 <div className="absolute top-6 right-6">
                                     <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                                         <CreditCard size={24} />
                                     </div>
                                 </div>
-                                {/* Contactless */}
+
                                 <div className="absolute top-6 right-20 text-2xl">📡</div>
                             </div>
 
-                            {/* Navegação Carousel */}
                             {cartoes.length > 1 && (
                                 <div className="flex justify-center gap-2 mt-4">
                                     <button onClick={handleCartaoAnterior} className="p-2 hover:bg-gray-100 rounded-full">
@@ -160,7 +169,6 @@ export default function MeusCartoesPage() {
                             )}
                         </div>
 
-                        {/* Informações do Cartão Selecionado */}
                         <div className="mt-6 pt-6 border-t border-gray-100">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="font-bold text-gray-800">Detalhes do Cartão</h3>
@@ -194,7 +202,6 @@ export default function MeusCartoesPage() {
                     </div>
                 )}
 
-                {/* Mensagem quando não há cartões */}
                 {cartoes.length === 0 && (
                     <div className="bg-white rounded-3xl shadow-lg p-8 mb-6 text-center">
                         <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -205,12 +212,11 @@ export default function MeusCartoesPage() {
                     </div>
                 )}
 
-                {/* Botão Adicionar Cartão */}
                 <button
                     onClick={() => setAdicionandoCartao(!adicionandoCartao)}
                     className={`w-full py-4 border-2 border-dashed rounded-xl font-medium transition-all flex items-center justify-center gap-2 mb-6 ${adicionandoCartao
-                            ? 'border-red-300 text-red-600 hover:border-red-400'
-                            : 'border-gray-300 text-gray-600 hover:border-green-500 hover:text-green-600'
+                        ? 'border-red-300 text-red-600 hover:border-red-400'
+                        : 'border-gray-300 text-gray-600 hover:border-green-500 hover:text-green-600'
                         }`}
                 >
                     {adicionandoCartao ? (
@@ -226,7 +232,6 @@ export default function MeusCartoesPage() {
                     )}
                 </button>
 
-                {/* Formulário Novo Cartão */}
                 {adicionandoCartao && (
                     <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4 mb-6">
                         <h3 className="font-bold text-gray-800 mb-4">Novo Cartão</h3>
@@ -309,7 +314,6 @@ export default function MeusCartoesPage() {
                     </div>
                 )}
 
-                {/* Lista de Todos os Cartões */}
                 {cartoes.length > 0 && (
                     <div className="bg-white rounded-2xl shadow-lg p-6">
                         <h3 className="font-bold text-gray-800 mb-4">Todos os Cartões ({cartoes.length})</h3>
@@ -319,8 +323,8 @@ export default function MeusCartoesPage() {
                                     key={cartao.id}
                                     onClick={() => setCartaoAtivo(idx)}
                                     className={`flex items-center justify-between p-4 rounded-xl cursor-pointer transition-all ${idx === cartaoAtivo
-                                            ? 'bg-gray-900 text-white'
-                                            : 'bg-gray-50 hover:bg-gray-100'
+                                        ? 'bg-gray-900 text-white'
+                                        : 'bg-gray-50 hover:bg-gray-100'
                                         }`}
                                 >
                                     <div className="flex items-center gap-4">
@@ -341,8 +345,8 @@ export default function MeusCartoesPage() {
                                             handleRemoverCartao(cartao.id);
                                         }}
                                         className={`p-2 rounded-full transition-all ${idx === cartaoAtivo
-                                                ? 'hover:bg-white/20 text-white'
-                                                : 'hover:bg-red-50 text-red-500'
+                                            ? 'hover:bg-white/20 text-white'
+                                            : 'hover:bg-red-50 text-red-500'
                                             }`}
                                     >
                                         <Trash2 size={16} />

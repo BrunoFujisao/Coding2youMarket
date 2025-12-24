@@ -1,83 +1,103 @@
 import { getToken } from './auth';
-const BASE_URL = "http://localhost:3000/";
 
+// Production base URL
+const BASE_URL = "https://coding2youmarket-production.up.railway.app";
 
+// Helper to build auth headers
 const getAuthHeaders = () => {
     const token = getToken();
     return {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
     };
 };
 
+/**
+ * Fetch the logged‑in user's cards.
+ * Returns an object { success: boolean, cartoes: Array }.
+ */
 export const meusCartoes = async () => {
-    const response = await fetch(`${BASE_URL}api/cartoes/meus`, {
-        headers: getAuthHeaders()  // Token JWT no header
-    });
-    return response.json().cartoes;
-};
-
-
-// Adicionar cartão (com token do Mercado Pago)
-export const adicionarCartao = async (dadosCartao) => {
     try {
-
-        const response = await fetch(`${BASE_URL}cartoes`, {
-            method: "POST",
+        const response = await fetch(`${BASE_URL}/api/cartoes/meus`, {
             headers: getAuthHeaders(),
-            body: JSON.stringify(dadosCartao)
         });
-
-        if (!response.ok) throw new Error(await response.text());
-
-        const json = await response.json();
-
-        return json;
-    } catch (error) {
-        console.error("Erro ao adicionar cartão:", error);
-        return { success: false, message: error.message };
-    }
-};
-
-//Editar cartão
-export const editarCartao = async (id, nomeImpresso, principal) => {
-    try {
-        const response = await fetch(`${BASE_URL}cartoes/${id}`, {
-            method: "PUT",
-            headers: getAuthHeaders(),
-            body: JSON.stringify({ nomeImpresso, principal })
-        });
-
         const json = await response.json();
         if (!response.ok) {
-            return { success: false, message: json?.message || "Erro ao editar" };
+            return { success: false, cartoes: [] };
         }
-
-        return json;
+        // API may return { cartoes: [...] } or directly an array
+        return { success: true, cartoes: json.cartoes ?? json };
     } catch (error) {
-        console.error("Erro ao editar cartão:", error);
-        return { success: false, message: "Erro interno ao editar." };
+        console.error('Erro ao buscar cartões:', error);
+        return { success: false, cartoes: [] };
     }
 };
 
-// DELETE - Remover cartão
-export const deletarCartao = async (id) => {
+/** Add a new card */
+export const adicionarCartao = async (dadosCartao) => {
     try {
-        const response = await fetch(`${BASE_URL}cartoes/${id}`, {
-            method: "DELETE",
-            headers: getAuthHeaders()
+        const response = await fetch(`${BASE_URL}/api/cartoes`, {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify(dadosCartao),
         });
-
         const json = await response.json();
-
         if (!response.ok) {
             return { success: false, message: json.message };
         }
-
-        return json;
+        return { success: true, ...json };
     } catch (error) {
-        console.error("Erro ao deletar cartão:", error);
-        return { success: false, message: "Erro interno ao deletar." };
+        console.error('Erro ao adicionar cartão:', error);
+        return { success: false, message: 'Erro interno ao adicionar cartão.' };
     }
 };
 
+/** Edit an existing card */
+export const editarCartao = async (id, nomeImpresso, principal) => {
+    try {
+        const response = await fetch(`${BASE_URL}/api/cartoes/${id}`, {
+            method: "PUT",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ nomeImpresso, principal }),
+        });
+        const json = await response.json();
+        if (!response.ok) {
+            return { success: false, message: json.message };
+        }
+        return { success: true, ...json };
+    } catch (error) {
+        console.error('Erro ao editar cartão:', error);
+        return { success: false, message: 'Erro interno ao editar cartão.' };
+    }
+};
+
+/** Delete a card */
+export const deletarCartao = async (id) => {
+    try {
+        const response = await fetch(`${BASE_URL}/api/cartoes/${id}`, {
+            method: "DELETE",
+            headers: getAuthHeaders(),
+        });
+        const json = await response.json();
+        if (!response.ok) {
+            return { success: false, message: json.message };
+        }
+        return { success: true, ...json };
+    } catch (error) {
+        console.error('Erro ao deletar cartão:', error);
+        return { success: false, message: 'Erro interno ao deletar cartão.' };
+    }
+};
+
+/** Legacy endpoint: fetch all cards */
+export const buscarCartoes = async () => {
+    try {
+        const response = await fetch(`${BASE_URL}/api/cartoes`, {
+            headers: getAuthHeaders(),
+        });
+        return await response.json();
+    } catch (error) {
+        console.error('Erro ao buscar cartões (legacy):', error);
+        return { success: false, cartoes: [] };
+    }
+};

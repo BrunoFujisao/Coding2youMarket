@@ -135,6 +135,7 @@ export default function Header() {
                                 >
                                     Perfil
                                 </Link>
+                                <button onClick={() => { setMenuAberto(false); handleLogout(); }} className="block w-full text-left py-3 px-4 rounded-xl text-red-600 hover:bg-gray-100 font-medium">Logout</button>
                             </nav>
                         </div>
                     </div>
