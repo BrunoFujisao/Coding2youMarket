@@ -4,7 +4,7 @@ import Login from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ConfirmacaoEmailPage from "./pages/CofirmacaoEmailPage";
 import ConfirmacaoEmailCode from "./pages/ConfirmacaoEmailCode";
-import SegurancaPage from "./pages/SegurancaPage";
+import SegurancaPrivacidadePage from "./pages/SegurancaPrivacidadePage";
 import RedefinirSenhaPage from "./pages/RedefinirSenhaPage";
 import NovoEnderecoModal from "./pages/NovoEndereco";
 // Nova Página Principal
@@ -17,6 +17,7 @@ import MeusCartoesPage from './pages/meusCartoesPage';
 import DadosPessoaisPage from './pages/DadosPessoaisPage';
 import SuportePage from './pages/SuportePage';
 import ConfiguracoesPage from './pages/ConfiguracoesPage';
+<<<<<<< Updated upstream
 import ProtectedRoute from './components/ProtectedRoute';
 import { CarrinhoProvider } from './context/CarrinhoContext';
 function App() {
@@ -43,6 +44,12 @@ function App() {
           <Route path="/configuracoes" element={<ProtectedRoute><ConfiguracoesPage /></ProtectedRoute>} />
           <Route path="/meus-cartoes" element={<ProtectedRoute><MeusCartoesPage /></ProtectedRoute>} />
 
+=======
+<<<<<<< HEAD
+import ProtectedRoute from "./components/ProtectedRoute";
+
+
+function App() {
   return (
     <Router>
       <Routes>
