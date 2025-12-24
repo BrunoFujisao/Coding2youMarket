@@ -7,6 +7,7 @@ export default function PerfilPage() {
     const navigate = useNavigate();
     const [cliente, setCliente] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         const carregarDados = async () => {
@@ -73,11 +74,36 @@ export default function PerfilPage() {
 
                 <div
                     className="mt-4 bg-white rounded-2xl shadow-lg px-5 py-4 flex justify-between items-center cursor-pointer hover:bg-red-50 transition-all"
-                    onClick={() => console.log('Deletar conta')}
+                    onClick={() => setShowModal(true)}
                 >
                     <span className="text-red-600 font-medium">Deletar Conta</span>
                     <span className="text-red-400 text-xl">›</span>
                 </div>
+                {showModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                        <div className="bg-white rounded-lg p-6 max-w-sm w-full">
+                            <h2 className="text-xl font-semibold mb-4">Confirmar Exclusão</h2>
+                            <p className="mb-6">Tem certeza que deseja deletar sua conta?</p>
+                            <div className="flex justify-end space-x-4">
+                                <button
+                                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+                                    onClick={() => setShowModal(false)}
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                                    onClick={() => {
+                                        console.log('Deletar conta confirmada');
+                                        setShowModal(false);
+                                    }}
+                                >
+                                    Confirmar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </main>
         </div>
     );

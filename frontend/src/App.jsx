@@ -4,6 +4,7 @@ import Login from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ConfirmacaoEmailPage from "./pages/CofirmacaoEmailPage";
 import ConfirmacaoEmailCode from "./pages/ConfirmacaoEmailCode";
+import SegurancaPage from "./pages/SegurancaPage";
 import RedefinirSenhaPage from "./pages/RedefinirSenhaPage";
 import NovoEnderecoModal from "./pages/NovoEndereco";
 // Nova Página Principal
@@ -40,7 +41,7 @@ function App() {
         <Route path="/configuracoes" element={<ConfiguracoesPage />} />
         <Route path="/meus-cartoes" element={<MeusCartoesPage />} />
 
-        {/* Fallback 404 - pagina não encontrada */}
+        <Route path="/seguranca" element={<SegurancaPage />} />
         <Route path="*" element={
           <div className="min-h-screen flex items-center justify-center">
             <h1 className="text-2xl font-bold text-gray-400">Página não encontrada</h1>
