@@ -153,9 +153,13 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
     if (!card) {
       console.log('🔍 [DEBUG] Criando novo customer...');
       try {
+        // Usar email único para evitar conflito com cache do MP
+        const uniqueEmail = `${user.email.split('@')[0]}+${Date.now()}@${user.email.split('@')[1]}`;
+        console.log('🔍 [DEBUG] Email único:', uniqueEmail);
+
         const newCustomer = await customerClient.create({
           body: {
-            email: user.email,
+            email: uniqueEmail,
             first_name: user.nome?.split(' ')[0] || 'Cliente',
             last_name: user.nome?.split(' ').slice(1).join(' ') || '',
             phone: {
@@ -179,40 +183,7 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
         console.log('✅ [DEBUG] Card criado com novo customer!');
       } catch (error) {
         console.error('❌ [DEBUG] Erro ao criar novo customer:', error);
-
-        // 3️⃣ SE DEU ERRO 101 (já existe), BUSCAR E USAR
-        if (error.cause?.[0]?.code === '101') {
-          console.log('🔍 [DEBUG] Customer já existe (erro 101), buscando...');
-          const { results } = await customerClient.search({
-            options: { filters: { email: user.email } }
-          });
-
-          if (results && results.length > 0) {
-            // Tentar com cada customer encontrado até funcionar
-            for (const foundCustomer of results) {
-              try {
-                console.log('🔍 [DEBUG] Tentando customer:', foundCustomer.id);
-                card = await cardClient.create({
-                  customer_id: foundCustomer.id,
-                  body: { token }
-                });
-                customerId = foundCustomer.id;
-                console.log('✅ [DEBUG] Card criado com customer encontrado:', customerId);
-                break; // Funcionou, sair do loop
-              } catch (cardError) {
-                console.log('⚠️ [DEBUG] Falhou com customer:', foundCustomer.id);
-                console.log('⚠️ [DEBUG] Erro específico:', {
-                  message: cardError.message,
-                  status: cardError.status,
-                  cause: cardError.cause
-                });
-                continue; // Tentar próximo
-              }
-            }
-          }
-        } else {
-          throw error;
-        }
+        throw new Error('Falha ao criar customer e cartão: ' + error.message);
       }
     }
 
