@@ -29,7 +29,6 @@ export default function PagamentoPage() {
     });
     const dadosCompra = location.state || {};
     useEffect(() => {
-        console.log('🔑 Chave MP:', MP_PUBLIC_KEY);
         initMercadoPago(MP_PUBLIC_KEY);
         carregarCartoes();
         calcularResumo();
@@ -97,7 +96,7 @@ export default function PagamentoPage() {
                 setSalvandoCartao(false);
                 return;
             }
-            console.log('✅ Token recebido do MP:', tokenResult); // 🐛 DEBUG
+
             const token = localStorage.getItem('token');
             const response = await fetch(`${API_URL}/pagamentos/salvar-cartao`, {
                 method: 'POST',
@@ -146,12 +145,7 @@ export default function PagamentoPage() {
             const token = localStorage.getItem('token');
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             const cartaoSelecionado = cartoes[cartaoAtivo];
-            // 🐛 LOGS DE DEBUG
-            console.group('🔍 DEBUG - Processando Pagamento');
-            console.log('📋 Cartão Selecionado:', cartaoSelecionado);
-            console.log('💰 Resumo:', resumo);
-            console.log('👤 Usuário:', user);
-            // ✅ USAR CUSTOMER ID E CARD ID
+
             const dadosPagamento = {
                 customerId: cartaoSelecionado.customerid,
                 cardId: cartaoSelecionado.cardid,
@@ -162,16 +156,11 @@ export default function PagamentoPage() {
                 paymentMethodId: cartaoSelecionado.bandeira?.toLowerCase() || 'master',
                 email: user.email || user.Email || 'teste@teste.com'
             };
-            console.log('📤 Dados do Pagamento:', dadosPagamento);
             if (!dadosPagamento.customerId || !dadosPagamento.cardId) {
-                console.error('❌ Customer ID ou Card ID não encontrado!');
                 toast.error('Erro: Cartão inválido. Adicione um novo cartão.', { id: loadingToast });
                 setProcessandoPagamento(false);
-                console.groupEnd();
                 return;
             }
-            console.log('✅ Validações OK. Enviando requisição...');
-            console.groupEnd();
             const response = await fetch(`${API_URL}/pagamentos/processar`, {
                 method: 'POST',
                 headers: {
@@ -181,21 +170,18 @@ export default function PagamentoPage() {
                 body: JSON.stringify(dadosPagamento)
             });
             const data = await response.json();
-            console.log('📥 Resposta do Backend:', data);
             if (data.success && data.pagamento.status === 'approved') {
                 toast.success('Pagamento aprovado!', { id: loadingToast });
                 navigate('/confirmacao', { state: { pagamento: data.pagamento } });
             } else {
                 const statusDetail = data.pagamento?.statusDetail || data.message || 'Erro desconhecido';
-                console.error('❌ Pagamento falhou:', statusDetail);
                 toast.error(`Pagamento ${data.pagamento?.status || 'recusado'}. ${statusDetail}`, {
                     id: loadingToast,
                     duration: 5000
                 });
             }
         } catch (error) {
-            console.error('💥 Erro ao processar pagamento:', error);
-            toast.error('Erro ao processar pagamento. Verifique o console.', { id: loadingToast });
+            toast.error('Erro ao processar pagamento. Tente novamente.', { id: loadingToast });
         } finally {
             setProcessandoPagamento(false);
         }

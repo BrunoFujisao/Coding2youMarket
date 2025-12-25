@@ -9,31 +9,26 @@ const { MercadoPagoConfig, Payment, PreApproval, Customer, CustomerCard } = requ
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN
 });
-console.log("Webhook endpoint registrado SEM autenticação!");
-console.log("DEBUG: pagamentoRouter.js carregado - VERSÃO: 2025-12-24-22:00 (Saved Cards)");
+
 router.post("/pagamentos/webhook", async (req, res) => {
   res.status(200).send("OK");
   try {
     const { type, data } = req.body;
-    console.log("Webhook recebido:", type, data);
     if (type === "payment") {
       try {
         const paymentClient = new Payment(client);
         const payment = await paymentClient.get({ id: data.id });
-        console.log(`Status do pagamento ${payment.id}: ${payment.status}`);
         if (payment.status === "approved") {
-          console.log("Pagamento aprovado!");
+          // Pagamento aprovado
         }
       } catch (error) {
-        console.warn("Pagamento ainda não disponível:", data.id);
+        // Pagamento ainda não disponível
       }
     } else if (type === "subscription_preapproval" || type === "subscription_authorized_payment") {
       try {
         const preApprovalClient = new PreApproval(client);
         const preapproval = await preApprovalClient.get({ id: data.id });
-        console.log(`Status da assinatura ${data.id}: ${preapproval.status}`);
         if (preapproval.status === "authorized") {
-          console.log("Assinatura aprovada!");
           if (preapproval.external_reference) {
             const usuarioId = parseInt(preapproval.external_reference.replace("club_", ""));
             if (!isNaN(usuarioId)) {
@@ -41,19 +36,16 @@ router.post("/pagamentos/webhook", async (req, res) => {
               if (clube) {
                 await updateStatusClubMarket(clube.id, "ativa");
                 await updateClubMember(usuarioId, true);
-                console.log(`Club Market ativado para usuário ${usuarioId}`);
               }
             }
           }
         }
       } catch (error) {
-        console.warn("Assinatura ainda não disponível:", data.id);
+        // Assinatura ainda não disponível
       }
-    } else {
-      console.log(`Tipo de notificação não tratado: ${type}`);
     }
   } catch (error) {
-    console.error("Erro ao processar webhook:", error);
+    // Erro ao processar webhook
   }
 });
 // READ TODOS
@@ -126,12 +118,21 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
         message: "Token do cartão é obrigatório"
       });
     }
-    console.log('📝 Salvando cartão para usuário:', usuarioId);
+
     const customerClient = new Customer(client);
     let customerId = await getCustomerIdPorUsuario(usuarioId);
-    // ✅ BUSCAR/CRIAR CUSTOMER
+
+    // Validar se o customer do banco existe no MP
+    if (customerId) {
+      try {
+        await customerClient.get({ id: customerId });
+      } catch (error) {
+        customerId = null; // Forçar criação de um novo
+      }
+    }
+
+    // Buscar/Criar customer
     if (!customerId) {
-      console.log('🔍 Buscando customer no MP pelo email:', user.email);
 
       try {
         const { results } = await customerClient.search({
@@ -143,9 +144,7 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
         });
         if (results && results.length > 0) {
           customerId = results[0].id;
-          console.log('♻️ Customer encontrado:', customerId);
         } else {
-          console.log('🆕 Criando novo customer...');
           const customer = await customerClient.create({
             body: {
               email: user.email,
@@ -162,35 +161,29 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
             }
           });
           customerId = customer.id;
-          console.log('✅ Customer criado:', customerId);
         }
       } catch (error) {
         if (error.cause?.[0]?.code === '101') {
-          console.log('🔄 Customer existe, buscando...');
           const { results } = await customerClient.search({
             options: { filters: { email: user.email } }
           });
           if (results && results.length > 0) {
             customerId = results[0].id;
-            console.log('✅ Customer recuperado:', customerId);
           }
         } else {
           throw error;
         }
       }
-    } else {
-      console.log('✅ Customer do banco:', customerId);
     }
-    // ✅ SALVAR CARTÃO (AQUI ESTAVA O ERRO!)
-    console.log('💳 Salvando cartão...');
+    // Salvar cartão
     const cardClient = new CustomerCard(client);
 
     const card = await cardClient.create({
       customer_id: customerId,
       body: { token }
     });
-    console.log('✅ Card criado:', card.id);
-    // ✅ SALVAR NO BANCO
+
+    // Salvar no banco
     const cartaoSalvo = await salvarCartaoTokenizado({
       usuarioId,
       customerId,
@@ -202,14 +195,13 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
       principal: principal || false,
       isDebito: false
     });
-    console.log('✅ Salvo no banco:', cartaoSalvo.id);
+
     return res.status(201).json({
       success: true,
       message: "Cartão salvo com sucesso",
       cartao: cartaoSalvo
     });
   } catch (error) {
-    console.error("❌ Erro:", error);
     return res.status(500).json({
       success: false,
       message: "Erro ao salvar cartão",
@@ -238,9 +230,6 @@ router.post("/pagamentos/processar", auth, async (req, res) => {
         message: "Dados incompletos (precisa de customerId e cardId)"
       });
     }
-    console.log('💰 Processando pagamento com saved card...');
-    console.log('Customer:', customerId);
-    console.log('Card:', cardId);
     const paymentClient = new Payment(client);
     const payment = await paymentClient.create({
       body: {
@@ -254,7 +243,6 @@ router.post("/pagamentos/processar", auth, async (req, res) => {
         }
       }
     });
-    console.log('✅ Pagamento processado:', payment.id, payment.status);
     const pagamentoSalvo = await insertPagamentoMercadoPago({
       usuarioId,
       cartaoId: cartaoId || null,
@@ -273,7 +261,6 @@ router.post("/pagamentos/processar", auth, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error("❌ Erro ao processar pagamento:", error);
     return res.status(500).json({
       success: false,
       message: "Erro ao processar pagamento",
@@ -305,11 +292,10 @@ router.post("/pagamentos/criar-assinatura", auth, async (req, res) => {
       back_url: backUrl || "https://seusite.com/assinatura/confirmada",
       status: "pending"
     };
-    // ✅ SE TEM CARD ID, ADICIONAR
+    // Se tem card ID, adicionar
     if (cardId && customerId) {
       body.card_token_id = cardId;
       body.payer_id = customerId;
-      console.log('✅ Assinatura com saved card');
     }
     const preapproval = await preApprovalClient.create({ body });
     return res.status(201).json({
@@ -322,7 +308,6 @@ router.post("/pagamentos/criar-assinatura", auth, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error("Erro ao criar assinatura:", error);
     return res.status(500).json({
       success: false,
       message: "Erro ao criar assinatura",
