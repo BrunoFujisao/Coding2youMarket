@@ -125,98 +125,85 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
       });
     }
 
-    console.log('🔍 [DEBUG] Criando customerClient...');
     const customerClient = new Customer(client);
-    console.log('🔍 [DEBUG] Buscando customerId do banco...');
-    let customerId = await getCustomerIdPorUsuario(usuarioId);
-    console.log('🔍 [DEBUG] Customer ID do banco:', customerId);
+    const cardClient = new CustomerCard(client);
+    let customerId = null;
+    let card = null;
 
-    // Validar se o customer do banco existe no MP
-    if (customerId) {
+    // 1️⃣ TENTAR USAR CUSTOMER DO BANCO (se existir)
+    console.log('🔍 [DEBUG] Buscando customerId do banco...');
+    const customerIdFromDb = await getCustomerIdPorUsuario(usuarioId);
+    console.log('🔍 [DEBUG] Customer ID do banco:', customerIdFromDb);
+
+    if (customerIdFromDb) {
+      console.log('🔍 [DEBUG] Tentando criar card com customer do banco...');
       try {
-        console.log('🔍 [DEBUG] Validando customer no MP:', customerId);
-        await customerClient.get({ id: customerId });
-        console.log('✅ [DEBUG] Customer válido');
+        card = await cardClient.create({
+          customer_id: customerIdFromDb,
+          body: { token }
+        });
+        customerId = customerIdFromDb;
+        console.log('✅ [DEBUG] Card criado com customer do banco!');
       } catch (error) {
-        console.log('⚠️ [DEBUG] Customer inválido, será criado novo');
-        customerId = null; // Forçar criação de um novo
+        console.log('⚠️ [DEBUG] Falha ao criar card com customer do banco:', error.message);
       }
     }
 
-    // Buscar/Criar customer
-    if (!customerId) {
-      console.log('🔍 [DEBUG] Buscando/criando customer...');
+    // 2️⃣ SE NÃO FUNCIONOU, CRIAR NOVO CUSTOMER E TENTAR NOVAMENTE
+    if (!card) {
+      console.log('🔍 [DEBUG] Criando novo customer...');
       try {
-        console.log('🔍 [DEBUG] Buscando por email:', user.email);
-        const { results } = await customerClient.search({
-          options: {
-            filters: {
-              email: user.email
+        const newCustomer = await customerClient.create({
+          body: {
+            email: user.email,
+            first_name: user.nome?.split(' ')[0] || 'Cliente',
+            last_name: user.nome?.split(' ').slice(1).join(' ') || '',
+            phone: {
+              area_code: user.telefone?.substring(0, 2) || '00',
+              number: user.telefone?.substring(2) || '000000000'
+            },
+            identification: {
+              type: 'CPF',
+              number: user.cpf || '00000000000'
             }
           }
         });
+        customerId = newCustomer.id;
+        console.log('✅ [DEBUG] Novo customer criado:', customerId);
 
-        if (results && results.length > 0) {
-          // ✅ VALIDAR SE O CUSTOMER DA BUSCA REALMENTE EXISTE
-          const customerIdFromSearch = results[0].id;
-          console.log('🔍 [DEBUG] Customer encontrado na busca:', customerIdFromSearch);
-          console.log('🔍 [DEBUG] Validando se existe no MP...');
-
-          try {
-            await customerClient.get({ id: customerIdFromSearch });
-            customerId = customerIdFromSearch;
-            console.log('✅ [DEBUG] Customer validado:', customerId);
-          } catch (validationError) {
-            console.log('⚠️ [DEBUG] Customer da busca não existe mais, criando novo...');
-            // Customer não existe, criar um novo
-            const customer = await customerClient.create({
-              body: {
-                email: user.email,
-                first_name: user.nome?.split(' ')[0] || 'Cliente',
-                last_name: user.nome?.split(' ').slice(1).join(' ') || '',
-                phone: {
-                  area_code: user.telefone?.substring(0, 2) || '00',
-                  number: user.telefone?.substring(2) || '000000000'
-                },
-                identification: {
-                  type: 'CPF',
-                  number: user.cpf || '00000000000'
-                }
-              }
-            });
-            customerId = customer.id;
-            console.log('✅ [DEBUG] Novo customer criado:', customerId);
-          }
-        } else {
-          console.log('🔍 [DEBUG] Nenhum customer encontrado, criando novo...');
-          const customer = await customerClient.create({
-            body: {
-              email: user.email,
-              first_name: user.nome?.split(' ')[0] || 'Cliente',
-              last_name: user.nome?.split(' ').slice(1).join(' ') || '',
-              phone: {
-                area_code: user.telefone?.substring(0, 2) || '00',
-                number: user.telefone?.substring(2) || '000000000'
-              },
-              identification: {
-                type: 'CPF',
-                number: user.cpf || '00000000000'
-              }
-            }
-          });
-          customerId = customer.id;
-          console.log('✅ [DEBUG] Customer criado:', customerId);
-        }
+        console.log('🔍 [DEBUG] Criando card com novo customer...');
+        card = await cardClient.create({
+          customer_id: customerId,
+          body: { token }
+        });
+        console.log('✅ [DEBUG] Card criado com novo customer!');
       } catch (error) {
-        console.error('❌ [DEBUG] Erro ao buscar/criar customer:', error);
+        console.error('❌ [DEBUG] Erro ao criar novo customer:', error);
+
+        // 3️⃣ SE DEU ERRO 101 (já existe), BUSCAR E USAR
         if (error.cause?.[0]?.code === '101') {
-          console.log('🔍 [DEBUG] Tratando erro 101...');
+          console.log('🔍 [DEBUG] Customer já existe (erro 101), buscando...');
           const { results } = await customerClient.search({
             options: { filters: { email: user.email } }
           });
+
           if (results && results.length > 0) {
-            customerId = results[0].id;
-            console.log('✅ [DEBUG] Customer recuperado:', customerId);
+            // Tentar com cada customer encontrado até funcionar
+            for (const foundCustomer of results) {
+              try {
+                console.log('🔍 [DEBUG] Tentando customer:', foundCustomer.id);
+                card = await cardClient.create({
+                  customer_id: foundCustomer.id,
+                  body: { token }
+                });
+                customerId = foundCustomer.id;
+                console.log('✅ [DEBUG] Card criado com customer encontrado:', customerId);
+                break; // Funcionou, sair do loop
+              } catch (cardError) {
+                console.log('⚠️ [DEBUG] Falhou com customer:', foundCustomer.id);
+                continue; // Tentar próximo
+              }
+            }
           }
         } else {
           throw error;
@@ -224,17 +211,14 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
       }
     }
 
-    // Salvar cartão
-    console.log('🔍 [DEBUG] Criando card no MP...');
-    const cardClient = new CustomerCard(client);
+    // 4️⃣ VERIFICAR SE CONSEGUIMOS CRIAR O CARD
+    if (!card || !customerId) {
+      throw new Error('Não foi possível criar o cartão com nenhum customer disponível');
+    }
 
-    const card = await cardClient.create({
-      customer_id: customerId,
-      body: { token }
-    });
-    console.log('✅ [DEBUG] Card criado:', card.id);
+    console.log('✅ [DEBUG] Card ID final:', card.id);
 
-    // Salvar no banco
+    // 5️⃣ SALVAR NO BANCO
     console.log('🔍 [DEBUG] Salvando no banco...');
     const cartaoSalvo = await salvarCartaoTokenizado({
       usuarioId,
