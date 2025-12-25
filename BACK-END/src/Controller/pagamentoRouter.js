@@ -155,11 +155,40 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
             }
           }
         });
+
         if (results && results.length > 0) {
-          customerId = results[0].id;
-          console.log('✅ [DEBUG] Customer encontrado:', customerId);
+          // ✅ VALIDAR SE O CUSTOMER DA BUSCA REALMENTE EXISTE
+          const customerIdFromSearch = results[0].id;
+          console.log('🔍 [DEBUG] Customer encontrado na busca:', customerIdFromSearch);
+          console.log('🔍 [DEBUG] Validando se existe no MP...');
+
+          try {
+            await customerClient.get({ id: customerIdFromSearch });
+            customerId = customerIdFromSearch;
+            console.log('✅ [DEBUG] Customer validado:', customerId);
+          } catch (validationError) {
+            console.log('⚠️ [DEBUG] Customer da busca não existe mais, criando novo...');
+            // Customer não existe, criar um novo
+            const customer = await customerClient.create({
+              body: {
+                email: user.email,
+                first_name: user.nome?.split(' ')[0] || 'Cliente',
+                last_name: user.nome?.split(' ').slice(1).join(' ') || '',
+                phone: {
+                  area_code: user.telefone?.substring(0, 2) || '00',
+                  number: user.telefone?.substring(2) || '000000000'
+                },
+                identification: {
+                  type: 'CPF',
+                  number: user.cpf || '00000000000'
+                }
+              }
+            });
+            customerId = customer.id;
+            console.log('✅ [DEBUG] Novo customer criado:', customerId);
+          }
         } else {
-          console.log('🔍 [DEBUG] Criando novo customer...');
+          console.log('🔍 [DEBUG] Nenhum customer encontrado, criando novo...');
           const customer = await customerClient.create({
             body: {
               email: user.email,
