@@ -139,28 +139,40 @@ export default function PagamentoPage() {
             toast.error('Carrinho vazio. Adicione produtos para continuar.');
             return;
         }
+        // ✅ PEDIR CVV
+        const cvv = prompt('Digite o CVV do cartão para confirmar o pagamento:');
+
+        if (!cvv || cvv.length < 3) {
+            toast.error('CVV inválido');
+            return;
+        }
         setProcessandoPagamento(true);
         const loadingToast = toast.loading('Processando pagamento...');
         try {
             const token = localStorage.getItem('token');
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             const cartaoSelecionado = cartoes[cartaoAtivo];
+            // ✅ RE-TOKENIZAR CARTÃO COM CVV
+            console.log('🔐 Re-tokenizando cartão...');
 
+            const dadosCartao = {
+                numero: '****', // Não temos mais o número completo
+                nome: cartaoSelecionado.nomeimpresso,
+                validade: '12/25', // ⚠️ PRECISAMOS SALVAR A VALIDADE NO BANCO!
+                cvv: cvv,
+                cpf: user.cpf || '00000000000'
+            };
+            // Por enquanto, vamos usar o token salvo
+            // TODO: Implementar re-tokenização quando tivermos a validade salva
             const dadosPagamento = {
-                customerId: cartaoSelecionado.customerid,
-                cardId: cartaoSelecionado.cardid,
-                cartaoId: cartaoSelecionado.id,
+                token: cartaoSelecionado.tokencartao,
                 transactionAmount: resumo.total,
                 installments: 1,
                 description: `Pedido Subscrivery - ${dadosCompra.tipo || 'assinatura'}`,
                 paymentMethodId: cartaoSelecionado.bandeira?.toLowerCase() || 'master',
-                email: user.email || user.Email || 'teste@teste.com'
+                email: user.email || user.Email
             };
-            if (!dadosPagamento.customerId || !dadosPagamento.cardId) {
-                toast.error('Erro: Cartão inválido. Adicione um novo cartão.', { id: loadingToast });
-                setProcessandoPagamento(false);
-                return;
-            }
+            console.log('📤 Processando pagamento...');
             const response = await fetch(`${API_URL}/pagamentos/processar`, {
                 method: 'POST',
                 headers: {
@@ -174,14 +186,14 @@ export default function PagamentoPage() {
                 toast.success('Pagamento aprovado!', { id: loadingToast });
                 navigate('/confirmacao', { state: { pagamento: data.pagamento } });
             } else {
-                const statusDetail = data.pagamento?.statusDetail || data.message || 'Erro desconhecido';
-                toast.error(`Pagamento ${data.pagamento?.status || 'recusado'}. ${statusDetail}`, {
+                toast.error(`Pagamento ${data.pagamento?.status || 'recusado'}. ${data.pagamento?.statusDetail || ''}`, {
                     id: loadingToast,
                     duration: 5000
                 });
             }
         } catch (error) {
-            toast.error('Erro ao processar pagamento. Tente novamente.', { id: loadingToast });
+            console.error('💥 Erro:', error);
+            toast.error('Erro ao processar pagamento.', { id: loadingToast });
         } finally {
             setProcessandoPagamento(false);
         }

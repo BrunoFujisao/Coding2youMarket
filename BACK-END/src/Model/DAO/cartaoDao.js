@@ -49,8 +49,8 @@ async function salvarCartaoTokenizado({
   principal,
   isDebito
 }) {
-  if (!usuarioId || !customerId || !cardId) {
-    console.error("Falha ao salvar cartão: usuarioId, customerId ou cardId ausentes.");
+  if (!usuarioId || !tokenCartao) {
+    console.error("Falha ao salvar token: usuarioId ou tokenCartao ausentes.");
     return false;
   }
   const result = await pool.query(
@@ -69,8 +69,19 @@ async function salvarCartaoTokenizado({
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     RETURNING *
     `,
-    [usuarioId, customerId, cardId, tokenCartao || null, bandeira, ultimos4Digitos, nomeImpresso, principal, isDebito]
+    [
+      usuarioId,
+      customerId || null,  // ✅ ACEITA NULL
+      cardId || null,      // ✅ ACEITA NULL
+      tokenCartao,
+      bandeira,
+      ultimos4Digitos,
+      nomeImpresso,
+      principal,
+      isDebito
+    ]
   );
+
   return result.rows[0];
 }
 // READ TODOS
