@@ -143,10 +143,19 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
 
     // Criar customer se não existir
     if (!customerId) {
-      const customer = await customerClient.create({
-        body: { email: req.usuario.email }
+      const customers = await customerClient.search({
+        options: { email: req.usuario.email }
       });
-      customerId = customer.id;
+
+      if (customers.results && customers.results.length > 0) {
+        customerId = customers.results[0].id;
+      } else {
+        // 2️⃣ Criar somente se NÃO existir
+        const customer = await customerClient.create({
+          body: { email: req.usuario.email }
+        });
+        customerId = customer.id;
+      }
     }
 
     // Criar cartão
