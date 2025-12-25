@@ -108,33 +108,46 @@ router.put("/pagamentos/:id/status", auth, async (req, res) => {
 
 // SALVAR CARTÃO COM CUSTOMER (SAVED CARD)
 router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
+  console.log('🔍 [DEBUG] Iniciando salvar-cartao...');
   try {
     const usuarioId = req.usuario.id;
     const { token, bandeira, ultimos4digitos, nomeImpresso, principal } = req.body;
     const user = req.usuario;
+
+    console.log('🔍 [DEBUG] Usuario ID:', usuarioId);
+    console.log('🔍 [DEBUG] Body:', { token: token ? 'presente' : 'ausente', bandeira, ultimos4digitos });
+
     if (!token) {
+      console.log('❌ [DEBUG] Token ausente');
       return res.status(400).json({
         success: false,
         message: "Token do cartão é obrigatório"
       });
     }
 
+    console.log('🔍 [DEBUG] Criando customerClient...');
     const customerClient = new Customer(client);
+    console.log('🔍 [DEBUG] Buscando customerId do banco...');
     let customerId = await getCustomerIdPorUsuario(usuarioId);
+    console.log('🔍 [DEBUG] Customer ID do banco:', customerId);
 
     // Validar se o customer do banco existe no MP
     if (customerId) {
       try {
+        console.log('🔍 [DEBUG] Validando customer no MP:', customerId);
         await customerClient.get({ id: customerId });
+        console.log('✅ [DEBUG] Customer válido');
       } catch (error) {
+        console.log('⚠️ [DEBUG] Customer inválido, será criado novo');
         customerId = null; // Forçar criação de um novo
       }
     }
 
     // Buscar/Criar customer
     if (!customerId) {
-
+      console.log('🔍 [DEBUG] Buscando/criando customer...');
       try {
+        console.log('🔍 [DEBUG] Buscando por email:', user.email);
         const { results } = await customerClient.search({
           options: {
             filters: {
@@ -144,7 +157,9 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
         });
         if (results && results.length > 0) {
           customerId = results[0].id;
+          console.log('✅ [DEBUG] Customer encontrado:', customerId);
         } else {
+          console.log('🔍 [DEBUG] Criando novo customer...');
           const customer = await customerClient.create({
             body: {
               email: user.email,
@@ -161,29 +176,37 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
             }
           });
           customerId = customer.id;
+          console.log('✅ [DEBUG] Customer criado:', customerId);
         }
       } catch (error) {
+        console.error('❌ [DEBUG] Erro ao buscar/criar customer:', error);
         if (error.cause?.[0]?.code === '101') {
+          console.log('🔍 [DEBUG] Tratando erro 101...');
           const { results } = await customerClient.search({
             options: { filters: { email: user.email } }
           });
           if (results && results.length > 0) {
             customerId = results[0].id;
+            console.log('✅ [DEBUG] Customer recuperado:', customerId);
           }
         } else {
           throw error;
         }
       }
     }
+
     // Salvar cartão
+    console.log('🔍 [DEBUG] Criando card no MP...');
     const cardClient = new CustomerCard(client);
 
     const card = await cardClient.create({
       customer_id: customerId,
       body: { token }
     });
+    console.log('✅ [DEBUG] Card criado:', card.id);
 
     // Salvar no banco
+    console.log('🔍 [DEBUG] Salvando no banco...');
     const cartaoSalvo = await salvarCartaoTokenizado({
       usuarioId,
       customerId,
@@ -195,6 +218,7 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
       principal: principal || false,
       isDebito: false
     });
+    console.log('✅ [DEBUG] Salvo no banco:', cartaoSalvo.id);
 
     return res.status(201).json({
       success: true,
@@ -202,10 +226,13 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
       cartao: cartaoSalvo
     });
   } catch (error) {
+    console.error('❌ [DEBUG] Erro geral:', error);
+    console.error('❌ [DEBUG] Stack:', error.stack);
     return res.status(500).json({
       success: false,
       message: "Erro ao salvar cartão",
-      error: error.message
+      error: error.message,
+      details: error.cause || error.response?.data || 'Sem detalhes adicionais'
     });
   }
 });
