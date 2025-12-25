@@ -133,73 +133,113 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
   try {
     const usuarioId = req.usuario.id;
     const { token, bandeira, ultimos4digitos, nomeImpresso, principal } = req.body;
-
+    const user = req.usuario;
     if (!token) {
-      return res.status(400).json({ message: "Token obrigatório" });
+      return res.status(400).json({
+        success: false,
+        message: "Token do cartão é obrigatório"
+      });
     }
-
+    console.log('📝 Salvando cartão para usuário:', usuarioId);
     const customerClient = new Customer(client);
     const cardClient = new CustomerCard(client);
-
     let customerId = await getCustomerIdPorUsuario(usuarioId);
-
-    // Criar customer se não existir
-    if (!customerId) {
-      const customers = await customerClient.search({
-        options: { email: req.usuario.email }
-      }) || { results: [] };
-
-      if (customers.results && customers.results.length > 0) {
-        customerId = customers.results[0].id;
-      } else {
-        // 2️⃣ Criar somente se NÃO existir
-        const customer = await customerClient.create({
-          body: { email: req.usuario.email }
-        });
-        customerId = customer.id;
+    // 1️⃣ VALIDAR SE CUSTOMER DO BANCO EXISTE NO MP
+    if (customerId) {
+      console.log('🔍 Validando customer do banco:', customerId);
+      try {
+        await customerClient.get({ id: customerId });
+        console.log('✅ Customer do banco é válido');
+      } catch (err) {
+        console.warn('⚠️ Customer do banco não existe no MP, recriando...');
+        customerId = null;
       }
     }
+    // 2️⃣ SE NÃO TEM OU É INVÁLIDO, BUSCAR/CRIAR
+    if (!customerId) {
+      console.log('🔍 Buscando customer por email:', user.email);
 
-    // Criar cartão
+      try {
+        const { results } = await customerClient.search({
+          options: {
+            filters: {
+              email: user.email
+            }
+          }
+        });
+        if (results && results.length > 0) {
+          customerId = results[0].id;
+          console.log('♻️ Customer encontrado:', customerId);
+        } else {
+          console.log('🆕 Criando novo customer...');
+          const newCustomer = await customerClient.create({
+            body: {
+              email: user.email,
+              first_name: user.nome?.split(' ')[0] || 'Cliente',
+              last_name: user.nome?.split(' ').slice(1).join(' ') || 'Subscrivery'
+            }
+          });
+          customerId = newCustomer.id;
+          console.log('✅ Customer criado:', customerId);
+        }
+      } catch (searchError) {
+        console.error('❌ Erro ao buscar/criar customer:', searchError);
+        return res.status(500).json({
+          success: false,
+          message: "Não foi possível criar customer",
+          details: searchError.message
+        });
+      }
+    }
+    // 3️⃣ CRIAR CARTÃO (PROTEGIDO COM TRY/CATCH)
+    console.log('💳 Criando cartão no customer:', customerId);
+    let card;
 
     try {
       card = await cardClient.create({
         customer_id: customerId,
         body: { token }
       });
+      console.log('✅ Card criado:', card.id);
     } catch (mpError) {
-      console.error("❌ Erro Mercado Pago - criar cartão:", {
+      console.error('❌ Erro MP ao criar cartão:', {
         message: mpError.message,
         status: mpError.status,
-        cause: mpError.cause || mpError.error
+        cause: mpError.cause
       });
-
       return res.status(400).json({
         success: false,
-        message: "Erro ao salvar cartão no Mercado Pago",
-        details: mpError.cause || mpError.message
+        message: "Não foi possível salvar o cartão",
+        details: mpError.message
       });
     }
-    // Salvar SOMENTE card_id (não salvar token)
+    // 4️⃣ SALVAR NO BANCO
     const cartaoSalvo = await salvarCartaoTokenizado({
       usuarioId,
       customerId,
       cardId: card.id,
-      bandeira,
-      ultimos4Digitos: ultimos4digitos,
-      nomeImpresso,
+      tokenCartao: token,
+      bandeira: bandeira || "master",
+      ultimos4Digitos: ultimos4digitos || "****",
+      nomeImpresso: nomeImpresso || "",
       principal: principal || false,
       isDebito: false
     });
-
+    console.log('✅ Salvo no banco:', cartaoSalvo.id);
     return res.status(201).json({
       success: true,
       message: "Cartão salvo com sucesso",
       cartao: cartaoSalvo
     });
   } catch (error) {
-    console.error("Erro salvar cartão:", error);
-    return res.status(500).json({ message: "Erro ao salvar cartão" });
+    console.error('❌ Erro geral:', error);
+
+    // SEMPRE RETORNAR RESPOSTA (evita SIGTERM)
+    return res.status(500).json({
+      success: false,
+      message: "Erro ao salvar cartão",
+      error: error.message
+    });
   }
 });
 
