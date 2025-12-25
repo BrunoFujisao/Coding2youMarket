@@ -201,6 +201,11 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
                 break; // Funcionou, sair do loop
               } catch (cardError) {
                 console.log('⚠️ [DEBUG] Falhou com customer:', foundCustomer.id);
+                console.log('⚠️ [DEBUG] Erro específico:', {
+                  message: cardError.message,
+                  status: cardError.status,
+                  cause: cardError.cause
+                });
                 continue; // Tentar próximo
               }
             }
