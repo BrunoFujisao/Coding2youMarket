@@ -1,9 +1,9 @@
 import { getToken } from './auth';
 
-// Production base URL
+
 const BASE_URL = "https://coding2youmarket-production.up.railway.app";
 
-// Helper to build auth headers
+
 const getAuthHeaders = () => {
     const token = getToken();
     return {
@@ -33,7 +33,7 @@ export const meusCartoes = async () => {
     }
 };
 
-/** Add a new card */
+
 export const adicionarCartao = async (dadosCartao) => {
     try {
         const response = await fetch(`${BASE_URL}/api/cartoes`, {
@@ -52,7 +52,7 @@ export const adicionarCartao = async (dadosCartao) => {
     }
 };
 
-/** Edit an existing card */
+
 export const editarCartao = async (id, nomeImpresso, principal) => {
     try {
         const response = await fetch(`${BASE_URL}/api/cartoes/${id}`, {
@@ -71,7 +71,7 @@ export const editarCartao = async (id, nomeImpresso, principal) => {
     }
 };
 
-/** Delete a card */
+
 export const deletarCartao = async (id) => {
     try {
         const response = await fetch(`${BASE_URL}/api/cartoes/${id}`, {
@@ -89,7 +89,6 @@ export const deletarCartao = async (id) => {
     }
 };
 
-/** Legacy endpoint: fetch all cards */
 export const buscarCartoes = async () => {
     try {
         const response = await fetch(`${BASE_URL}/api/cartoes`, {

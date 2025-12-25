@@ -122,10 +122,19 @@ async function getPagamentosPorPedidoId(pedidoId) {
 
 //UPDATE
 async function updateStatusPagamento(id, status) {
-  const statusPermitidos = ['pendente', 'aprovado', 'recusado', 'estornado'];
-
-  if (!id || !statusPermitidos.includes(status)) return false;
-
+  const statusPermitidos = [
+    'pending',
+    'approved',
+    'rejected',
+    'cancelled',
+    'refunded',
+    'charged_back',
+    'in_process'
+  ];
+  if (!id || !statusPermitidos.includes(status)) {
+    console.error(`Status inválido: ${status}. Permitidos:`, statusPermitidos);
+    return false;
+  }
   const { rows } = await pool.query(
     `
     UPDATE pagamentos
@@ -135,7 +144,6 @@ async function updateStatusPagamento(id, status) {
     `,
     [status, id]
   );
-
   return rows[0] || false;
 }
 
