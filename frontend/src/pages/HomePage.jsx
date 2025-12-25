@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, Filter } from "lucide-react";
 import Header from "../components/Header";
 import ProductCard from "../components/ProductCard";
@@ -22,6 +23,8 @@ export default function HomePage() {
   const [filtro, setFiltro] = useState("");
   const [categoriaAtiva, setCategoriaAtiva] = useState(null);
   const [usandoMock, setUsandoMock] = useState(false);
+  const [showClubModal, setShowClubModal] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => {
     carregarDados();
   }, []);
@@ -72,7 +75,10 @@ export default function HomePage() {
             Garanta sua ceia com desconto exclusivo no{' '}
             <span className="text-green-400">Clube+</span>
           </h1>
-          <button className="bg-white/20 backdrop-blur-sm border border-white/30 px-6 py-3 rounded-full text-white font-semibold hover:bg-white/30 transition-all w-max shadow-lg">
+          <button
+            onClick={() => setShowClubModal(true)}
+            className="bg-white/20 backdrop-blur-sm border border-white/30 px-6 py-3 rounded-full text-white font-semibold hover:bg-white/30 transition-all w-max shadow-lg"
+          >
             Entrar no Clube
           </button>
         </div>
@@ -156,6 +162,127 @@ export default function HomePage() {
         </section>
 
       </main>
+
+      {/* Club Modal */}
+      {showClubModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            {/* Modal Header */}
+            <div className="relative bg-gradient-to-r from-green-600 to-emerald-500 p-6 rounded-t-3xl">
+              <button
+                onClick={() => setShowClubModal(false)}
+                className="absolute top-4 right-4 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition-all"
+              >
+                ✕
+              </button>
+              <div className="text-center">
+                <span className="text-4xl mb-2 block">⭐</span>
+                <h2 className="text-2xl md:text-3xl font-bold text-white">Club Market</h2>
+                <p className="text-white/80 mt-2">Escolha o plano ideal para você</p>
+              </div>
+            </div>
+
+            {/* Subscription Cards */}
+            <div className="p-6">
+              <div className="grid md:grid-cols-3 gap-4">
+                {/* Plano Entrada */}
+                <div className="bg-gray-50 rounded-2xl p-5 border-2 border-gray-200 hover:border-green-300 transition-all">
+                  <div className="text-center mb-4">
+                    <span className="text-3xl">🌱</span>
+                    <h3 className="text-lg font-bold text-gray-800 mt-2">Entrada</h3>
+                  </div>
+                  <div className="text-center mb-4">
+                    <span className="text-3xl font-bold text-gray-800">R$ 9,90</span>
+                    <span className="text-gray-500 text-sm">/mês</span>
+                  </div>
+                  <ul className="space-y-2 text-sm text-gray-600 mb-4">
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span> Frete grátis
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-gray-400">○</span> Sem desconto
+                    </li>
+                  </ul>
+                  <div className="text-center">
+                    <span className="inline-block px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-medium">
+                      0% desconto
+                    </span>
+                  </div>
+                </div>
+
+                {/* Plano Intermediário */}
+                <div className="bg-green-50 rounded-2xl p-5 border-2 border-green-400 shadow-lg relative">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full">
+                    POPULAR
+                  </div>
+                  <div className="text-center mb-4">
+                    <span className="text-3xl">🌿</span>
+                    <h3 className="text-lg font-bold text-gray-800 mt-2">Intermediário</h3>
+                  </div>
+                  <div className="text-center mb-4">
+                    <span className="text-3xl font-bold text-green-600">R$ 19,90</span>
+                    <span className="text-gray-500 text-sm">/mês</span>
+                  </div>
+                  <ul className="space-y-2 text-sm text-gray-600 mb-4">
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span> Frete grátis
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span> 10% de desconto
+                    </li>
+                  </ul>
+                  <div className="text-center">
+                    <span className="inline-block px-3 py-1 bg-green-500 text-white rounded-full text-sm font-medium">
+                      10% desconto
+                    </span>
+                  </div>
+                </div>
+
+                {/* Plano Premium */}
+                <div className="bg-gradient-to-b from-amber-50 to-orange-50 rounded-2xl p-5 border-2 border-amber-300 hover:border-amber-400 transition-all">
+                  <div className="text-center mb-4">
+                    <span className="text-3xl">👑</span>
+                    <h3 className="text-lg font-bold text-gray-800 mt-2">Premium</h3>
+                  </div>
+                  <div className="text-center mb-4">
+                    <span className="text-3xl font-bold text-amber-600">R$ 39,90</span>
+                    <span className="text-gray-500 text-sm">/mês</span>
+                  </div>
+                  <ul className="space-y-2 text-sm text-gray-600 mb-4">
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span> Frete grátis
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span> 25% de desconto
+                    </li>
+                  </ul>
+                  <div className="text-center">
+                    <span className="inline-block px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full text-sm font-medium">
+                      25% desconto
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* CTA Button */}
+              <div className="mt-6 text-center">
+                <button
+                  onClick={() => {
+                    setShowClubModal(false);
+                    navigate('/club-market');
+                  }}
+                  className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-500 text-white font-bold rounded-full hover:shadow-lg hover:scale-105 transition-all"
+                >
+                  Ver Todos os Planos →
+                </button>
+                <p className="text-gray-500 text-sm mt-3">
+                  Cancele quando quiser, sem compromisso.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
