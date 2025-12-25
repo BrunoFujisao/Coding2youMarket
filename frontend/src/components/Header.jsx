@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingCart, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { verMeuCarrinho } from '../api/carrinhoAPI';
@@ -7,6 +7,7 @@ export default function Header() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const { contadorCarrinho, atualizarContador } = useCarrinho();
     const navigate = useNavigate();
+    const location = useLocation();
     useEffect(() => {
         carregarQuantidadeCarrinho();
     }, []);
@@ -71,7 +72,7 @@ export default function Header() {
                                         <Link to="/pedidos" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
                                             📦 Meus Pedidos
                                         </Link>
-                                        <Link to="/club" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
+                                        <Link to="/club-market" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
                                             ⭐ Club Market
                                         </Link>
                                         <Link to="/perfil" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
@@ -97,13 +98,13 @@ export default function Header() {
                             </span>
                         </Link>
                         <nav className="flex items-center gap-8">
-                            <Link to="/" className="text-gray-800 hover:text-green-600 font-semibold transition-colors border-b-2 border-green-500 pb-1">
+                            <Link to="/" className={`font-medium transition-colors pb-1 ${location.pathname === '/' || location.pathname === '/home' ? 'text-gray-800 font-semibold border-b-2 border-green-500' : 'text-gray-700 hover:text-green-600'}`}>
                                 Início
                             </Link>
-                            <Link to="/pedidos" className="text-gray-700 hover:text-green-600 font-medium transition-colors">
+                            <Link to="/pedidos" className={`font-medium transition-colors pb-1 ${location.pathname === '/pedidos' ? 'text-gray-800 font-semibold border-b-2 border-green-500' : 'text-gray-700 hover:text-green-600'}`}>
                                 Meus Pedidos
                             </Link>
-                            <Link to="/club" className="text-gray-700 hover:text-green-600 font-medium transition-colors">
+                            <Link to="/club-market" className={`font-medium transition-colors pb-1 ${location.pathname === '/club-market' ? 'text-gray-800 font-semibold border-b-2 border-green-500' : 'text-gray-700 hover:text-green-600'}`}>
                                 Club Market
                             </Link>
                         </nav>
@@ -126,7 +127,7 @@ export default function Header() {
                                         <Link to="/pedidos" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
                                             Meus Pedidos
                                         </Link>
-                                        <Link to="/club" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
+                                        <Link to="/club-market" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
                                             Club Market
                                         </Link>
                                         <Link to="/perfil" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
