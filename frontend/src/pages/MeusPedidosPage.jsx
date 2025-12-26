@@ -18,7 +18,7 @@ export default function MeusPedidosPage() {
                 navigate('/login');
                 return;
             }
-            const dados = await meusPedidos(usuarioId);
+            const dados = await meusPedidos();
             setPedidos(dados || []);
             setLoading(false);
         };
