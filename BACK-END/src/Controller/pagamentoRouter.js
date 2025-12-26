@@ -145,14 +145,37 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
 
     if (!customerId) {
       const customerClient = new Customer(client);
-      const customer = await customerClient.create({
-        body: {
-          email: req.usuario.email || req.usuario.Email,
-          first_name: req.usuario.nome || "Cliente",
-          last_name: req.usuario.sobrenome || "Subscrivery"
+
+      try {
+        // Tentar criar novo customer
+        const customer = await customerClient.create({
+          body: {
+            email: req.usuario.email || req.usuario.Email,
+            first_name: req.usuario.nome || "Cliente",
+            last_name: req.usuario.sobrenome || "Subscrivery"
+          }
+        });
+        customerId = customer.id;
+      } catch (error) {
+        // Se o customer já existe, buscar pelo email
+        if (error.cause && error.cause[0]?.code === '101') {
+          console.log('Customer já existe, buscando pelo email...');
+          const customers = await customerClient.search({
+            filters: {
+              email: req.usuario.email || req.usuario.Email
+            }
+          });
+
+          if (customers.results && customers.results.length > 0) {
+            customerId = customers.results[0].id;
+            console.log('Customer encontrado:', customerId);
+          } else {
+            throw new Error('Customer existe no MP mas não foi encontrado na busca');
+          }
+        } else {
+          throw error; // Re-throw se for outro erro
         }
-      });
-      customerId = customer.id;
+      }
 
       // Salvar customer_id no banco
       await salvarCustomerId(usuarioId, customerId);
