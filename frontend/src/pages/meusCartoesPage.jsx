@@ -1,17 +1,30 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, CreditCard, Plus, ChevronLeft, ChevronRight, Trash2, Edit2, Check, X } from 'lucide-react';
-import { meusCartoes, adicionarCartao } from '../api/cartaoAPI';
+import { meusCartoes, adicionarCartao, deletarCartao } from '../api/cartaoAPI';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
+import toast from 'react-hot-toast';
 
 // Helper to mask card number, showing only last 4 digits
-const maskNumber = (numero) => {
+const maskNumber = (numero, ultimos4) => {
+    // Se tem ultimos4digitos do backend, usa esse
+    if (ultimos4) return `•••• •••• •••• ${ultimos4}`;
     if (!numero) return '•••• •••• •••• ••••';
+    // Remove espaços e pega últimos 4
+    const limpo = numero.replace(/\s/g, '');
+    if (limpo.length >= 4) {
+        return `•••• •••• •••• ${limpo.slice(-4)}`;
+    }
     const parts = numero.split(' ');
     return parts
         .map((p, i) => (i === parts.length - 1 ? p : '****'))
         .join(' ');
 };
+
+// Helper para obter nome do cartão (compatível com backend e frontend)
+const getNome = (cartao) => cartao.nome || cartao.nomeimpresso || cartao.nomeImpresso || '';
+const getNumeroDisplay = (cartao) => cartao.numero || (cartao.ultimos4digitos ? `•••• •••• •••• ${cartao.ultimos4digitos}` : '');
+const getValidade = (cartao) => cartao.validade || '--/--';
 
 export default function MeusCartoesPage() {
     const navigate = useNavigate();
@@ -57,29 +70,64 @@ export default function MeusCartoesPage() {
 
     const handleAdicionarCartao = async () => {
         if (novoCartao.numero && novoCartao.nome && novoCartao.validade && novoCartao.cvv) {
+            const loadingToast = toast.loading('Salvando cartão...');
             try {
-                const response = await adicionarCartao(novoCartao);
+                // Prepara dados no formato esperado pelo backend
+                const numeroLimpo = novoCartao.numero.replace(/\s/g, '');
+                const dadosParaEnviar = {
+                    tokenCartao: `tok_${Date.now()}`, // Token simulado (em produção seria do gateway de pagamento)
+                    bandeira: novoCartao.bandeira,
+                    ultimos4Digitos: numeroLimpo.slice(-4),
+                    nomeImpresso: novoCartao.nome,
+                    principal: cartoes.length === 0, // Primeiro cartão é principal
+                    isDebito: false
+                };
+
+                const response = await adicionarCartao(dadosParaEnviar);
                 if (response.success) {
-                    const novoId = response.id ?? (cartoes.length > 0 ? Math.max(...cartoes.map(c => c.id)) + 1 : 1);
-                    const novoCartaoComId = { ...novoCartao, id: novoId };
-                    setCartoes([...cartoes, novoCartaoComId]);
+                    // Adiciona o cartão retornado ou cria um objeto para exibição
+                    const cartaoCriado = response.cartao || {
+                        id: response.id || Date.now(),
+                        numero: `**** **** **** ${numeroLimpo.slice(-4)}`,
+                        nome: novoCartao.nome,
+                        validade: novoCartao.validade,
+                        bandeira: novoCartao.bandeira,
+                        ultimos4digitos: numeroLimpo.slice(-4)
+                    };
+                    setCartoes([...cartoes, cartaoCriado]);
                     setNovoCartao({ numero: '', nome: '', validade: '', cvv: '', bandeira: 'Mastercard' });
                     setAdicionandoCartao(false);
                     setCartaoAtivo(cartoes.length);
+                    toast.success('Cartão adicionado com sucesso!', { id: loadingToast });
                 } else {
-                    console.error('Erro ao adicionar cartão:', response.message);
+                    toast.error(response.message || 'Erro ao adicionar cartão', { id: loadingToast });
                 }
             } catch (error) {
                 console.error('Erro ao adicionar cartão:', error);
+                toast.error('Erro ao adicionar cartão', { id: loadingToast });
             }
         }
     };
 
-    const handleRemoverCartao = (id) => {
-        const novosCartoes = cartoes.filter(c => c.id !== id);
-        setCartoes(novosCartoes);
-        if (cartaoAtivo >= novosCartoes.length) {
-            setCartaoAtivo(Math.max(0, novosCartoes.length - 1));
+    const handleRemoverCartao = async (id) => {
+        if (!confirm('Tem certeza que deseja remover este cartão?')) return;
+
+        const loadingToast = toast.loading('Removendo cartão...');
+        try {
+            const response = await deletarCartao(id);
+            if (response.success) {
+                const novosCartoes = cartoes.filter(c => c.id !== id);
+                setCartoes(novosCartoes);
+                if (cartaoAtivo >= novosCartoes.length) {
+                    setCartaoAtivo(Math.max(0, novosCartoes.length - 1));
+                }
+                toast.success('Cartão removido com sucesso!', { id: loadingToast });
+            } else {
+                toast.error(response.message || 'Erro ao remover cartão', { id: loadingToast });
+            }
+        } catch (error) {
+            console.error('Erro ao remover cartão:', error);
+            toast.error('Erro ao remover cartão', { id: loadingToast });
         }
     };
 
@@ -129,17 +177,17 @@ export default function MeusCartoesPage() {
                                 <div className="w-12 h-10 bg-gradient-to-br from-yellow-200 to-yellow-400 rounded-lg mb-6"></div>
 
                                 <p className="text-xl md:text-2xl font-mono tracking-wider mb-6">
-                                    {maskNumber(cartoes[cartaoAtivo].numero)}
+                                    {maskNumber(cartoes[cartaoAtivo].numero, cartoes[cartaoAtivo].ultimos4digitos)}
                                 </p>
 
                                 <div className="flex justify-between items-end">
                                     <div>
                                         <p className="text-xs text-gray-400 mb-1">Nome</p>
-                                        <p className="font-semibold">{cartoes[cartaoAtivo].nome}</p>
+                                        <p className="font-semibold">{getNome(cartoes[cartaoAtivo])}</p>
                                     </div>
                                     <div className="text-right">
                                         <p className="text-xs text-gray-400 mb-1">Validade</p>
-                                        <p className="font-semibold">{cartoes[cartaoAtivo].validade}</p>
+                                        <p className="font-semibold">{getValidade(cartoes[cartaoAtivo])}</p>
                                     </div>
                                 </div>
 
@@ -192,15 +240,15 @@ export default function MeusCartoesPage() {
                                 </div>
                                 <div>
                                     <p className="text-gray-500 mb-1">Final</p>
-                                    <p className="font-medium text-gray-800">**** {cartoes[cartaoAtivo].numero.slice(-4)}</p>
+                                    <p className="font-medium text-gray-800">**** {cartoes[cartaoAtivo].ultimos4digitos || (cartoes[cartaoAtivo].numero ? cartoes[cartaoAtivo].numero.slice(-4) : '----')}</p>
                                 </div>
                                 <div>
                                     <p className="text-gray-500 mb-1">Nome no Cartão</p>
-                                    <p className="font-medium text-gray-800">{cartoes[cartaoAtivo].nome}</p>
+                                    <p className="font-medium text-gray-800">{getNome(cartoes[cartaoAtivo])}</p>
                                 </div>
                                 <div>
                                     <p className="text-gray-500 mb-1">Validade</p>
-                                    <p className="font-medium text-gray-800">{cartoes[cartaoAtivo].validade}</p>
+                                    <p className="font-medium text-gray-800">{getValidade(cartoes[cartaoAtivo])}</p>
                                 </div>
                             </div>
                         </div>
@@ -338,9 +386,9 @@ export default function MeusCartoesPage() {
                                             <CreditCard size={20} className={idx === cartaoAtivo ? 'text-white' : 'text-gray-600'} />
                                         </div>
                                         <div>
-                                            <p className="font-medium">•••• {cartao.numero.slice(-4)}</p>
+                                            <p className="font-medium">•••• {cartao.ultimos4digitos || (cartao.numero ? cartao.numero.slice(-4) : '----')}</p>
                                             <p className={`text-sm ${idx === cartaoAtivo ? 'text-gray-300' : 'text-gray-500'}`}>
-                                                {cartao.bandeira} • {cartao.validade}
+                                                {cartao.bandeira} • {getValidade(cartao)}
                                             </p>
                                         </div>
                                     </div>
