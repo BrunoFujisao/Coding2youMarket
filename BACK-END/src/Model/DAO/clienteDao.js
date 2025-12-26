@@ -55,9 +55,9 @@ async function insertCliente(
   const result = await pool.query(
     `
     INSERT INTO usuarios
-      (nome, email, cpf, telefone, senha, clubMember, dataCadastroClub, dataCadastro, ativo)
+      (nome, email, cpf, telefone, senha, clubMember, dataCadastroClub, dataCadastro, ativo, club_marketid)
     VALUES
-      ($1, $2, $3, $4, $5, $6, $7, NOW(), true)
+      ($1, $2, $3, $4, $5, $6, $7, NOW(), true, NULL)
     RETURNING *
     `,
     [nome, email, cpf, telefone, senha, clubMember, dataCadastroClub]
