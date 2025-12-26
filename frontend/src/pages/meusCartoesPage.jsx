@@ -1,0 +1,397 @@
+import { useState, useEffect } from 'react';
+import { ArrowLeft, CreditCard, Plus, ChevronLeft, ChevronRight, Trash2, Edit2, Check, X } from 'lucide-react';
+import { meusCartoes, adicionarCartao } from '../api/cartaoAPI';
+import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
+
+export default function MeusCartoesPage() {
+    const navigate = useNavigate();
+    const [cartoes, setCartoes] = useState([]);
+    const [cartaoAtivo, setCartaoAtivo] = useState(0);
+    const [adicionandoCartao, setAdicionandoCartao] = useState(false);
+    const [novoCartao, setNovoCartao] = useState({
+        numero: '',
+        nome: '',
+        validade: '',
+        cvv: '',
+        bandeira: 'Mastercard'
+    });
+    const [loading, setLoading] = useState(true);
+
+    const handleProximoCartao = () => {
+        setCartaoAtivo((prev) => (prev + 1) % cartoes.length);
+    };
+
+    const handleCartaoAnterior = () => {
+        setCartaoAtivo((prev) => (prev - 1 + cartoes.length) % cartoes.length);
+    };
+
+    useEffect(() => {
+        const fetchCards = async () => {
+            try {
+                const response = await meusCartoes();
+                if (response && response.success) {
+                    setCartoes(response.cartoes || []);
+                } else {
+                    setCartoes([]);
+                }
+            } catch (error) {
+                console.error('Erro ao buscar cartões:', error);
+                setCartoes([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCards();
+    }, []);
+
+
+    const handleAdicionarCartao = async () => {
+        // Validar número do cartão (deve ter 13-19 dígitos)
+        const numeroLimpo = novoCartao.numero.replace(/\s/g, '');
+        if (numeroLimpo.length < 13 || numeroLimpo.length > 19) {
+            alert('Número do cartão inválido. Deve ter entre 13 e 19 dígitos.');
+            return;
+        }
+
+        // Validar validade (MM/AA)
+        if (!novoCartao.validade || novoCartao.validade.length !== 5) {
+            alert('Validade inválida. Use o formato MM/AA.');
+            return;
+        }
+
+        const [mes, ano] = novoCartao.validade.split('/');
+        const mesNum = parseInt(mes, 10);
+        const anoNum = parseInt('20' + ano, 10);
+
+        if (mesNum < 1 || mesNum > 12) {
+            alert('Mês inválido. Deve ser entre 01 e 12.');
+            return;
+        }
+
+        const hoje = new Date();
+        const anoAtual = hoje.getFullYear();
+        const mesAtual = hoje.getMonth() + 1;
+
+        if (anoNum < anoAtual || (anoNum === anoAtual && mesNum < mesAtual)) {
+            alert('Cartão expirado. Verifique a validade.');
+            return;
+        }
+
+        // Validar CVV (3-4 dígitos)
+        if (!novoCartao.cvv || novoCartao.cvv.length < 3 || novoCartao.cvv.length > 4) {
+            alert('CVV inválido. Deve ter 3 ou 4 dígitos.');
+            return;
+        }
+
+        // Validar nome
+        if (!novoCartao.nome || novoCartao.nome.trim().length < 3) {
+            alert('Nome no cartão inválido. Digite o nome completo.');
+            return;
+        }
+
+        try {
+            const response = await adicionarCartao(novoCartao);
+            if (response.success) {
+                const novoId = response.id ?? (cartoes.length > 0 ? Math.max(...cartoes.map(c => c.id)) + 1 : 1);
+                const novoCartaoComId = { ...novoCartao, id: novoId };
+                setCartoes([...cartoes, novoCartaoComId]);
+                setNovoCartao({ numero: '', nome: '', validade: '', cvv: '', bandeira: 'Mastercard' });
+                setAdicionandoCartao(false);
+                setCartaoAtivo(cartoes.length);
+                alert('✅ Cartão adicionado com sucesso!');
+            } else {
+                alert('❌ Erro do Mercado Pago: ' + (response.message || 'Verifique os dados do cartão.'));
+            }
+        } catch (error) {
+            console.error('Erro ao adicionar cartão:', error);
+            alert('❌ Erro ao adicionar cartão: ' + (error.message || 'Tente novamente.'));
+        }
+    };
+
+    const handleRemoverCartao = (id) => {
+        const novosCartoes = cartoes.filter(c => c.id !== id);
+        setCartoes(novosCartoes);
+        if (cartaoAtivo >= novosCartoes.length) {
+            setCartaoAtivo(Math.max(0, novosCartoes.length - 1));
+        }
+    };
+
+    const formatarNumeroCartao = (valor) => {
+        const numeros = valor.replace(/\D/g, '');
+        const grupos = numeros.match(/.{1,4}/g) || [];
+        return grupos.join(' ').substring(0, 19);
+    };
+
+    const formatarValidade = (valor) => {
+        const numeros = valor.replace(/\D/g, '');
+        if (numeros.length >= 2) {
+            return numeros.substring(0, 2) + '/' + numeros.substring(2, 4);
+        }
+        return numeros;
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-50 pb-24">
+            <Header />
+            {loading && <p className="text-center py-4">Carregando cartões...</p>}
+
+            <div className="relative h-48 md:h-56 w-full mb-8 overflow-hidden">
+                <img
+                    src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1200"
+                    alt="Meus Cartões"
+                    className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
+                <div className="relative z-10 h-full container mx-auto px-4 md:px-8 flex items-center max-w-7xl pt-20">
+                    <button onClick={() => navigate(-1)} className="p-2 hover:bg-white/20 rounded-full mr-4">
+                        <ArrowLeft className="text-white" size={24} />
+                    </button>
+                    <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">Meus Cartões</h1>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 h-8 bg-gray-50 rounded-t-3xl"></div>
+            </div>
+
+            <main className="container mx-auto px-4 md:px-8 max-w-3xl">
+
+                {cartoes.length > 0 && (
+                    <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
+                        <div className="relative">
+
+                            <div className="w-full h-40 bg-gradient-to-br from-gray-900 to-gray-700 rounded-2xl p-4 text-white shadow-2xl relative overflow-hidden">
+
+                                <div className="w-12 h-10 bg-gradient-to-br from-yellow-200 to-yellow-400 rounded-lg mb-6"></div>
+
+                                <p className="text-xl md:text-2xl font-mono tracking-wider mb-6">
+                                    •••• •••• •••• {cartoes[cartaoAtivo].ultimos4digitos || '••••'}
+                                </p>
+
+                                <div className="flex justify-between items-end">
+                                    <div>
+                                        <p className="text-xs text-gray-400 mb-1">Nome</p>
+                                        <p className="font-semibold">{cartoes[cartaoAtivo].nomeimpresso || 'Nome não disponível'}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-xs text-gray-400 mb-1">Bandeira</p>
+                                        <p className="font-semibold uppercase">{cartoes[cartaoAtivo].bandeira || 'N/A'}</p>
+                                    </div>
+                                </div>
+
+                                <div className="absolute top-6 right-6">
+                                    <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                                        <CreditCard size={24} />
+                                    </div>
+                                </div>
+
+                                <div className="absolute top-6 right-20 text-2xl">📡</div>
+                            </div>
+
+                            {cartoes.length > 1 && (
+                                <div className="flex justify-center gap-2 mt-4">
+                                    <button onClick={handleCartaoAnterior} className="p-2 hover:bg-gray-100 rounded-full">
+                                        <ChevronLeft size={20} />
+                                    </button>
+                                    <div className="flex gap-2 items-center">
+                                        {cartoes.map((_, idx) => (
+                                            <div
+                                                key={idx}
+                                                onClick={() => setCartaoAtivo(idx)}
+                                                className={`h-2 rounded-full transition-all cursor-pointer ${idx === cartaoAtivo ? 'w-8 bg-gray-900' : 'w-2 bg-gray-300 hover:bg-gray-400'
+                                                    }`}
+                                            />
+                                        ))}
+                                    </div>
+                                    <button onClick={handleProximoCartao} className="p-2 hover:bg-gray-100 rounded-full">
+                                        <ChevronRight size={20} />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="mt-6 pt-6 border-t border-gray-100">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="font-bold text-gray-800">Detalhes do Cartão</h3>
+                                <button
+                                    onClick={() => handleRemoverCartao(cartoes[cartaoAtivo].id)}
+                                    className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-all"
+                                    title="Remover cartão"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <p className="text-gray-500 mb-1">Bandeira</p>
+                                    <p className="font-medium text-gray-800 uppercase">{cartoes[cartaoAtivo].bandeira || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-gray-500 mb-1">Final</p>
+                                    <p className="font-medium text-gray-800">**** {cartoes[cartaoAtivo].ultimos4digitos || '••••'}</p>
+                                </div>
+                                <div className="col-span-2">
+                                    <p className="text-gray-500 mb-1">Nome no Cartão</p>
+                                    <p className="font-medium text-gray-800">{cartoes[cartaoAtivo].nomeimpresso || 'Nome não disponível'}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {cartoes.length === 0 && (
+                    <div className="bg-white rounded-3xl shadow-lg p-8 mb-6 text-center">
+                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <CreditCard size={40} className="text-gray-400" />
+                        </div>
+                        <h3 className="font-bold text-gray-800 mb-2">Nenhum cartão cadastrado</h3>
+                        <p className="text-gray-500 text-sm">Adicione um cartão para facilitar seus pagamentos</p>
+                    </div>
+                )}
+
+                <button
+                    onClick={() => setAdicionandoCartao(!adicionandoCartao)}
+                    className={`w-full py-4 border-2 border-dashed rounded-xl font-medium transition-all flex items-center justify-center gap-2 mb-6 ${adicionandoCartao
+                        ? 'border-red-300 text-red-600 hover:border-red-400'
+                        : 'border-gray-300 text-gray-600 hover:border-green-500 hover:text-green-600'
+                        }`}
+                >
+                    {adicionandoCartao ? (
+                        <>
+                            <X size={20} />
+                            Cancelar
+                        </>
+                    ) : (
+                        <>
+                            <Plus size={20} />
+                            Adicionar novo cartão
+                        </>
+                    )}
+                </button>
+
+                {adicionandoCartao && (
+                    <div className="bg-white rounded-2xl shadow-lg p-6 space-y-4 mb-6">
+                        <h3 className="font-bold text-gray-800 mb-4">Novo Cartão</h3>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Número do cartão
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="1234 1234 1234 1234"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+                                value={novoCartao.numero}
+                                onChange={(e) => setNovoCartao({ ...novoCartao, numero: formatarNumeroCartao(e.target.value) })}
+                                maxLength={19}
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Nome no cartão</label>
+                            <input
+                                type="text"
+                                placeholder="NOME COMO NO CARTÃO"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none uppercase"
+                                value={novoCartao.nome}
+                                onChange={(e) => setNovoCartao({ ...novoCartao, nome: e.target.value.toUpperCase() })}
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Data de expiração
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="MM/AA"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+                                    value={novoCartao.validade}
+                                    onChange={(e) => setNovoCartao({ ...novoCartao, validade: formatarValidade(e.target.value) })}
+                                    maxLength={5}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+                                <input
+                                    type="text"
+                                    placeholder="123"
+                                    maxLength={4}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+                                    value={novoCartao.cvv}
+                                    onChange={(e) => setNovoCartao({ ...novoCartao, cvv: e.target.value.replace(/\D/g, '') })}
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Bandeira</label>
+                            <select
+                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none bg-white"
+                                value={novoCartao.bandeira}
+                                onChange={(e) => setNovoCartao({ ...novoCartao, bandeira: e.target.value })}
+                            >
+                                <option value="Visa">Visa</option>
+                                <option value="Mastercard">Mastercard</option>
+                                <option value="Elo">Elo</option>
+                                <option value="American Express">American Express</option>
+                                <option value="Hipercard">Hipercard</option>
+                            </select>
+                        </div>
+
+                        <button
+                            onClick={handleAdicionarCartao}
+                            disabled={!novoCartao.numero || !novoCartao.nome || !novoCartao.validade || !novoCartao.cvv}
+                            className="w-full py-3 bg-gray-900 text-white font-semibold rounded-full hover:bg-gray-800 transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                            <Check size={20} />
+                            Salvar Cartão
+                        </button>
+                    </div>
+                )}
+
+                {cartoes.length > 0 && (
+                    <div className="bg-white rounded-2xl shadow-lg p-6">
+                        <h3 className="font-bold text-gray-800 mb-4">Todos os Cartões ({cartoes.length})</h3>
+                        <div className="space-y-3">
+                            {cartoes.map((cartao, idx) => (
+                                <div
+                                    key={cartao.id}
+                                    onClick={() => setCartaoAtivo(idx)}
+                                    className={`flex items-center justify-between p-4 rounded-xl cursor-pointer transition-all ${idx === cartaoAtivo
+                                        ? 'bg-gray-900 text-white'
+                                        : 'bg-gray-50 hover:bg-gray-100'
+                                        }`}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${idx === cartaoAtivo ? 'bg-white/20' : 'bg-gray-200'
+                                            }`}>
+                                            <CreditCard size={20} className={idx === cartaoAtivo ? 'text-white' : 'text-gray-600'} />
+                                        </div>
+                                        <div>
+                                            <p className="font-medium">•••• {cartao.ultimos4digitos || '••••'}</p>
+                                            <p className={`text-sm uppercase ${idx === cartaoAtivo ? 'text-gray-300' : 'text-gray-500'}`}>
+                                                {cartao.bandeira || 'N/A'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleRemoverCartao(cartao.id);
+                                        }}
+                                        className={`p-2 rounded-full transition-all ${idx === cartaoAtivo
+                                            ? 'hover:bg-white/20 text-white'
+                                            : 'hover:bg-red-50 text-red-500'
+                                            }`}
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </main>
+        </div>
+    );
+}
