@@ -167,10 +167,21 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
           });
 
           if (customers.results && customers.results.length > 0) {
-            customerId = customers.results[0].id;
-            console.log('Customer encontrado:', customerId);
+            const foundCustomerId = customers.results[0].id;
+            console.log('Customer encontrado:', foundCustomerId);
+
+            // Verificar se o customer é válido
+            try {
+              await customerClient.get({ customerId: foundCustomerId });
+              customerId = foundCustomerId;
+              console.log('Customer válido!');
+            } catch (getError) {
+              console.log('Customer inválido (404), marcando como null para criar novo');
+              customerId = null; // Vai falhar na criação do card e criar novo
+            }
           } else {
-            throw new Error('Customer existe no MP mas não foi encontrado na busca');
+            console.log('Customer não encontrado na busca, marcando null');
+            customerId = null;
           }
         } else {
           throw error; // Re-throw se for outro erro
@@ -183,10 +194,27 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
 
     // 2️⃣ Salvar cartão no Customer
     const cardClient = new CustomerCard(client);
-    const card = await cardClient.create({
-      customer_id: customerId,
-      body: { token }
-    });
+    let card;
+
+    try {
+      card = await cardClient.create({
+        customer_id: customerId,
+        body: { token }
+      });
+    } catch (error) {
+      // Se o customer não existe (404), significa que customer_id está inválido
+      if (error.status === 404) {
+        return res.status(400).json({
+          success: false,
+          message: 'Customer inválido. Por favor, tente adicionar o cartão novamente.',
+          error: 'invalid_customer',
+          hint: 'Limpe o cache e tente novamente'
+        });
+      } else {
+        throw error;
+      }
+    }
+
 
     // 3️⃣ Salvar card_id e customer_id no banco
     const cartaoSalvo = await salvarCartaoTokenizado({
