@@ -34,7 +34,7 @@ async function insertPedido({
     dataProximaEntrega,
     dataProximaCobranca
 }) {
-    if (!usuarioId || !enderecoId || !frequencia || valorTotal == null || valorFinal == null) {
+    if (!usuarioId || !enderecoId || valorTotal == null || valorFinal == null) {
         console.error('Falha ao criar pedido: dados obrigatórios ausentes.');
         return false;
     }

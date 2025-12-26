@@ -123,12 +123,22 @@ router.post("/pedidos", async (req, res) => {
       dataProximaCobranca
     });
 
+    // Se insertPedido retornar false ao invés de lançar erro
+    if (!pedido) {
+      console.error('❌ insertPedido retornou false');
+      return res.status(500).json({
+        success: false,
+        message: "Erro ao criar pedido no banco"
+      });
+    }
+
     return res.status(201).json({
       success: true,
       message: "Pedido criado com sucesso",
       pedido
     });
   } catch (error) {
+    console.error('🔥 ERRO AO CRIAR PEDIDO:', error);
     return res.status(500).json({
       success: false,
       message: "Erro ao criar pedido",
