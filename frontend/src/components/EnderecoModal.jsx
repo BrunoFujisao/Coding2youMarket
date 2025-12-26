@@ -1,27 +1,39 @@
 import { X, MapPin, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
+import { meusEnderecos } from '../api/enderecoAPI';
 export default function EnderecoModal({ isOpen, onClose, onConfirmar }) {
     const [enderecoSelecionado, setEnderecoSelecionado] = useState(null);
-    // TODO: Buscar endereços do usuário da API
-    const enderecos = [
-        {
-            id: 1,
-            tipo: 'Casa',
-            rua: 'Rua das Flores, 222 - Centro',
-            cidade: 'Florianópolis - SC',
-            cep: '88010-100'
-        },
-        {
-            id: 2,
-            tipo: 'Trabalho',
-            rua: 'Rua São João, 222 - Centro',
-            cidade: 'Florianópolis - SC',
-            cep: '88010-200'
+    const [enderecos, setEnderecos] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    // Carregar endereços do usuário
+    useEffect(() => {
+        if (isOpen) {
+            carregarEnderecos();
         }
-    ];
+    }, [isOpen]);
+
+    const carregarEnderecos = async () => {
+        try {
+            setLoading(true);
+            const response = await meusEnderecos();
+            if (response.success) {
+                setEnderecos(response.enderecos || []);
+            } else {
+                toast.error('Erro ao carregar endereços');
+            }
+        } catch (error) {
+            console.error('Erro ao carregar endereços:', error);
+            toast.error('Erro ao carregar endereços');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleConfirmar = () => {
         if (!enderecoSelecionado) {
-            alert('Selecione um endereço');
+            toast.error('Selecione um endereço', { duration: 2000 });
             return;
         }
         onConfirmar(enderecoSelecionado);

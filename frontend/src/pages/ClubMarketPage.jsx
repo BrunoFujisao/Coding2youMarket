@@ -79,8 +79,15 @@ export default function ClubMarketPage() {
 
     const handleAssinar = () => {
         if (planoSelecionado) {
-            // Aqui você pode integrar com a API de assinatura
-            navigate('/pagamento', { state: { plano: planoSelecionado } });
+            const plano = planos.find(p => p.id === planoSelecionado);
+            // Redireciona para pagamento com valor do club e tipo
+            navigate('/pagamento', {
+                state: {
+                    tipoCompra: 'club',
+                    valorClub: plano.preco,
+                    planoClub: plano
+                }
+            });
         }
     };
 

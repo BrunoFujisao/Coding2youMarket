@@ -1,5 +1,5 @@
 import { getToken } from './auth';
-const BASE_URL = "http://localhost:3000/";
+const BASE_URL = "https://coding2youmarket-production.up.railway.app/api/";
 
 // Headers com autenticação
 const getAuthHeaders = () => {
@@ -10,46 +10,32 @@ const getAuthHeaders = () => {
     };
 };
 
-//Listar todos os pedidos (Admin)
-export const listarPedidos = async () => {
+// Criar novo pedido
+export const criarPedido = async (pedidoData) => {
     try {
         const response = await fetch(`${BASE_URL}pedidos`, {
-            method: "GET",
-            headers: getAuthHeaders()
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify(pedidoData)
         });
 
-        if (!response.ok) throw new Error('Erro ao carregar pedidos');
         const json = await response.json();
-        return json.pedidos;
 
+        if (!response.ok) {
+            return { success: false, message: json.message || "Erro ao criar pedido" };
+        }
+
+        return { success: true, pedido: json.pedido, message: json.message };
     } catch (error) {
-        console.error("Erro ao buscar pedidos:", error);
-        return [];
-    }
-};
-
-//Buscar pedido por ID
-export const buscarPedidoPorId = async (id) => {
-    try {
-        const response = await fetch(`${BASE_URL}pedidos/${id}`, {
-            method: "GET",
-            headers: getAuthHeaders()
-        });
-
-        if (!response.ok) throw new Error('Pedido não encontrado');
-        const json = await response.json();
-        return json.pedido;
-
-    } catch (error) {
-        console.error("Erro ao buscar pedido:", error);
-        return null;
+        console.error("Erro ao criar pedido:", error);
+        return { success: false, message: "Erro interno ao criar pedido" };
     }
 };
 
 //Meus pedidos (do usuário logado)
-export const meusPedidos = async (usuarioId) => {
+export const meusPedidos = async () => {
     try {
-        const response = await fetch(`${BASE_URL}pedidos/usuario/${usuarioId}`, {
+        const response = await fetch(`${BASE_URL}pedidos/meus`, {
             method: "GET",
             headers: getAuthHeaders()
         });
@@ -68,89 +54,7 @@ export const meusPedidos = async (usuarioId) => {
     }
 };
 
-//Pedidos ativos
-export const pedidosAtivos = async () => {
-    try {
-        const response = await fetch(`${BASE_URL}pedidos/ativos`, {
-            method: "GET",
-            headers: getAuthHeaders()
-        });
-
-        if (!response.ok) throw new Error('Erro ao carregar pedidos ativos');
-        const json = await response.json();
-        return json.pedidos;
-
-    } catch (error) {
-        console.error("Erro ao buscar pedidos ativos:", error);
-        return [];
-    }
-};
-
-//Criar novo pedido
-export const criarPedido = async (dadosPedido) => {
-    try {
-        const response = await fetch(`${BASE_URL}pedidos`, {
-            method: "POST",
-            headers: getAuthHeaders(),
-            body: JSON.stringify(dadosPedido)
-        });
-
-        if (!response.ok) throw new Error(await response.text());
-        const json = await response.json();
-        return json;
-
-    } catch (error) {
-        console.error("Erro ao criar pedido:", error);
-        return { success: false, message: error.message };
-    }
-};
-
-//Atualizar status do pedido
-export const atualizarStatus = async (id, status) => {
-    try {
-        const response = await fetch(`${BASE_URL}pedidos/${id}/status`, {
-            method: "PUT",
-            headers: getAuthHeaders(),
-            body: JSON.stringify({ status })
-        });
-
-        const json = await response.json();
-
-        if (!response.ok) {
-            return { success: false, message: json?.message || "Erro ao atualizar status" };
-        }
-
-        return { success: true, message: json?.message, pedido: json.pedido };
-    } catch (error) {
-        console.error("Erro ao atualizar status:", error);
-        return { success: false, message: "Erro interno ao atualizar." };
-    }
-};
-
-//Atualizar datas do pedido
-export const atualizarDatas = async (id, dataProximaEntrega, dataProximaCobranca) => {
-    try {
-        const response = await fetch(`${BASE_URL}pedidos/${id}/datas`, {
-            method: "PUT",
-            headers: getAuthHeaders(),
-            body: JSON.stringify({ dataProximaEntrega, dataProximaCobranca })
-        });
-
-        const json = await response.json();
-
-        if (!response.ok) {
-            return { success: false, message: json?.message || "Erro ao atualizar datas" };
-        }
-
-        return { success: true, message: json?.message, pedido: json.pedido };
-
-    } catch (error) {
-        console.error("Erro ao atualizar datas:", error);
-        return { success: false, message: "Erro interno ao atualizar." };
-    }
-};
-
-// Cancelar pedido (soft delete)
+// Cancelar pedido
 export const cancelarPedido = async (id) => {
     try {
         const response = await fetch(`${BASE_URL}pedidos/${id}/cancelar`, {
@@ -161,36 +65,54 @@ export const cancelarPedido = async (id) => {
         const json = await response.json();
 
         if (!response.ok) {
-            return { success: false, message: json.message };
+            return { success: false, message: json.message || "Erro ao cancelar pedido" };
         }
 
-        return json;
+        return { success: true, message: json.message };
     } catch (error) {
         console.error("Erro ao cancelar pedido:", error);
-        return { success: false, message: "Erro interno ao cancelar." };
+        return { success: false, message: "Erro interno ao cancelar pedido" };
     }
 };
 
-//Deletar pedido permanentemente (Admin)
-export const deletarPedido = async (id) => {
+// Pausar pedido
+export const pausarPedido = async (id) => {
     try {
-        const response = await fetch(`${BASE_URL}pedidos/${id}`, {
-            method: "DELETE",
+        const response = await fetch(`${BASE_URL}pedidos/${id}/pausar`, {
+            method: "PATCH",
             headers: getAuthHeaders()
         });
 
         const json = await response.json();
 
         if (!response.ok) {
-            return { success: false, message: json.message };
+            return { success: false, message: json.message || "Erro ao pausar pedido" };
         }
-        return json;
+
+        return { success: true, message: json.message };
     } catch (error) {
-        console.error("Erro ao deletar pedido:", error);
-        return { success: false, message: "Erro interno ao deletar." };
+        console.error("Erro ao pausar pedido:", error);
+        return { success: false, message: "Erro interno ao pausar pedido" };
     }
 };
 
-// Funções de atalho para status específicos
-export const pausarPedido = (id) => atualizarStatus(id, 'pausada');
-export const reativarPedido = (id) => atualizarStatus(id, 'ativa');
+// Reativar pedido
+export const reativarPedido = async (id) => {
+    try {
+        const response = await fetch(`${BASE_URL}pedidos/${id}/reativar`, {
+            method: "PATCH",
+            headers: getAuthHeaders()
+        });
+
+        const json = await response.json();
+
+        if (!response.ok) {
+            return { success: false, message: json.message || "Erro ao reativar pedido" };
+        }
+
+        return { success: true, message: json.message };
+    } catch (error) {
+        console.error("Erro ao reativar pedido:", error);
+        return { success: false, message: "Erro interno ao reativar pedido" };
+    }
+};

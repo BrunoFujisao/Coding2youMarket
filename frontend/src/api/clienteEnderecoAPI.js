@@ -1,5 +1,5 @@
 
-const BASE_URL = "http://localhost:3000/api"; 
+const BASE_URL = "https://coding2youmarket-production.up.railway.app/api";
 
 // Vincular um endereço existente ao usuário logado
 export const vincularEndereco = async (enderecoId) => {
@@ -12,7 +12,7 @@ export const vincularEndereco = async (enderecoId) => {
 
         const json = await response.json();
         if (!response.ok) return { success: false, message: json.error || "Erro ao vincular" };
-        
+
         return { success: true, data: json.data };
     } catch (error) {
         console.error("Erro ao vincular endereço:", error);
@@ -51,7 +51,7 @@ export const desvincularEndereco = async (enderecoId) => {
 
         const json = await response.json();
         if (!response.ok) return { success: false, message: json.error || "Erro ao desvincular" };
-        
+
         return { success: true, message: json.message };
     } catch (error) {
         console.error("Erro ao desvincular endereço:", error);

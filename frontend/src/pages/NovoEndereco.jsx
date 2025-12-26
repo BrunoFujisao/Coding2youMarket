@@ -14,7 +14,7 @@ export default function NovoEnderecoModal() {
   const [estado, setEstado] = useState("");
   const [apelido, setApelido] = useState("");
   const [mensagem, setMensagem] = useState({ tipo: "", texto: "" });
-  
+
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
   const [buscandoCep, setBuscandoCep] = useState(false);
@@ -32,17 +32,18 @@ export default function NovoEnderecoModal() {
     try {
       setErro("");
       setBuscandoCep(true);
-      const dados = await buscarCep(cep);
+      const response = await buscarCep(cep);
 
-      if (dados && !dados.erro) {
-        setRua(dados.logradouro || "");
-        setBairro(dados.bairro || "");
-        setCidade(dados.cidade || ""); 
-        setEstado(dados.uf || "");
+      if (response.success && response.endereco) {
+        setRua(response.endereco.rua || "");
+        setBairro(response.endereco.bairro || "");
+        setCidade(response.endereco.cidade || "");
+        setEstado(response.endereco.estado || "");
       } else {
-        setMensagem({ tipo: "erro", texto: "CEP não encontrado" });
+        setMensagem({ tipo: "erro", texto: response.message || "CEP não encontrado" });
       }
-    } catch {
+    } catch (error) {
+      console.error("Erro ao buscar CEP:", error);
       setMensagem({ tipo: "erro", texto: "Erro ao buscar o CEP" });
     } finally {
       setBuscandoCep(false);
@@ -77,7 +78,7 @@ export default function NovoEnderecoModal() {
       }
 
       setMensagem({ tipo: "sucesso", texto: "Endereço cadastrado com sucesso" });
-      setTimeout(() => navigate("/home"), 1500); 
+      setTimeout(() => navigate("/home"), 1500);
     } catch (error) {
       setMensagem({ tipo: "erro", texto: error?.message || "Erro ao salvar endereço." });
     } finally {
@@ -104,11 +105,11 @@ export default function NovoEnderecoModal() {
         </div>
 
         <div style={styles.formContent}>
-          
+
           {/* RENDERIZAÇÃO DA MENSAGEM */}
           {mensagem.texto && (
             <p style={{
-              ...styles.errorText, 
+              ...styles.errorText,
               color: mensagem.tipo === "erro" ? "red" : "green",
               textAlign: 'center',
               marginBottom: '15px'
@@ -120,16 +121,16 @@ export default function NovoEnderecoModal() {
           <div style={styles.inputGroup}>
             <label style={styles.label}>CEP</label>
             <div style={styles.row}>
-              <input 
-                style={{ ...styles.input, flex: 1, marginRight: '10px' }} 
-                type="text" 
+              <input
+                style={{ ...styles.input, flex: 1, marginRight: '10px' }}
+                type="text"
                 placeholder="00000000"
                 value={cep}
                 onChange={handleCepChange}
                 maxLength={8}
               />
-              <button 
-                onClick={fetchCep} 
+              <button
+                onClick={fetchCep}
                 disabled={buscandoCep}
                 style={styles.searchButton}
               >
@@ -140,9 +141,9 @@ export default function NovoEnderecoModal() {
 
           <div style={styles.inputGroup}>
             <label style={styles.label}>Rua</label>
-            <input 
-              style={styles.input} 
-              type="text" 
+            <input
+              style={styles.input}
+              type="text"
               value={rua}
               onChange={(e) => setRua(e.target.value)}
             />
@@ -151,18 +152,18 @@ export default function NovoEnderecoModal() {
           <div style={styles.row}>
             <div style={{ ...styles.inputGroup, flex: 1, marginRight: '10px' }}>
               <label style={styles.label}>Número</label>
-              <input 
-                style={styles.input} 
-                type="text" 
+              <input
+                style={styles.input}
+                type="text"
                 value={numero}
                 onChange={(e) => setNumero(e.target.value)}
               />
             </div>
             <div style={{ ...styles.inputGroup, flex: 2 }}>
               <label style={styles.label}>Bairro</label>
-              <input 
-                style={styles.input} 
-                type="text" 
+              <input
+                style={styles.input}
+                type="text"
                 value={bairro}
                 onChange={(e) => setBairro(e.target.value)}
               />
@@ -171,9 +172,9 @@ export default function NovoEnderecoModal() {
 
           <div style={styles.inputGroup}>
             <label style={styles.label}>Complemento</label>
-            <input 
-              style={styles.input} 
-              type="text" 
+            <input
+              style={styles.input}
+              type="text"
               value={complemento}
               onChange={(e) => setComplemento(e.target.value)}
             />
@@ -181,9 +182,9 @@ export default function NovoEnderecoModal() {
 
           <div style={styles.inputGroup}>
             <label style={styles.label}>Cidade</label>
-            <input 
-              style={styles.input} 
-              type="text" 
+            <input
+              style={styles.input}
+              type="text"
               value={cidade}
               onChange={(e) => setCidade(e.target.value)}
             />
@@ -192,27 +193,27 @@ export default function NovoEnderecoModal() {
           <div style={styles.row}>
             <div style={{ ...styles.inputGroup, flex: 1, marginRight: '10px' }}>
               <label style={styles.label}>UF</label>
-              <input 
-                style={styles.input} 
-                type="text" 
+              <input
+                style={styles.input}
+                type="text"
                 value={estado}
                 onChange={(e) => setEstado(e.target.value)}
               />
             </div>
             <div style={{ ...styles.inputGroup, flex: 3 }}>
               <label style={styles.label}>Apelido</label>
-              <input 
-                style={styles.input} 
-                type="text" 
-                placeholder="Casa, Trabalho..." 
+              <input
+                style={styles.input}
+                type="text"
+                placeholder="Casa, Trabalho..."
                 value={apelido}
                 onChange={(e) => setApelido(e.target.value)}
               />
             </div>
           </div>
 
-          <button 
-            style={{...styles.submitButton, opacity: loading ? 0.7 : 1}} 
+          <button
+            style={{ ...styles.submitButton, opacity: loading ? 0.7 : 1 }}
             onClick={handleSubmit}
             disabled={loading}
           >
@@ -237,7 +238,7 @@ const styles = {
     fontFamily: 'sans-serif',
     padding: '20px',
   },
-  
+
   modal: {
     backgroundColor: '#F8F9FA',
     width: '100%',

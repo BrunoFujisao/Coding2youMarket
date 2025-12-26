@@ -7,9 +7,11 @@ import SumarioOrdem from '../components/SumarioOrdem';
 import FrequenciaModal from '../components/FrequenciaModal';
 import EnderecoModal from '../components/EnderecoModal';
 import { verMeuCarrinho, atualizarQuantidade, removerItem, limparCarrinho } from '../api/carrinhoAPI';
+import { useCarrinho } from '../context/CarrinhoContext';
 
 export default function CarrinhoPage() {
     const navigate = useNavigate();
+    const { decrementarContador } = useCarrinho();
     const [itensCarrinho, setItensCarrinho] = useState([]);
     const [resumo, setResumo] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -86,10 +88,16 @@ export default function CarrinhoPage() {
     };
     const handleRemoverItem = async (itemId) => {
         try {
+            const itemRemovido = itensCarrinho.find(item => item.id === itemId);
             await removerItem(itemId);
             const novosItens = itensCarrinho.filter(item => item.id !== itemId);
             setItensCarrinho(novosItens);
             calcularResumo(novosItens);
+
+            // Atualiza contador no header
+            if (itemRemovido) {
+                decrementarContador(itemRemovido.quantidade);
+            }
         } catch (error) {
             console.error('Erro ao remover item:', error);
             alert('Erro ao remover item. Tente novamente.');

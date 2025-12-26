@@ -34,8 +34,10 @@ export default function Login() {
         setMensagem({ tipo: "erro", texto: "Não foi possível identificar o usuário." });
         return;
       }
-      const enderecos = await meusEnderecos(usuarioId);
-      if (enderecos && enderecos.length > 0) {
+
+      // Verificar se tem endereços
+      const response = await meusEnderecos();
+      if (response.success && response.enderecos && response.enderecos.length > 0) {
         setTimeout(() => navigate("/home"), 1500);
       } else {
         setTimeout(() => navigate("/novoEndereco"), 1500);

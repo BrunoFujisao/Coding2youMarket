@@ -3,9 +3,17 @@ import { CheckCircle, Home, Package } from 'lucide-react';
 import { useEffect } from 'react';
 import confetti from 'canvas-confetti';
 export default function ConfirmacaoPage() {
-    const location = useLocation();
     const navigate = useNavigate();
-    const pagamento = location.state?.pagamento;
+    const location = useLocation();
+    const { pagamento, pedido, isClub } = location.state || {};
+
+    // Detectar se é assinatura recorrente ou compra única
+    const isAssinatura = pedido?.frequencia &&
+        pedido.frequencia !== 'unica' &&
+        (pedido.frequencia === 'semanal' || pedido.frequencia === 'mensal');
+    const titulo = isClub ? 'Bem-vindo ao Club!' :
+        isAssinatura ? 'Assinatura Criada!' :
+            'Pedido Criado!';
     useEffect(() => {
         // Confetti ao carregar
         confetti({
@@ -14,32 +22,29 @@ export default function ConfirmacaoPage() {
             origin: { y: 0.6 }
         });
     }, []);
-    if (!pagamento) {
+    if (!pagamento && !pedido) { // Adjusted condition to check for both
         navigate('/');
         return null;
     }
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 flex items-center justify-center p-4">
-            <div className="max-w-md w-full">
-                {/* Card Principal */}
-                <div className="bg-white rounded-3xl shadow-2xl p-8 text-center relative overflow-hidden">
-                    {/* Elementos decorativos */}
-                    <div className="absolute top-0 left-0 w-32 h-32 bg-green-200 rounded-full -translate-x-16 -translate-y-16 opacity-50"></div>
-                    <div className="absolute bottom-0 right-0 w-40 h-40 bg-blue-200 rounded-full translate-x-20 translate-y-20 opacity-50"></div>
-                    <div className="absolute top-1/2 right-0 w-20 h-20 bg-purple-200 rounded-full translate-x-10 opacity-50"></div>
+        <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
+            <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
+                {/* Animação de Confetti */}
+                <div className="relative h-48 bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center overflow-hidden">
+                    <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+
                     {/* Ícone de Sucesso */}
-                    <div className="relative mb-6 inline-block">
-                        <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-lg animate-bounce-slow">
-                            <CheckCircle className="text-white" size={56} strokeWidth={2.5} />
-                        </div>
-                        {/* Elementos decorativos ao redor */}
-                        <div className="absolute -top-2 -right-2 w-4 h-4 bg-yellow-400 rounded-full animate-ping"></div>
-                        <div className="absolute -bottom-2 -left-2 w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
-                        <div className="absolute top-0 -left-4 w-2 h-2 bg-red-400 rounded-full animate-bounce"></div>
+                    <div className="relative z-10 w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                        <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
                     </div>
-                    <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                        Assinatura Criada!
-                    </h1>
+                </div>
+
+                {/* Conteúdo */}
+                <div className="p-8 text-center">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">{titulo}</h1>
                     <p className="text-gray-600 mb-8">
                         Tudo certo. A gente cuida do resto.
                     </p>

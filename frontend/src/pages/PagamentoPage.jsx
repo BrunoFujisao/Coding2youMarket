@@ -4,8 +4,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Header from '../components/Header';
 import CVVModal from '../components/cvvmodal';
-import { meusCartoes } from '../api/cartaoAPI';
-import { verMeuCarrinho } from '../api/carrinhoAPI';
+import { meusCartoes, deletarCartao } from '../api/cartaoAPI';
+import { verMeuCarrinho, limparCarrinho } from '../api/carrinhoAPI';
+import { criarPedido } from '../api/pedidosAPI';
 import { initMercadoPago, tokenizarCartao, detectarBandeira, formatarNumeroCartao, formatarValidade } from '../services/mercadoPagoService';
 
 const API_URL = 'https://coding2youmarket-production.up.railway.app/api';
@@ -51,6 +52,19 @@ export default function PagamentoPage() {
 
     const calcularResumo = async () => {
         try {
+            // Se for compra Club, usar valor fixo
+            if (dadosCompra.tipoCompra === 'club') {
+                const valorClub = dadosCompra.valorClub || 39.90;
+                setResumo({
+                    subtotal: valorClub,
+                    descontoClub: 0,
+                    frete: 0, // Club não tem frete
+                    total: valorClub
+                });
+                return;
+            }
+
+            // Compra normal - calcular carrinho
             const carrinho = await verMeuCarrinho();
             if (!carrinho || carrinho.length === 0) {
                 setResumo({
@@ -132,6 +146,58 @@ export default function PagamentoPage() {
     };
 
 
+    const handleDeletarCartao = async (cartaoId) => {
+        // Toast com confirmação bonita ao invés de confirm()
+        toast((t) => (
+            <div className="flex flex-col gap-3">
+                <p className="font-medium">Tem certeza que deseja excluir este cartão?</p>
+                <div className="flex gap-2">
+                    <button
+                        onClick={async () => {
+                            toast.dismiss(t.id);
+                            const loadingToast = toast.loading('Removendo cartão...');
+                            try {
+                                const response = await deletarCartao(cartaoId);
+
+                                if (response.success) {
+                                    toast.success('Cartão removido com sucesso!', { id: loadingToast });
+
+                                    // Atualiza lista IMEDIATAMENTE removendo o cartão
+                                    const novosCartoes = cartoes.filter(c => c.id !== cartaoId);
+                                    setCartoes(novosCartoes);
+
+                                    // Ajusta índice ativo
+                                    if (novosCartoes.length === 0) {
+                                        // Sem cartões, reseta
+                                        setCartaoAtivo(0);
+                                    } else if (cartaoAtivo >= novosCartoes.length) {
+                                        // Índice fora do range, vai pro último
+                                        setCartaoAtivo(novosCartoes.length - 1);
+                                    }
+                                } else {
+                                    toast.error(response.message || 'Erro ao remover cartão', { id: loadingToast });
+                                }
+                            } catch (error) {
+                                console.error('Erro ao deletar cartão:', error);
+                                toast.error('Erro ao remover cartão', { id: loadingToast });
+                            }
+                        }}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700"
+                    >
+                        Excluir
+                    </button>
+                    <button
+                        onClick={() => toast.dismiss(t.id)}
+                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300"
+                    >
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        ), { duration: 10000 });
+    };
+
+
     const handleContinuar = () => {
         if (cartoes.length === 0) {
             toast.error('Adicione um cartão para continuar');
@@ -150,16 +216,30 @@ export default function PagamentoPage() {
         const loadingToast = toast.loading('Processando pagamento...');
         try {
             const token = localStorage.getItem('token');
-            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userStr = localStorage.getItem('user');
+
+            // Validação robusta do user
+            let user = {};
+            if (userStr && userStr !== 'undefined' && userStr !== 'null') {
+                try {
+                    user = JSON.parse(userStr);
+                } catch (e) {
+                    console.error('Erro ao fazer parse do user:', e);
+                    user = {};
+                }
+            }
+
             const cartaoSelecionado = cartoes[cartaoAtivo];
             const dadosPagamento = {
                 token: cartaoSelecionado.tokencartao,
-                transactionAmount: resumo.total,
+                transactionAmount: parseFloat(resumo.total.toFixed(2)), // Garantir número com ponto
                 installments: 1,
                 description: `Pedido Subscrivery - ${dadosCompra.tipo || 'assinatura'}`,
                 paymentMethodId: cartaoSelecionado.bandeira?.toLowerCase() || 'master',
-                email: user.email || user.Email
+                email: user.email || user.Email,
+                securityCode: cvv
             };
+
             const response = await fetch(`${API_URL}/pagamentos/processar`, {
                 method: 'POST',
                 headers: {
@@ -168,10 +248,87 @@ export default function PagamentoPage() {
                 },
                 body: JSON.stringify(dadosPagamento)
             });
+
             const data = await response.json();
             if (data.success && data.pagamento.status === 'approved') {
                 toast.success('Pagamento aprovado!', { id: loadingToast });
-                navigate('/confirmacao', { state: { pagamento: data.pagamento } });
+
+                // Criar pedido após pagamento aprovado
+                try {
+                    // Se for Club Market, não precisa de carrinho
+                    if (dadosCompra.tipoCompra === 'club') {
+                        toast.success('🎉 Parabéns! Você agora está participando do Club Market!', {
+                            id: loadingToast,
+                            duration: 5000
+                        });
+                        navigate('/confirmacao', {
+                            state: {
+                                pagamento: data.pagamento,
+                                isClub: true,
+                                planoClub: dadosCompra.planoClub
+                            }
+                        });
+                        return;
+                    }
+
+                    // Compra normal - validar carrinho
+                    const carrinho = await verMeuCarrinho();
+
+                    if (!carrinho || carrinho.length === 0) {
+                        toast.error('Carrinho vazio!');
+                        return;
+                    }
+
+                    // Pegar endereço e frequência do localStorage/state
+                    const enderecoId = dadosCompra.enderecoId || 1; // TODO: Pegar do fluxo real
+                    const frequencia = dadosCompra.frequencia || 'unica'; // 'unica' = compra única
+                    const diaEntrega = dadosCompra.diaEntrega || new Date().getDate();
+
+                    // Calcular datas baseado na frequência
+                    const diasParaProximaEntrega = frequencia === 'semanal' ? 7 : 30;
+                    const dataProximaEntrega = new Date(Date.now() + diasParaProximaEntrega * 24 * 60 * 60 * 1000);
+                    const dataProximaCobranca = new Date(dataProximaEntrega.getTime() - 24 * 60 * 60 * 1000); // 1 dia antes
+
+                    // Criar pedido
+                    const pedidoData = {
+                        enderecoId,
+                        frequencia,
+                        diaEntrega,
+                        valorTotal: resumo.subtotal,
+                        valorFinal: resumo.total,
+                        dataProximaEntrega: dataProximaEntrega.toISOString(),
+                        dataProximaCobranca: dataProximaCobranca.toISOString()
+                    };
+
+                    console.log('📦 Enviando pedido:', pedidoData);
+                    const pedidoResponse = await criarPedido(pedidoData);
+
+                    if (pedidoResponse.success) {
+                        // Limpar carrinho após criar pedido
+                        await limparCarrinho();
+
+                        // Notificação personalizada para Club
+                        if (dadosCompra.tipoCompra === 'club') {
+                            toast.success('🎉 Parabéns! Você agora está participando do Club Market!', { id: loadingToast, duration: 5000 });
+                        } else {
+                            toast.success('Pedido criado com sucesso!');
+                        }
+
+                        navigate('/confirmacao', {
+                            state: {
+                                pagamento: data.pagamento,
+                                pedido: pedidoResponse.pedido
+                            }
+                        });
+                    } else {
+                        toast.error('Erro ao criar pedido. Entre em contato com suporte.');
+                        navigate('/confirmacao', { state: { pagamento: data.pagamento } });
+                    }
+                } catch (pedidoError) {
+                    console.error('Erro ao criar pedido:', pedidoError);
+                    toast.error('Pagamento aprovado, mas erro ao criar pedido. Entre em contato com suporte.');
+                    navigate('/confirmacao', { state: { pagamento: data.pagamento } });
+                }
             } else {
                 toast.error(`Pagamento ${data.pagamento?.status || 'recusado'}. ${data.pagamento?.statusDetail || ''}`, {
                     id: loadingToast,
@@ -245,6 +402,18 @@ export default function PagamentoPage() {
                                         </div>
                                         <div className="absolute top-6 right-20 text-2xl">📡</div>
                                     </div>
+
+                                    {/* Botão Deletar Cartão - Sempre visível */}
+                                    <button
+                                        onClick={() => handleDeletarCartao(cartoes[cartaoAtivo].id)}
+                                        className="mt-3 w-full py-2 text-red-600 hover:bg-red-50 rounded-xl font-medium transition-all flex items-center justify-center gap-2 border border-red-200"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        Remover este cartão
+                                    </button>
+
                                     {cartoes.length > 1 && (
                                         <div className="flex justify-center gap-2 mt-4">
                                             <button onClick={handleCartaoAnterior} className="p-2 hover:bg-gray-100 rounded-full">

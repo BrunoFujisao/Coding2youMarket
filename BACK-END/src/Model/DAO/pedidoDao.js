@@ -42,17 +42,17 @@ async function insertPedido({
     const { rows } = await pool.query(
         `
     INSERT INTO pedidos (
-      usuarioId,
-      enderecoId,
+      usuarioid,
+      enderecoid,
       frequencia,
-      diaEntrega,
-      valorTotal,
-      valorFrete,
-      descontoClub,
-      valorFinal,
+      diaentrega,
+      valortotal,
+      valorfrete,
+      descontoclub,
+      valorfinal,
       status,
-      dataProximaEntrega,
-      dataProximaCobranca
+      dataproximaentrega,
+      dataproximacobranca
     )
     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
     RETURNING *

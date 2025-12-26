@@ -105,10 +105,10 @@ router.post("/pedidos", async (req, res) => {
       dataProximaCobranca
     } = req.body;
 
-    if (!enderecoId || !frequencia || valorTotal == null || valorFinal == null) {
+    if (!enderecoId || valorTotal == null || valorFinal == null) {
       return res.status(400).json({
         success: false,
-        message: "Campos obrigatórios não informados"
+        message: "Campos obrigatórios não informados (enderecoId, valorTotal, valorFinal)"
       });
     }
 

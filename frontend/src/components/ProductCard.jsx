@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus, Minus, ShoppingCart } from 'lucide-react';
+import toast from 'react-hot-toast';
 const API_URL = 'https://coding2youmarket-production.up.railway.app/api';
 import { useCarrinho } from '../context/CarrinhoContext';
 export default function ProductCard({ produto }) {
@@ -12,7 +13,7 @@ export default function ProductCard({ produto }) {
             const token = localStorage.getItem('token');
 
             if (!token) {
-                alert("Faça login para adicionar ao carrinho");
+                toast.error("Faça login para adicionar ao carrinho", { duration: 2000 });
                 return;
             }
             const response = await fetch(`${API_URL}/carrinho`, {
@@ -28,20 +29,19 @@ export default function ProductCard({ produto }) {
             });
             const data = await response.json();
             if (data.success) {
-                // Atualiza o contador no header
                 incrementarContador(quantidade);
 
-                // Feedback visual
-                alert(`✅ ${quantidade}x ${produto.nome} adicionado ao carrinho!`);
+                // Feedback silencioso sem bloquear
+                toast.success(`${quantidade}x ${produto.nome} adicionado`, { duration: 1500 });
 
                 // Reseta quantidade
                 setQuantidade(1);
             } else {
-                alert('❌ Erro ao adicionar ao carrinho. Tente novamente.');
+                toast.error('Erro ao adicionar ao carrinho', { duration: 2000 });
             }
         } catch (error) {
             console.error('Erro ao adicionar:', error);
-            alert('❌ Erro ao adicionar ao carrinho. Verifique sua conexão.');
+            toast.error('Erro de conexão. Tente novamente', { duration: 2000 });
         } finally {
             setLoading(false);
         }

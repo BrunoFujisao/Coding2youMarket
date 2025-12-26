@@ -113,34 +113,7 @@ router.put("/carrinho/:id", async (req, res) => {
   }
 });
 
-// DELETE
-router.delete("/carrinho/:id", async (req, res) => {
-  try {
-    const id = Number(req.params.id);
-    const result = await deleteCarrinho(id);
-
-    if (!result) {
-      return res.status(404).json({
-        success: false,
-        message: "Item do carrinho não encontrado"
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "Item removido do carrinho com sucesso!"
-    });
-
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Erro ao excluir item do carrinho",
-      error: error.message
-    });
-  }
-});
-
-// DELETE
+// DELETE - LIMPAR CARRINHO (DEVE VIR ANTES DO /:id)
 router.delete("/carrinho/limpar", async (req, res) => {
   try {
     const usuarioId = req.usuario.id;
@@ -163,6 +136,33 @@ router.delete("/carrinho/limpar", async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Erro ao limpar carrinho",
+      error: error.message
+    });
+  }
+});
+
+// DELETE - REMOVER ITEM POR ID
+router.delete("/carrinho/:id", async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const result = await deleteCarrinho(id);
+
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: "Item do carrinho não encontrado"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Item removido do carrinho com sucesso!"
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Erro ao excluir item do carrinho",
       error: error.message
     });
   }

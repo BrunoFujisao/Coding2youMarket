@@ -87,6 +87,24 @@ export const limparCarrinho = async () => {
             method: "DELETE",
             headers: getAuthHeaders()
         });
+
+        // Se a rota não existir (404), limpar item por item
+        if (response.status === 404) {
+            // Fallback silencioso: limpa item por item
+            const carrinho = await verMeuCarrinho();
+
+            if (!carrinho || carrinho.length === 0) {
+                return { success: true, message: "Carrinho já está vazio" };
+            }
+
+            // Deletar cada item
+            for (const item of carrinho) {
+                await removerItem(item.id);
+            }
+
+            return { success: true, message: "Carrinho limpo com sucesso!" };
+        }
+
         const json = await response.json();
         if (!response.ok) {
             return { success: false, message: json.message };

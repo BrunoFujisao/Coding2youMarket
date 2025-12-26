@@ -1,5 +1,5 @@
 import { getToken } from './auth';
-const BASE_URL = "http://localhost:3000/";
+const BASE_URL = "https://coding2youmarket-production.up.railway.app/api/";
 
 // Headers com autenticação
 const getAuthHeaders = () => {

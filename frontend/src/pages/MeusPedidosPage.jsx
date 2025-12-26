@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
 import Header from "../components/Header";
-import { meusPedidos } from "../api/pedidosAPI";
+import { meusPedidos, cancelarPedido, pausarPedido } from "../api/pedidosAPI";
 import { getUsuarioId } from "../api/auth";
 
 export default function MeusPedidosPage() {
     const navigate = useNavigate();
     const [pedidos, setPedidos] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [processando, setProcessando] = useState(false);
 
     useEffect(() => {
         const carregarPedidos = async () => {
@@ -62,6 +64,33 @@ export default function MeusPedidosPage() {
             style: 'currency',
             currency: 'BRL'
         }).format(value);
+    };
+
+    const handleCancelarPedido = async (pedidoId) => {
+        if (!confirm('Tem certeza que deseja cancelar este pedido?')) {
+            return;
+        }
+
+        setProcessando(true);
+        const loadingToast = toast.loading('Cancelando pedido...');
+
+        try {
+            const response = await cancelarPedido(pedidoId);
+
+            if (response.success) {
+                toast.success('Pedido cancelado com sucesso!', { id: loadingToast });
+                // Recarregar pedidos
+                const dados = await meusPedidos();
+                setPedidos(dados || []);
+            } else {
+                toast.error(response.message || 'Erro ao cancelar pedido', { id: loadingToast });
+            }
+        } catch (error) {
+            console.error('Erro ao cancelar:', error);
+            toast.error('Erro ao cancelar pedido', { id: loadingToast });
+        } finally {
+            setProcessando(false);
+        }
     };
 
     return (
@@ -140,19 +169,19 @@ export default function MeusPedidosPage() {
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                                         <div>
                                             <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Data do Pedido</p>
-                                            <p className="font-semibold text-gray-800">{formatDate(pedido.dataPedido || pedido.createdAt)}</p>
+                                            <p className="font-semibold text-gray-800">{formatDate(pedido.datainicio || pedido.createdat)}</p>
                                         </div>
                                         <div>
                                             <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Próxima Entrega</p>
-                                            <p className="font-semibold text-gray-800">{formatDate(pedido.dataProximaEntrega)}</p>
+                                            <p className="font-semibold text-gray-800">{formatDate(pedido.dataproximaentrega)}</p>
                                         </div>
                                         <div>
                                             <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Próxima Cobrança</p>
-                                            <p className="font-semibold text-gray-800">{formatDate(pedido.dataProximaCobranca)}</p>
+                                            <p className="font-semibold text-gray-800">{formatDate(pedido.dataproximacobranca)}</p>
                                         </div>
                                         <div>
                                             <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Valor Total</p>
-                                            <p className="font-bold text-green-600 text-lg">{formatCurrency(pedido.valorTotal)}</p>
+                                            <p className="font-bold text-green-600 text-lg">{formatCurrency(pedido.valorfinal || pedido.valortotal || 0)}</p>
                                         </div>
                                     </div>
 
@@ -178,6 +207,23 @@ export default function MeusPedidosPage() {
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Botão Cancelar - Só para assinaturas recorrentes */}
+                                {(pedido.status === 'ativa' || pedido.status === 'pausada') &&
+                                    (pedido.frequencia === 'semanal' || pedido.frequencia === 'mensal') && (
+                                        <div className="px-5 pb-5">
+                                            <button
+                                                onClick={() => handleCancelarPedido(pedido.id)}
+                                                disabled={processando}
+                                                className="w-full py-2.5 text-red-600 hover:bg-red-50 rounded-xl font-medium transition-all flex items-center justify-center gap-2 border border-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                                {processando ? 'Cancelando...' : 'Cancelar Assinatura'}
+                                            </button>
+                                        </div>
+                                    )}
                             </div>
                         ))}
                     </div>

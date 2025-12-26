@@ -106,7 +106,19 @@ export const getToken = () => {
 // Pegar usuário logado
 export const getUsuarioLogado = () => {
   const user = localStorage.getItem('user');
-  return user ? JSON.parse(user) : null;
+
+  // Validação robusta
+  if (!user || user === 'undefined' || user === 'null') {
+    return null;
+  }
+
+  try {
+    return JSON.parse(user);
+  } catch (error) {
+    console.error('Erro ao fazer parse do usuário:', error);
+    localStorage.removeItem('user');
+    return null;
+  }
 };
 
 // Pegar o ID do usuário logado
