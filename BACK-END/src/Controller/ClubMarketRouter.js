@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { insertClubMarket, getClubMarkets, getClubMarketPorUsuario, getClubMarketPorId, updateStatusClubMarket,
   deleteClubMarket } = require('../Model/DAO/clubMarketDao');
-const { updateClubMember } = require('../Model/DAO/clienteDao');
+const { updateClubMember, assinarClubMarket, cancelarClubMarket } = require('../Model/DAO/clienteDao');
 const auth = require('../Middleware/authJWTMid');
 
 const { MercadoPagoConfig, PreApproval } = require('mercadopago');
@@ -298,5 +298,103 @@ router.patch('/club-market/cancelar', async (req, res) => {
     });
   }
 });
+
+
+// ASSINAR CLUB MARKET (passando apenas o planoId)
+router.post('/club-market/assinar/:planoId', async (req, res) => {
+  try {
+    const usuarioId = req.usuario.id;
+    const planoId = Number(req.params.planoId);
+
+    if (!planoId) {
+      return res.status(400).json({
+        success: false,
+        message: 'ID do plano é obrigatório'
+      });
+    }
+
+    // Verifica se o plano existe
+    const plano = await getClubMarketPorId(planoId);
+    if (!plano) {
+      return res.status(404).json({
+        success: false,
+        message: 'Plano não encontrado'
+      });
+    }
+
+    // Verifica se o usuário já tem assinatura
+    const assinaturaAtual = await getClubMarketPorUsuario(usuarioId);
+    if (assinaturaAtual) {
+      return res.status(400).json({
+        success: false,
+        message: 'Você já possui uma assinatura ativa'
+      });
+    }
+
+    // Assina o plano
+    const resultado = await assinarClubMarket(usuarioId, planoId);
+
+    if (!resultado) {
+      return res.status(500).json({
+        success: false,
+        message: 'Erro ao assinar plano'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Assinatura realizada com sucesso!',
+      usuario: resultado
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Erro ao assinar plano',
+      error: error.message
+    });
+  }
+});
+
+
+// CANCELAR ASSINATURA CLUB MARKET (simples)
+router.post('/club-market/cancelar-assinatura', async (req, res) => {
+  try {
+    const usuarioId = req.usuario.id;
+
+    // Verifica se o usuário tem assinatura
+    const assinaturaAtual = await getClubMarketPorUsuario(usuarioId);
+    if (!assinaturaAtual) {
+      return res.status(404).json({
+        success: false,
+        message: 'Você não possui assinatura ativa'
+      });
+    }
+
+    // Cancela a assinatura
+    const resultado = await cancelarClubMarket(usuarioId);
+
+    if (!resultado) {
+      return res.status(500).json({
+        success: false,
+        message: 'Erro ao cancelar assinatura'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Assinatura cancelada com sucesso!',
+      usuario: resultado
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Erro ao cancelar assinatura',
+      error: error.message
+    });
+  }
+});
+
 
 module.exports = router;

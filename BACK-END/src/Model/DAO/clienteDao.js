@@ -257,6 +257,34 @@ async function updateClubMember(usuarioId, clubMember, club_marketid = null) {
   return rows[0];
 }
 
+// ASSINAR CLUB MARKET (apenas passa o club_marketid)
+async function assinarClubMarket(usuarioId, club_marketid) {
+  if (!usuarioId || !club_marketid) {
+    console.error('Falha ao assinar Club Market: usuarioId e club_marketid são obrigatórios');
+    return null;
+  }
+
+  const { rows } = await pool.query(
+    'UPDATE usuarios SET clubMember = true, club_marketid = $1, dataCadastroClub = NOW() WHERE id = $2 RETURNING *',
+    [club_marketid, usuarioId]
+  );
+  return rows[0];
+}
+
+// CANCELAR ASSINATURA CLUB MARKET
+async function cancelarClubMarket(usuarioId) {
+  if (!usuarioId) {
+    console.error('Falha ao cancelar Club Market: usuarioId é obrigatório');
+    return null;
+  }
+
+  const { rows } = await pool.query(
+    'UPDATE usuarios SET clubMember = false, club_marketid = NULL WHERE id = $1 RETURNING *',
+    [usuarioId]
+  );
+  return rows[0];
+}
+
 //REDEFINIR SENHA
 async function updateSenha(email, senha) {
   const { rows } = await pool.query(
@@ -289,6 +317,8 @@ module.exports = {
   getClienteByEmail,
   getClienteByCpf,
   updateClubMember,
+  assinarClubMarket,
+  cancelarClubMarket,
   deleteCliente,
   updateSenha,
   getClienteById

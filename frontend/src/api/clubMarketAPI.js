@@ -138,3 +138,72 @@ export const deletarClub = async (id) => {
 export const cancelar = (id) => atualizarStatus(id, 'cancelada');
 export const reativar = (id) => atualizarStatus(id, 'ativa');
 export const suspender = (id) => atualizarStatus(id, 'suspensa');
+
+
+// POST - Assinar um plano (passa apenas o ID do plano)
+export const assinarPlano = async (planoId) => {
+    try {
+        const response = await fetch(`${BASE_URL}club-market/assinar/${planoId}`, {
+            method: "POST",
+            headers: getAuthHeaders()
+        });
+
+        const json = await response.json();
+
+        if (!response.ok) {
+            return { success: false, message: json.message || 'Erro ao assinar plano' };
+        }
+
+        return { success: true, message: json.message, usuario: json.usuario };
+
+    } catch (error) {
+        console.error("Erro ao assinar plano:", error);
+        return { success: false, message: "Erro ao conectar com o servidor" };
+    }
+};
+
+
+// POST - Cancelar assinatura do usuário logado
+export const cancelarAssinatura = async () => {
+    try {
+        const response = await fetch(`${BASE_URL}club-market/cancelar-assinatura`, {
+            method: "POST",
+            headers: getAuthHeaders()
+        });
+
+        const json = await response.json();
+
+        if (!response.ok) {
+            return { success: false, message: json.message || 'Erro ao cancelar assinatura' };
+        }
+
+        return { success: true, message: json.message, usuario: json.usuario };
+
+    } catch (error) {
+        console.error("Erro ao cancelar assinatura:", error);
+        return { success: false, message: "Erro ao conectar com o servidor" };
+    }
+};
+
+
+// Buscar minha assinatura (usuário logado)
+export const minhaAssinatura = async () => {
+    try {
+        const response = await fetch(`${BASE_URL}club-market/meu`, {
+            method: "GET",
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+            if (response.status === 404) return null;
+            throw new Error('Erro ao buscar assinatura');
+        }
+
+        const json = await response.json();
+        return json.clube;
+
+    } catch (error) {
+        console.error("Erro ao buscar minha assinatura:", error);
+        return null;
+    }
+};
