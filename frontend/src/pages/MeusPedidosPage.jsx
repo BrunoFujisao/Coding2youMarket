@@ -48,6 +48,9 @@ export default function MeusPedidosPage() {
         return labels[status?.toLowerCase()] || status || 'Desconhecido';
     };
 
+    const pedidosClub = pedidos.filter(p => p.frequencia === 'club');
+    const pedidosNormais = pedidos.filter(p => p.frequencia !== 'club');
+
     const formatDate = (dateString) => {
         if (!dateString) return '—';
         const date = new Date(dateString);
@@ -140,92 +143,151 @@ export default function MeusPedidosPage() {
                         </button>
                     </div>
                 ) : (
-                    <div className="space-y-4">
-                        {pedidos.map((pedido, index) => (
-                            <div
-                                key={pedido.id || index}
-                                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
-                            >
-                                {/* Header do Card */}
-                                <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-5 py-4 border-b border-gray-200">
-                                    <div className="flex flex-wrap justify-between items-center gap-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                                                <span className="text-lg">📋</span>
+                    <div className="space-y-6">
+                        {/* Seção Club Market */}
+                        {pedidosClub.length > 0 && (
+                            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-200">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center">
+                                        <span className="text-2xl">⭐</span>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-xl font-bold text-purple-900">Club Market</h2>
+                                        <p className="text-sm text-purple-700">Sua assinatura premium</p>
+                                    </div>
+                                </div>
+                                {pedidosClub.map((club) => (
+                                    <div key={club.id} className="bg-white rounded-xl p-5 mt-4">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div>
+                                                <p className="text-sm text-gray-500">Plano</p>
+                                                <p className="font-bold text-gray-900 text-lg">
+                                                    {formatCurrency(club.valorfinal)} /mês
+                                                </p>
+                                            </div>
+                                            <span className={`px-4 py-1.5 rounded-full text-sm font-semibold border ${getStatusColor(club.status)}`}>
+                                                {getStatusLabel(club.status)}
+                                            </span>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4 mb-4">
+                                            <div>
+                                                <p className="text-sm text-gray-500">Início</p>
+                                                <p className="font-medium text-gray-900">{formatDate(club.datainicio)}</p>
                                             </div>
                                             <div>
-                                                <p className="text-sm text-gray-500">Pedido</p>
-                                                <p className="font-bold text-gray-800">#{pedido.id}</p>
+                                                <p className="text-sm text-gray-500">Próxima cobrança</p>
+                                                <p className="font-medium text-gray-900">{formatDate(club.dataproximacobranca)}</p>
                                             </div>
                                         </div>
-                                        <span className={`px-4 py-1.5 rounded-full text-sm font-semibold border ${getStatusColor(pedido.status)}`}>
-                                            {getStatusLabel(pedido.status)}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* Body do Card */}
-                                <div className="p-5">
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                                        <div>
-                                            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Data do Pedido</p>
-                                            <p className="font-semibold text-gray-800">{formatDate(pedido.datainicio || pedido.createdat)}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Próxima Entrega</p>
-                                            <p className="font-semibold text-gray-800">{formatDate(pedido.dataproximaentrega)}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Próxima Cobrança</p>
-                                            <p className="font-semibold text-gray-800">{formatDate(pedido.dataproximacobranca)}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Valor Total</p>
-                                            <p className="font-bold text-green-600 text-lg">{formatCurrency(pedido.valorfinal || pedido.valortotal || 0)}</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Itens do Pedido */}
-                                    {pedido.itens && pedido.itens.length > 0 && (
-                                        <div className="mt-4 pt-4 border-t border-gray-100">
-                                            <p className="text-xs text-gray-500 uppercase tracking-wide mb-3">Itens do Pedido</p>
-                                            <div className="flex flex-wrap gap-2">
-                                                {pedido.itens.slice(0, 5).map((item, idx) => (
-                                                    <span
-                                                        key={idx}
-                                                        className="px-3 py-1.5 bg-gray-100 rounded-lg text-sm text-gray-700"
-                                                    >
-                                                        {item.quantidade}x {item.nome || item.produto?.nome || `Item ${idx + 1}`}
-                                                    </span>
-                                                ))}
-                                                {pedido.itens.length > 5 && (
-                                                    <span className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
-                                                        +{pedido.itens.length - 5} itens
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Botão Cancelar - Só para assinaturas recorrentes */}
-                                {(pedido.status === 'ativa' || pedido.status === 'pausada') &&
-                                    (pedido.frequencia === 'semanal' || pedido.frequencia === 'mensal') && (
-                                        <div className="px-5 pb-5">
+                                        {club.status === 'ativa' && (
                                             <button
-                                                onClick={() => handleCancelarPedido(pedido.id)}
+                                                onClick={() => handleCancelarPedido(club.id)}
                                                 disabled={processando}
-                                                className="w-full py-2.5 text-red-600 hover:bg-red-50 rounded-xl font-medium transition-all flex items-center justify-center gap-2 border border-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                className="w-full py-2.5 text-red-600 hover:bg-red-50 rounded-xl font-medium transition-all flex items-center justify-center gap-2 border border-red-200"
                                             >
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                                 </svg>
-                                                {processando ? 'Cancelando...' : 'Cancelar Assinatura'}
+                                                Cancelar Club Market
                                             </button>
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        )}
+                        {/* Pedidos Normais */}
+                        {pedidosNormais.length > 0 && (
+                            <>
+                                <h2 className="text-xl font-bold text-gray-800">Meus Pedidos</h2>
+                                <div className="space-y-6">
+                                    {pedidosNormais.map((pedido, index) => (
+                                        <div
+                                            key={pedido.id || index}
+                                            className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
+                                        >
+                                            {/* Header do Card */}
+                                            <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-5 py-4 border-b border-gray-200">
+                                                <div className="flex flex-wrap justify-between items-center gap-3">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                                                            <span className="text-lg">📋</span>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm text-gray-500">Pedido</p>
+                                                            <p className="font-bold text-gray-800">#{pedido.id}</p>
+                                                        </div>
+                                                    </div>
+                                                    <span className={`px-4 py-1.5 rounded-full text-sm font-semibold border ${getStatusColor(pedido.status)}`}>
+                                                        {getStatusLabel(pedido.status)}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            {/* Body do Card */}
+                                            <div className="p-5">
+                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                                    <div>
+                                                        <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Data do Pedido</p>
+                                                        <p className="font-semibold text-gray-800">{formatDate(pedido.datainicio || pedido.createdat)}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Próxima Entrega</p>
+                                                        <p className="font-semibold text-gray-800">{formatDate(pedido.dataproximaentrega)}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Próxima Cobrança</p>
+                                                        <p className="font-semibold text-gray-800">{formatDate(pedido.dataproximacobranca)}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Valor Total</p>
+                                                        <p className="font-bold text-green-600 text-lg">{formatCurrency(pedido.valorfinal || pedido.valortotal || 0)}</p>
+                                                    </div>
+                                                </div>
+
+                                                {/* Itens do Pedido */}
+                                                {pedido.itens && pedido.itens.length > 0 && (
+                                                    <div className="mt-4 pt-4 border-t border-gray-100">
+                                                        <p className="text-xs text-gray-500 uppercase tracking-wide mb-3">Itens do Pedido</p>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {pedido.itens.slice(0, 5).map((item, idx) => (
+                                                                <span
+                                                                    key={idx}
+                                                                    className="px-3 py-1.5 bg-gray-100 rounded-lg text-sm text-gray-700"
+                                                                >
+                                                                    {item.quantidade}x {item.nome || item.produto?.nome || `Item ${idx + 1}`}
+                                                                </span>
+                                                            ))}
+                                                            {pedido.itens.length > 5 && (
+                                                                <span className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
+                                                                    +{pedido.itens.length - 5} itens
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Botão Cancelar - Só para assinaturas recorrentes */}
+                                            {(pedido.status === 'ativa' || pedido.status === 'pausada') &&
+                                                (pedido.frequencia === 'semanal' || pedido.frequencia === 'mensal') && (
+                                                    <div className="px-5 pb-5">
+                                                        <button
+                                                            onClick={() => handleCancelarPedido(pedido.id)}
+                                                            disabled={processando}
+                                                            className="w-full py-2.5 text-red-600 hover:bg-red-50 rounded-xl font-medium transition-all flex items-center justify-center gap-2 border border-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        >
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                            </svg>
+                                                            {processando ? 'Cancelando...' : 'Cancelar Assinatura'}
+                                                        </button>
+                                                    </div>
+                                                )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        )}
                     </div>
                 )}
 

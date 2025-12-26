@@ -255,19 +255,36 @@ export default function PagamentoPage() {
 
                 // Criar pedido após pagamento aprovado
                 try {
-                    // Se for Club Market, não precisa de carrinho
+                    // Se for Club Market, criar pedido especial
                     if (dadosCompra.tipoCompra === 'club') {
-                        toast.success('🎉 Parabéns! Você agora está participando do Club Market!', {
-                            id: loadingToast,
-                            duration: 5000
-                        });
-                        navigate('/confirmacao', {
-                            state: {
-                                pagamento: data.pagamento,
-                                isClub: true,
-                                planoClub: dadosCompra.planoClub
-                            }
-                        });
+                        const pedidoClubData = {
+                            enderecoId: 1, // Placeholder
+                            frequencia: 'club', // Tipo especial
+                            diaEntrega: null,
+                            valorTotal: dadosCompra.valorClub,
+                            valorFinal: dadosCompra.valorClub,
+                            dataProximaEntrega: null,
+                            dataProximaCobranca: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 dias
+                        };
+
+                        const pedidoClubResponse = await criarPedido(pedidoClubData);
+
+                        if (pedidoClubResponse.success) {
+                            toast.success('🎉 Parabéns! Você agora está participando do Club Market!', {
+                                id: loadingToast,
+                                duration: 5000
+                            });
+                            navigate('/confirmacao', {
+                                state: {
+                                    pagamento: data.pagamento,
+                                    pedido: pedidoClubResponse.pedido,
+                                    isClub: true,
+                                    planoClub: dadosCompra.planoClub
+                                }
+                            });
+                        } else {
+                            toast.error('Erro ao ativar Club Market');
+                        }
                         return;
                     }
 
@@ -300,7 +317,6 @@ export default function PagamentoPage() {
                         dataProximaCobranca: dataProximaCobranca.toISOString()
                     };
 
-                    console.log('📦 Enviando pedido:', pedidoData);
                     const pedidoResponse = await criarPedido(pedidoData);
 
                     if (pedidoResponse.success) {

@@ -6,6 +6,7 @@ import Header from '../components/Header';
 
 // Helper to mask card number, showing only last 4 digits
 const maskNumber = (numero) => {
+    if (!numero) return '•••• •••• •••• ••••';
     const parts = numero.split(' ');
     return parts
         .map((p, i) => (i === parts.length - 1 ? p : '****'))

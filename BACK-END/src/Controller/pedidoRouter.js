@@ -125,7 +125,6 @@ router.post("/pedidos", async (req, res) => {
 
     // Se insertPedido retornar false ao invés de lançar erro
     if (!pedido) {
-      console.error('❌ insertPedido retornou false');
       return res.status(500).json({
         success: false,
         message: "Erro ao criar pedido no banco"
@@ -138,7 +137,7 @@ router.post("/pedidos", async (req, res) => {
       pedido
     });
   } catch (error) {
-    console.error('🔥 ERRO AO CRIAR PEDIDO:', error);
+    console.error('Erro ao criar pedido:', error);
     return res.status(500).json({
       success: false,
       message: "Erro ao criar pedido",
