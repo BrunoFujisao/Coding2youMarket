@@ -176,12 +176,20 @@ router.post("/pagamentos/salvar-cartao", auth, async (req, res) => {
               customerId = foundCustomerId;
               console.log('Customer válido!');
             } catch (getError) {
-              console.log('Customer inválido (404), marcando como null para criar novo');
-              customerId = null; // Vai falhar na criação do card e criar novo
+              console.log('Customer inválido (404), retornando erro...');
+              return res.status(400).json({
+                success: false,
+                message: 'Dados de pagamento desatualizados. Limpe o cache do navegador (Ctrl+Shift+Del) e tente novamente.',
+                error: 'invalid_customer_cached'
+              });
             }
           } else {
-            console.log('Customer não encontrado na busca, marcando null');
-            customerId = null;
+            console.log('Customer não encontrado na busca');
+            return res.status(400).json({
+              success: false,
+              message: 'Erro ao configurar pagamento. Tente novamente.',
+              error: 'customer_not_found'
+            });
           }
         } else {
           throw error; // Re-throw se for outro erro
