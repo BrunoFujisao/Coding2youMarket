@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { meusPedidos } from "../api/pedidosAPI";
+import { assinarPlano, minhaAssinatura } from "../api/clubMarketAPI";
 import Header from "../components/Header";
+import toast from "react-hot-toast";
 
 
 export default function ClubMarketPage() {
@@ -9,16 +10,13 @@ export default function ClubMarketPage() {
     const [planoSelecionado, setPlanoSelecionado] = useState(null);
     const [clubAtivo, setClubAtivo] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [assinando, setAssinando] = useState(false);
 
     useEffect(() => {
         const verificarClubAtivo = async () => {
             try {
-                const pedidos = await meusPedidos();
-                const clubExistente = pedidos.find(
-                    p => p.frequencia === 'club' &&
-                        (p.status === 'ativa' || p.status === 'pausada')
-                );
-                setClubAtivo(clubExistente);
+                const assinatura = await minhaAssinatura();
+                setClubAtivo(assinatura);
             } catch (error) {
                 console.error('Erro ao verificar club:', error);
             } finally {
@@ -28,9 +26,10 @@ export default function ClubMarketPage() {
         verificarClubAtivo();
     }, []);
 
+    // IDs dos planos no banco de dados
     const planos = [
         {
-            id: 'entrada',
+            id: 2, // ID no banco
             nome: 'Entrada',
             preco: 9.90,
             emoji: '🌱',
@@ -44,7 +43,7 @@ export default function ClubMarketPage() {
             ]
         },
         {
-            id: 'intermediario',
+            id: 1, // ID no banco
             nome: 'Intermediário',
             preco: 19.90,
             emoji: '🌿',
@@ -59,7 +58,7 @@ export default function ClubMarketPage() {
             ]
         },
         {
-            id: 'premium',
+            id: 3, // ID no banco
             nome: 'Premium',
             preco: 39.90,
             emoji: '👑',
@@ -99,17 +98,28 @@ export default function ClubMarketPage() {
         return styles[plano.cor];
     };
 
-    const handleAssinar = () => {
-        if (planoSelecionado) {
-            const plano = planos.find(p => p.id === planoSelecionado);
-            // Redireciona para pagamento com valor do club e tipo
-            navigate('/pagamento', {
-                state: {
-                    tipoCompra: 'club',
-                    valorClub: plano.preco,
-                    planoClub: plano
-                }
-            });
+    const handleAssinar = async () => {
+        if (!planoSelecionado) return;
+
+        setAssinando(true);
+        const loadingToast = toast.loading('Processando assinatura...');
+
+        try {
+            const resultado = await assinarPlano(planoSelecionado);
+
+            if (resultado.success) {
+                toast.success('Assinatura realizada com sucesso! 🎉', { id: loadingToast });
+                // Atualiza o estado local
+                const plano = planos.find(p => p.id === planoSelecionado);
+                setClubAtivo({ id: planoSelecionado, valormensal: plano.preco });
+            } else {
+                toast.error(resultado.message || 'Erro ao assinar', { id: loadingToast });
+            }
+        } catch (error) {
+            console.error('Erro ao assinar:', error);
+            toast.error('Erro ao processar assinatura', { id: loadingToast });
+        } finally {
+            setAssinando(false);
         }
     };
 
@@ -222,13 +232,13 @@ export default function ClubMarketPage() {
 
                     <button
                         onClick={handleAssinar}
-                        disabled={!planoSelecionado}
-                        className={`px-10 py-4 rounded-full font-bold text-lg transition-all ${planoSelecionado
+                        disabled={!planoSelecionado || assinando || clubAtivo}
+                        className={`px-10 py-4 rounded-full font-bold text-lg transition-all ${planoSelecionado && !assinando && !clubAtivo
                             ? 'bg-gradient-to-r from-green-600 to-emerald-500 text-white hover:shadow-xl hover:scale-105 cursor-pointer'
                             : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                             }`}
                     >
-                        {planoSelecionado ? 'Assinar Agora →' : 'Selecione um plano'}
+                        {assinando ? 'Processando...' : planoSelecionado ? 'Assinar Agora →' : 'Selecione um plano'}
                     </button>
 
                     <div className="mt-6 flex flex-wrap justify-center gap-6 text-sm text-gray-500">
@@ -279,10 +289,10 @@ export default function ClubMarketPage() {
                                 Você já é membro do Club Market!
                             </h3>
                             <p className="text-purple-700 mb-6">
-                                Plano atual: <strong>R$ {Number(clubAtivo.valorfinal || 0).toFixed(2).replace('.', ',')}/mês</strong>
+                                Plano atual: <strong>R$ {Number(clubAtivo.valormensal || 0).toFixed(2).replace('.', ',')}/mês</strong>
                             </p>
                             <button
-                                onClick={() => navigate('/pedidos')}
+                                onClick={() => navigate('/perfil')}
                                 className="px-8 py-4 bg-purple-600 text-white font-bold text-lg rounded-full hover:bg-purple-700 transition-all shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
                             >
                                 Gerenciar Minha Assinatura
@@ -291,13 +301,13 @@ export default function ClubMarketPage() {
                     ) : (
                         <button
                             onClick={handleAssinar}
-                            disabled={!planoSelecionado}
-                            className={`w-full md:w-auto px-12 py-5 font-bold text-xl rounded-full shadow-2xl transition-all transform hover:scale-105 active:scale-95 ${planoSelecionado
+                            disabled={!planoSelecionado || assinando}
+                            className={`w-full md:w-auto px-12 py-5 font-bold text-xl rounded-full shadow-2xl transition-all transform hover:scale-105 active:scale-95 ${planoSelecionado && !assinando
                                 ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700'
                                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                 }`}
                         >
-                            {planoSelecionado ? '🎉 Assinar Agora' : 'Selecione um Plano'}
+                            {assinando ? '⏳ Processando...' : planoSelecionado ? '🎉 Assinar Agora' : 'Selecione um Plano'}
                         </button>
                     )}
                 </div>
