@@ -27,6 +27,7 @@ const clubMarketRouter = require('./Controller/ClubMarketRouter');
 const pagamentoRouter = require('./Controller/pagamentoRouter');
 const pagamentoDiretoRouter = require('./Controller/pagamentoDiretoRouter');
 const entregaRouter = require('./Controller/entregaRouter');
+const adminRouter = require('./Controller/adminRouter');
 
 // Carregar emailService para testar conexão SMTP na inicialização
 require('./Services/emailService');
@@ -43,6 +44,7 @@ app.use('/api', clubMarketRouter);
 app.use('/api', pagamentoRouter);
 app.use('/api', pagamentoDiretoRouter);
 app.use('/api', entregaRouter);
+app.use('/api', adminRouter);
 
 
 

@@ -11,32 +11,66 @@ export default function SumarioOrdem({ resumo, onCriarAssinatura, loading }) {
         <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
             <h2 className="text-xl font-bold text-gray-800 mb-6">{t('cart.orderSummary') || t('payment.orderSummary')}</h2>
             {/* Detalhes do Pedido */}
-            <div className="space-y-4 mb-6">
+            <div className="space-y-3 mb-6">
+                {/* Subtotal */}
                 <div className="flex justify-between text-gray-600">
                     <span>{t('cart.subtotal')}</span>
                     <span className="font-semibold">
                         R$ {subtotal.toFixed(2).replace('.', ',')}
                     </span>
                 </div>
-                <div className="flex justify-between text-gray-600">
-                    <span>{t('cart.discount')}</span>
-                    <span className="font-semibold text-green-600">
-                        - R$ {descontoClub.toFixed(2).replace('.', ',')}
-                    </span>
-                </div>
+
+                {/* Shipping */}
                 <div className="flex justify-between text-gray-600">
                     <span>{t('cart.shipping')}</span>
                     <span className="font-semibold">
                         R$ {frete.toFixed(2).replace('.', ',')}
                     </span>
                 </div>
-                <div className="h-px bg-gray-200"></div>
-                <div className="flex justify-between text-lg font-bold text-gray-800">
+
+                {/* Linha divisória leve */}
+                <div className="h-px bg-gray-200 my-2"></div>
+
+                {/* Total SEM desconto (mais apelativo!) */}
+                <div className="flex justify-between text-gray-700 font-medium">
+                    <span>Subtotal</span>
+                    <span className={descontoClub > 0 ? 'line-through text-gray-400' : ''}>
+                        R$ {(subtotal + frete).toFixed(2).replace('.', ',')}
+                    </span>
+                </div>
+
+                {/* Club Discount - DESTAQUE! */}
+                {descontoClub > 0 && (
+                    <div className="flex justify-between items-center bg-green-50 -mx-2 px-2 py-2 rounded-lg">
+                        <div className="flex items-center gap-2">
+                            <span className="text-xl">⭐</span>
+                            <span className="text-green-700 font-medium">{t('cart.clubDiscount')}</span>
+                        </div>
+                        <span className="font-bold text-green-700">
+                            - R$ {descontoClub.toFixed(2).replace('.', ',')}
+                        </span>
+                    </div>
+                )}
+
+                {/* Linha divisória forte */}
+                <div className="h-px bg-gray-300 my-3"></div>
+
+                {/* Total FINAL */}
+                <div className="flex justify-between text-xl font-bold text-gray-900">
                     <span>{t('cart.total')}</span>
                     <span className="text-green-700">
                         R$ {total.toFixed(2).replace('.', ',')}
                     </span>
                 </div>
+
+                {/* Badge de economia */}
+                {descontoClub > 0 && (
+                    <div className="bg-gradient-to-r from-green-100 to-emerald-100 border border-green-300 rounded-lg p-3 text-center">
+                        <p className="text-sm text-green-800">
+                            💰 <strong>Você economizou R$ {descontoClub.toFixed(2).replace('.', ',')}</strong> com o Club+!
+                        </p>
+                    </div>
+                )}
             </div>
             {/* Botão de Criar Assinatura */}
             <button
@@ -52,12 +86,6 @@ export default function SumarioOrdem({ resumo, onCriarAssinatura, loading }) {
             >
                 {loading ? t('common.loading') : t('cart.checkout')}
             </button>
-            {/* Nota sobre Clube+ */}
-            {descontoClub > 0 && (
-                <p className="text-xs text-gray-500 mt-4 text-center">
-                    {t('cart.clubBenefits')} <span className="font-bold text-green-600">R$ {descontoClub.toFixed(2)}</span>
-                </p>
-            )}
         </div>
     );
 }

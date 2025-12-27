@@ -8,7 +8,7 @@ import SumarioOrdem from '../components/SumarioOrdem';
 import FrequenciaModal from '../components/FrequenciaModal';
 import EnderecoModal from '../components/EnderecoModal';
 import { verMeuCarrinho, atualizarQuantidade, removerItem, limparCarrinho } from '../api/carrinhoAPI';
-import { meusPedidos } from '../api/pedidosAPI';
+import { minhaAssinatura } from '../api/clubMarketAPI';
 import { useCarrinho } from '../context/CarrinhoContext';
 
 export default function CarrinhoPage() {
@@ -49,36 +49,35 @@ export default function CarrinhoPage() {
         try {
             const subtotal = itens.reduce((acc, item) => acc + (item.produto.preco * item.quantidade), 0);
 
-            // Buscar Club ativo do usuário
-            const pedidos = await meusPedidos();
+            // ✅ Buscar Club ativo do usuário via clubMarketAPI
+            const assinatura = await minhaAssinatura();
 
             const valorFrete = 10.23; // Valor padrão do frete
             let descontoClub = 0;
             let percentualDesconto = 0;
 
-            // Verificar se tem Club ativo
-            const clubAtivo = (pedidos || []).find(
-                p => p.frequencia === 'club' &&
-                    (p.status === 'ativa' || p.status === 'pausada')
-            );
+            // ✅ Verificar se tem assinatura de clube ativa
+            console.log('🔍 Assinatura club:', assinatura);
 
-            if (clubAtivo) {
-                // Desconto no FRETE (sempre R$ 10,23 para membros Club)
+            if (assinatura && assinatura.id) {
+                // ✅ Desconto no FRETE (sempre frete grátis para membros Club)
                 descontoClub += valorFrete;
 
-                // Aplicar desconto ADICIONAL nos produtos baseado no plano
-                const valorFinal = clubAtivo.valorfinal || clubAtivo.valortotal;
+                // ✅ Aplicar desconto nos produtos baseado no club_marketid
+                // club_marketid = 1 → Intermediário (10%)
+                // club_marketid = 2 → Entrada (0%)
+                // club_marketid = 3 → Premium (25%)
+                const clubId = assinatura.id;
 
-                // R$ 9,90 = Entrada (só frete grátis)
-                // R$ 19,90 = Intermediário (frete grátis + 10% desconto produtos)
-                // R$ 39,90 = Premium (frete grátis + 25% desconto produtos)
-                if (valorFinal >= 39) {
-                    percentualDesconto = 0.25; // 25%
-                } else if (valorFinal >= 19) {
-                    percentualDesconto = 0.10; // 10%
-                } else {
-                    percentualDesconto = 0; // Só frete grátis
+                if (clubId === 3) {
+                    percentualDesconto = 0.25; // Premium: 25%
+                } else if (clubId === 1) {
+                    percentualDesconto = 0.10; // Intermediário: 10%
+                } else if (clubId === 2) {
+                    percentualDesconto = 0; // Entrada: só frete grátis
                 }
+
+                console.log('✅ Club ID:', clubId, '| Desconto:', percentualDesconto * 100 + '%');
 
                 // Somar desconto dos produtos ao desconto do frete
                 descontoClub += (subtotal * percentualDesconto);
@@ -91,7 +90,7 @@ export default function CarrinhoPage() {
                 descontoClub,
                 frete: valorFrete, // SEMPRE mostra valor real
                 total,
-                temClub: !!clubAtivo,
+                temClub: !!(assinatura && assinatura.id),
                 percentualDesconto
             });
         } catch (error) {

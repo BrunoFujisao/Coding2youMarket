@@ -186,27 +186,39 @@ export default function PagamentoPage() {
             if (data.success && data.pagamento.status === 'approved') {
                 toast.success('Pagamento aprovado!', { id: loadingToast });
 
-                // ✅ Criar pedido no banco
-                try {
-                    const carrinho = await verMeuCarrinho();
-                    await criarPedido({
-                        items: carrinho,
-                        valorTotal: resumo.total,
-                        valorFinal: resumo.total,
-                        frequencia: 'unica',
-                        pagamentoId: data.pagamento.id
-                    });
-                    console.log('✅ Pedido criado');
-                } catch (error) {
-                    console.error('Erro ao criar pedido:', error);
-                }
+                // ✅ Se for pagamento de club, atribuir ao usuário
+                if (dadosCompra.tipoCompra === 'club') {
+                    try {
+                        const { assinarPlano } = await import('../api/clubMarketAPI');
+                        await assinarPlano(dadosCompra.planoId);
+                        console.log('✅ Club atribuído ao usuário:', dadosCompra.planoId);
+                    } catch (error) {
+                        console.error('Erro ao atribuir club:', error);
+                        toast.error('Pagamento aprovado, mas houve erro ao ativar o clube. Entre em contato com suporte.');
+                    }
+                } else {
+                    // ✅ Criar pedido no banco (apenas para compras normais)
+                    try {
+                        const carrinho = await verMeuCarrinho();
+                        await criarPedido({
+                            items: carrinho,
+                            valorTotal: resumo.total,
+                            valorFinal: resumo.total,
+                            frequencia: 'unica',
+                            pagamentoId: data.pagamento.id
+                        });
+                        console.log('✅ Pedido criado');
+                    } catch (error) {
+                        console.error('Erro ao criar pedido:', error);
+                    }
 
-                // ✅ Limpar carrinho após pagamento aprovado
-                try {
-                    await limparCarrinho();
-                    console.log('✅ Carrinho limpo após pagamento');
-                } catch (error) {
-                    console.error('Erro ao limpar carrinho:', error);
+                    // ✅ Limpar carrinho após pagamento aprovado
+                    try {
+                        await limparCarrinho();
+                        console.log('✅ Carrinho limpo após pagamento');
+                    } catch (error) {
+                        console.error('Erro ao limpar carrinho:', error);
+                    }
                 }
 
                 navigate('/confirmacao', { state: { pagamento: data.pagamento } });
