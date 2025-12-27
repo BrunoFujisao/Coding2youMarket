@@ -6,6 +6,7 @@ import { LuEye, LuEyeOff } from "react-icons/lu";
 import { cadastrar } from "../api/auth";
 import { validarCPF } from "../utils/validarCPF";
 
+
 export default function Cadastro() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -27,6 +28,21 @@ export default function Cadastro() {
       return;
     }
 
+    if (!/^[A-Za-zÀ-ÿ\s]+$/.test(nome)) {
+      setMensagem({ tipo: "erro", texto: "Nome não pode conter números ou caracteres especiais." });
+      return;
+    }
+
+    if (!/^[0-9\-()]+$/.test(telefone)) {
+      setMensagem({ tipo: "erro", texto: "Telefone deve conter apenas números, hífen e parênteses." });
+      return;
+    }
+
+    const digitsOnly = telefone.replace(/\D/g, "");
+    if (digitsOnly.length > 15) {
+      setMensagem({ tipo: "erro", texto: "Telefone não pode ter mais que 11 dígitos." });
+      return;
+    }
     if (!validarCPF(cpf)) {
       setMensagem({ tipo: "erro", texto: "CPF inválido." });
       return;
@@ -37,6 +53,10 @@ export default function Cadastro() {
       return;
     }
 
+    if (!/(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/.test(senha)) {
+      setMensagem({ tipo: "erro", texto: "Senha deve conter letra maiúscula, número e caractere especial." });
+      return;
+    }
     try {
       setLoading(true);
       const res = await cadastrar(nome, email, cpf, telefone, senha);
@@ -96,6 +116,7 @@ export default function Cadastro() {
             <input
               type="text"
               placeholder="000.000.000-00"
+              maxLength={14}
               className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 mb-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
               value={cpf}
               onChange={(e) => setCpf(e.target.value)}
@@ -112,7 +133,7 @@ export default function Cadastro() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Celular</label>
             <input
               type="text"
-              placeholder="(DDD) 00000-0000"
+              placeholder="(DDD) 00000-0000" maxLength={15}
               className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 mb-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
               value={telefone}
               onChange={(e) => setTelefone(e.target.value)}
