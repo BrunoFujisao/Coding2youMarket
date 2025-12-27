@@ -1,11 +1,6 @@
-const IMAGENS_CATEGORIAS = {
-    'Hortifruti': 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=200&h=200&fit=crop',
-    'Carnes': 'https://images.unsplash.com/photo-1603048588665-791ca8aea617?w=200&h=200&fit=crop',
-    'Laticínios': 'https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=200&h=200&fit=crop',
-    'Padaria': 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&h=200&fit=crop',
-    'Bebidas': 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=200&h=200&fit=crop',
-    'Mercearia': 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=200&h=200&fit=crop'
-};
+import { categoriasImagens } from '../assets/imagens';
+
+const IMAGENS_CATEGORIAS = categoriasImagens;
 
 export default function CategoryCard({ nome, ativo, onClick }) {
     return (

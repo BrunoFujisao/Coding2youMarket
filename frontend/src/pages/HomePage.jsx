@@ -8,15 +8,16 @@ import ProductCard from "../components/ProductCard";
 import CategoryCard from "../components/CategoryCard";
 import ClubMarketModal from "../components/ClubMarketModal";
 import { listarProdutos } from '../api/produtoAPI';
+import { banners, getProdutoImagem } from '../assets/imagens';
 
 // Dados mockados para testar (remover depois que a API funcionar)
 const MOCK_CATEGORIAS = ['Hortifruti', 'Carnes', 'Laticínios', 'Padaria', 'Bebidas', 'Mercearia'];
 
 const MOCK_PRODUTOS = [
-  { id: 1, nome: 'Maçã Gala', categoria: 'Hortifruti', preco: 8.90, estoque: 50, imagemUrl: 'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=300' },
-  { id: 2, nome: 'Banana Prata', categoria: 'Hortifruti', preco: 5.50, estoque: 30, descontoClub: true, imagemUrl: 'https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=300' },
-  { id: 3, nome: 'Leite Integral', categoria: 'Laticínios', preco: 4.99, estoque: 20, imagemUrl: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300' },
-  { id: 4, nome: 'Pão Francês', categoria: 'Padaria', preco: 12.00, estoque: 15, imagemUrl: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300' },
+  { id: 1, nome: 'Maçã Gala', categoria: 'Hortifruti', preco: 8.90, estoque: 50, imagemUrl: getProdutoImagem('maca') },
+  { id: 2, nome: 'Banana Prata', categoria: 'Hortifruti', preco: 5.50, estoque: 30, descontoClub: true, imagemUrl: getProdutoImagem('banana') },
+  { id: 3, nome: 'Laranja', categoria: 'Hortifruti', preco: 4.99, estoque: 20, imagemUrl: getProdutoImagem('laranja') },
+  { id: 4, nome: 'Morango', categoria: 'Hortifruti', preco: 12.00, estoque: 15, imagemUrl: getProdutoImagem('morango') },
 ];
 
 export default function HomePage() {
@@ -91,7 +92,7 @@ export default function HomePage() {
       {/* Hero Section - Club Market */}
       <div className="relative h-[350px] md:h-[450px] w-full mb-8 pt-20 rounded-b-3xl overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200"
+          src={banners[0]}
           alt="Banner Promocional"
           className="absolute inset-0 w-full h-full object-cover"
         />
