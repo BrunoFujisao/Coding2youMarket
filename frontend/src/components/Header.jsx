@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { verMeuCarrinho } from '../api/carrinhoAPI';
 import { useCarrinho } from '../context/CarrinhoContext';
+import { minhaAssinatura } from '../api/clubMarketAPI';
 import TrocaIdioma from './TrocaIdioma';
 export default function Header() {
     const { t } = useTranslation();
@@ -32,6 +33,23 @@ export default function Header() {
         setDropdownOpen(false);
         navigate('/login');
     };
+
+    // Verifica se o usuário já tem plano via API e redireciona para a página correta
+    const handleClubMarketClick = async () => {
+        setDropdownOpen(false);
+        try {
+            const assinatura = await minhaAssinatura();
+            if (assinatura) {
+                navigate('/minhas-assinaturas');
+            } else {
+                navigate('/club-market');
+            }
+        } catch (error) {
+            console.error('Erro ao verificar assinatura:', error);
+            navigate('/club-market');
+        }
+    };
+
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (dropdownOpen && !e.target.closest('.dropdown-container')) {
@@ -76,9 +94,9 @@ export default function Header() {
                                         <Link to="/pedidos" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
                                             📦 {t('nav.orders')}
                                         </Link>
-                                        <Link to="/club-market" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
+                                        <button onClick={handleClubMarketClick} className="w-full text-left block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors">
                                             ⭐ {t('nav.clubMarket')}
-                                        </Link>
+                                        </button>
                                         <Link to="/perfil" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
                                             👤 {t('nav.profile')}
                                         </Link>
@@ -108,9 +126,9 @@ export default function Header() {
                             <Link to="/pedidos" className={`font-medium transition-colors pb-1 ${location.pathname === '/pedidos' ? 'text-gray-800 font-semibold border-b-2 border-green-500' : 'text-gray-700 hover:text-green-600'}`}>
                                 {t('nav.orders')}
                             </Link>
-                            <Link to="/club-market" className={`font-medium transition-colors pb-1 ${location.pathname === '/club-market' ? 'text-gray-800 font-semibold border-b-2 border-green-500' : 'text-gray-700 hover:text-green-600'}`}>
+                            <button onClick={handleClubMarketClick} className={`font-medium transition-colors pb-1 ${location.pathname === '/club-market' || location.pathname === '/minhas-assinaturas' ? 'text-gray-800 font-semibold border-b-2 border-green-500' : 'text-gray-700 hover:text-green-600'}`}>
                                 {t('nav.clubMarket')}
-                            </Link>
+                            </button>
                         </nav>
                         <div className="flex items-center gap-3">
                             <TrocaIdioma />
@@ -132,9 +150,9 @@ export default function Header() {
                                         <Link to="/pedidos" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
                                             {t('nav.orders')}
                                         </Link>
-                                        <Link to="/club-market" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
+                                        <button onClick={handleClubMarketClick} className="w-full text-left block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors">
                                             {t('nav.clubMarket')}
-                                        </Link>
+                                        </button>
                                         <Link to="/perfil" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
                                             {t('nav.profile')}
                                         </Link>
@@ -149,6 +167,6 @@ export default function Header() {
                     </div>
                 </div>
             </div>
-        </header>
+        </header >
     );
 }

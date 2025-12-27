@@ -22,6 +22,7 @@ import ConfiguracoesPage from './pages/ConfiguracoesPage';
 import MeusPedidosPage from './pages/MeusPedidosPage';
 import ClubMarketPage from './pages/ClubMarketPage';
 import MeusEnderecosPage from './pages/MeusEnderecosPage';
+import MinhasAssinaturasPage from './pages/MinhasAssinaturasPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { CarrinhoProvider } from './context/CarrinhoContext';
 function App() {
@@ -82,6 +83,7 @@ function App() {
           <Route path="/meus-enderecos" element={<ProtectedRoute><MeusEnderecosPage /></ProtectedRoute>} />
           <Route path="/pedidos" element={<ProtectedRoute><MeusPedidosPage /></ProtectedRoute>} />
           <Route path="/club-market" element={<ProtectedRoute><ClubMarketPage /></ProtectedRoute>} />
+          <Route path="/minhas-assinaturas" element={<ProtectedRoute><MinhasAssinaturasPage /></ProtectedRoute>} />
           <Route path="/seguranca" element={<SegurancaPage />} />
           <Route path="/confirmacao" element={<ProtectedRoute><ConfirmacaoPage /></ProtectedRoute>} />
           <Route path="*" element={

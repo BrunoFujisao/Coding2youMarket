@@ -160,7 +160,7 @@ export default function ClubMarketPage() {
                             <div
                                 key={plano.id}
                                 onClick={() => setPlanoSelecionado(plano.id)}
-                                className={`${styles.bg} rounded-3xl p-6 border-2 ${styles.border} cursor-pointer transition-all duration-300 hover:shadow-xl ${planoSelecionado === plano.id ? 'shadow-xl scale-[1.02]' : 'hover:scale-[1.01]'} relative`}
+                                className={`${styles.bg} rounded-3xl p-6 border-2 ${styles.border} cursor-pointer transition-all duration-300 hover:shadow-xl ${planoSelecionado === plano.id ? 'shadow-xl scale-[1.02]' : 'hover:scale-[1.01]'} relative flex flex-col`}
                             >
                                 {/* Badge Popular */}
                                 {plano.popular && (
@@ -200,8 +200,8 @@ export default function ClubMarketPage() {
                                     </span>
                                 </div>
 
-                                {/* Benefícios */}
-                                <ul className="space-y-3">
+                                {/* Benefícios - flex-grow para empurrar conteúdo abaixo para baixo */}
+                                <ul className="space-y-3 flex-grow">
                                     {plano.beneficios.map((beneficio, idx) => (
                                         <li key={idx} className="flex items-start gap-3">
                                             <span className={`text-lg ${beneficio.ativo ? 'text-green-500' : 'text-gray-300'}`}>

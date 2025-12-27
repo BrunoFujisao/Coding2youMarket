@@ -24,6 +24,7 @@ export default function PerfilPage() {
 
     const menuItems = [
         { label: "Dados Pessoais", path: "/dados-pessoais" },
+        { label: "Minhas Assinaturas", path: "/minhas-assinaturas" },
         { label: "Segurança e Privacidade", path: "/seguranca" },
         { label: "Formas de Pagamento", path: "/meus-cartoes" },
         { label: "Meus Endereços", path: "/meus-enderecos" },
