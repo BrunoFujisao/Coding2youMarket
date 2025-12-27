@@ -154,7 +154,7 @@ router.post("/pagamentos/processar-direto", auth, async (req, res) => {
 
     const paymentClient = new Payment(client);
 
-    // Criar pagamento com token
+    // Criar pagamento com token - PAYLOAD CORRIGIDO
     const paymentData = {
       transaction_amount: Number(Number(transactionAmount).toFixed(2)),
       token: token,
@@ -162,12 +162,16 @@ router.post("/pagamentos/processar-direto", auth, async (req, res) => {
       installments: Number(installments) || 1,
       payment_method_id: paymentMethodId || "master",
       payer: {
-        email: req.usuario.email || "test@test.com",
+        // ⚠️ EM SANDBOX, USAR EMAIL DE TEST USER VÁLIDO
+        email: "test_user_123456789@testuser.com",
+        first_name: "Test",
+        last_name: "User",
         identification: {
           type: "CPF",
-          number: "12345678909" // Em produção, pegar do usuário
+          number: "19119119100"
         }
-      }
+      },
+      binary_mode: true // ✅ IMPORTANTE: Retorna approved ou rejected direto
     };
 
     console.log('📦 Enviando ao Mercado Pago...');
@@ -196,7 +200,8 @@ router.post("/pagamentos/processar-direto", auth, async (req, res) => {
     });
 
   } catch (error) {
-    console.error("❌ Erro ao processar pagamento:", error);
+    console.error("❌ Erro ao processar pagamento:");
+    console.error("Error completo:", JSON.stringify(error, null, 2));
 
     let errorMessage = "Erro ao processar pagamento";
     let errorDetails = error.message;
@@ -208,7 +213,8 @@ router.post("/pagamentos/processar-direto", auth, async (req, res) => {
     return res.status(500).json({
       success: false,
       message: errorMessage,
-      details: errorDetails
+      details: errorDetails,
+      mpStatus: error.status
     });
   }
 });
