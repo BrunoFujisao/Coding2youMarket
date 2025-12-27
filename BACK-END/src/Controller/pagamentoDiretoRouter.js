@@ -44,15 +44,22 @@ router.post("/pagamentos/processar-direto", auth, async (req, res) => {
 
         // 3. Payload Simplificado
         const paymentData = {
-            transaction_amount: Number(Number(transactionAmount).toFixed(2)), // Fix: decimal precision error
+            transaction_amount: Number(Number(transactionAmount).toFixed(2)),
             token: token,
             description: description || "Coding2You Market",
             installments: Number(installments) || 1,
             payment_method_id: paymentMethodId || "master",
             payer: {
-                email: payerEmail
+                // Hardcoded test user to rule out email validation issues in Sandbox
+                email: "test_user_123456@testuser.com",
+                first_name: "Test",
+                last_name: "User",
+                identification: {
+                    type: "CPF",
+                    number: "19119119100"
+                }
             },
-            binary_mode: true // Força aprovado ou rejeitado (sem pendente)
+            binary_mode: true
         };
 
         console.log('📦 Dados enviados ao MP:', JSON.stringify(paymentData, null, 2));
