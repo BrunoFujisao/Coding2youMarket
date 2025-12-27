@@ -338,154 +338,64 @@ export default function PagamentoPage() {
         // Abrir modal CVV
         setMostrarCVVModal(true);
     };
-    const handleConfirmarCVV = async (cvv) => {
-        setMostrarCVVModal(false);
+    const handlePagarDireto = async () => {
+        if (!novoCartao.numero || !novoCartao.nome || !novoCartao.cvv || !novoCartao.validade || !novoCartao.cpf) {
+            toast.error('Preencha todos os campos do cartão');
+            return;
+        }
+
         setProcessandoPagamento(true);
         const loadingToast = toast.loading('Processando pagamento...');
+
         try {
-            const token = localStorage.getItem('token');
-            const userStr = localStorage.getItem('user');
-
-            let user = {};
-            if (userStr && userStr !== 'undefined' && userStr !== 'null') {
-                try {
-                    user = JSON.parse(userStr);
-                } catch (e) {
-                    console.error('Erro ao fazer parse do user:', e);
-                    user = {};
-                }
-            }
-
-            const cartaoSelecionado = cartoes[cartaoAtivo];
-
-            const dadosPagamento = {
-                customerId: cartaoSelecionado.customerid,    // ✅ NOVO
-                cardId: cartaoSelecionado.cardid,            // ✅ NOVO
-                securityCode: cvv,                           // ✅ CVV do modal
-                transactionAmount: parseFloat(resumo.total.toFixed(2)),
-                installments: 1,
-                description: `Pedido Subscrivery - ${dadosCompra.tipo || 'assinatura'}`,
-                email: user.email || user.Email
-            };
-
-            const response = await fetch(`${API_URL}/pagamentos/processar`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(dadosPagamento)
+            // Tokenizar cartão com MercadoPago
+            const token = await tokenizarCartao({
+                numero: novoCartao.numero.replace(/\s/g, ''),
+                nome: novoCartao.nome,
+                validade: novoCartao.validade,
+                cvv: novoCartao.cvv,
+                cpf: novoCartao.cpf.replace(/\D/g, '')
             });
 
-            const data = await response.json();
-            if (data.success && data.pagamento.status === 'approved') {
-                toast.success('Pagamento aprovado!', { id: loadingToast });
-
-                // Criar pedido após pagamento aprovado
-                try {
-                    // Se for Club Market, criar pedido especial
-                    if (dadosCompra.tipoCompra === 'club') {
-                        const pedidoClubData = {
-                            enderecoId: 1, // Placeholder
-                            frequencia: 'club', // Tipo especial
-                            diaEntrega: null,
-                            valorTotal: dadosCompra.valorClub,
-                            valorFinal: dadosCompra.valorClub,
-                            dataProximaEntrega: null,
-                            dataProximaCobranca: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 dias
-                        };
-
-                        const pedidoClubResponse = await criarPedido(pedidoClubData);
-
-                        if (pedidoClubResponse.success) {
-                            toast.success('🎉 Parabéns! Você agora está participando do Club Market!', {
-                                id: loadingToast,
-                                duration: 5000
-                            });
-                            navigate('/confirmacao', {
-                                state: {
-                                    pagamento: data.pagamento,
-                                    pedido: pedidoClubResponse.pedido,
-                                    isClub: true,
-                                    planoClub: dadosCompra.planoClub
-                                }
-                            });
-                        } else {
-                            toast.error('Erro ao ativar Club Market');
-                        }
-                        return;
-                    }
-
-                    // Compra normal - validar carrinho
-                    const carrinho = await verMeuCarrinho();
-
-                    if (!carrinho || carrinho.length === 0) {
-                        toast.error('Carrinho vazio!');
-                        return;
-                    }
-
-                    // Pegar endereço e frequência do localStorage/state
-                    const enderecoId = dadosCompra.enderecoId || 1; // TODO: Pegar do fluxo real
-                    const frequencia = dadosCompra.frequencia || 'unica'; // 'unica' = compra única
-                    const diaEntrega = dadosCompra.diaEntrega || new Date().getDate();
-
-                    // Calcular datas baseado na frequência
-                    const diasParaProximaEntrega = frequencia === 'semanal' ? 7 : 30;
-                    const dataProximaEntrega = new Date(Date.now() + diasParaProximaEntrega * 24 * 60 * 60 * 1000);
-                    const dataProximaCobranca = new Date(dataProximaEntrega.getTime() - 24 * 60 * 60 * 1000); // 1 dia antes
-
-                    // Criar pedido
-                    const pedidoData = {
-                        enderecoId,
-                        frequencia,
-                        diaEntrega,
-                        valorTotal: resumo.subtotal,
-                        valorFinal: resumo.total,
-                        dataProximaEntrega: dataProximaEntrega.toISOString(),
-                        dataProximaCobranca: dataProximaCobranca.toISOString()
-                    };
-
-                    const pedidoResponse = await criarPedido(pedidoData);
-
-                    if (pedidoResponse.success) {
-                        // Limpar carrinho após criar pedido
-                        await limparCarrinho();
-
-                        // Notificação personalizada para Club
-                        if (dadosCompra.tipoCompra === 'club') {
-                            toast.success('🎉 Parabéns! Você agora está participando do Club Market!', { id: loadingToast, duration: 5000 });
-                        } else {
-                            toast.success('Pedido criado com sucesso!');
-                        }
-
-                        navigate('/confirmacao', {
-                            state: {
-                                pagamento: data.pagamento,
-                                pedido: pedidoResponse.pedido
-                            }
-                        });
-                    } else {
-                        toast.error('Erro ao criar pedido. Entre em contato com suporte.');
-                        navigate('/confirmacao', { state: { pagamento: data.pagamento } });
-                    }
-                } catch (pedidoError) {
-                    console.error('Erro ao criar pedido:', pedidoError);
-                    toast.error('Pagamento aprovado, mas erro ao criar pedido. Entre em contato com suporte.');
-                    navigate('/confirmacao', { state: { pagamento: data.pagamento } });
-                }
-            } else {
-                toast.error(`Pagamento ${data.pagamento?.status || 'recusado'}. ${data.pagamento?.statusDetail || ''}`, {
-                    id: loadingToast,
-                    duration: 5000
-                });
+            if (!token) {
+                throw new Error('Erro ao gerar token do cartão');
             }
+
+            console.log('Token gerado:', token);
+
+            // Processar pagamento
+            const response = await fetch(`${API_URL}/pagamentos/processar-direto`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({
+                    token: token,
+                    transactionAmount: resumo.total,
+                    installments: 1,
+                    description: dadosCompra.tipoCompra === 'club' ? 'Club Market' : 'Compra Subscrivery',
+                    paymentMethodId: 'visa'
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success && result.status === 'approved') {
+                toast.success('Pagamento aprovado!', { id: loadingToast });
+                navigate('/pedidos');
+            } else {
+                toast.error(result.message || `Pagamento ${result.status}`, { id: loadingToast });
+            }
+
         } catch (error) {
             console.error('Erro ao processar pagamento:', error);
-            toast.error('Erro ao processar pagamento.', { id: loadingToast });
+            toast.error('Erro ao processar pagamento', { id: loadingToast });
         } finally {
             setProcessandoPagamento(false);
         }
     };
+
     const formatarCartaoDisplay = (cartao) => {
         const ultimos4 = cartao.ultimos4digitos || '****';
         return `•••• •••• •••• ${ultimos4}`;
@@ -646,12 +556,12 @@ export default function PagamentoPage() {
                                     </div>
                                 </div>
                                 <button
-                                    onClick={handleAdicionarCartao}
-                                    disabled={salvandoCartao}
-                                    className={`w-full py-3 rounded-full font-semibold text-white transition-all shadow-lg ${salvandoCartao ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 active:scale-95'
+                                    onClick={handlePagarDireto}
+                                    disabled={processandoPagamento}
+                                    className={`w-full py-3 rounded-full font-semibold text-white transition-all shadow-lg ${processandoPagamento ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 active:scale-95'
                                         }`}
                                 >
-                                    {salvandoCartao ? t('payment.saving') : t('payment.saveCard')}
+                                    {processandoPagamento ? 'Processando...' : 'Pagar Agora'}
                                 </button>
                             </div>
                         )}

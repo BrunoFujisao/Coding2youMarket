@@ -25,6 +25,7 @@ const enderecoRouter = require('./Controller/enderecoRouter');
 const cartaoRouter = require('./Controller/CartaoRouter');
 const clubMarketRouter = require('./Controller/ClubMarketRouter');
 const pagamentoRouter = require('./Controller/pagamentoRouter');
+const pagamentoDiretoRouter = require('./Controller/pagamentoDiretoRouter');
 const entregaRouter = require('./Controller/entregaRouter');
 
 // Carregar emailService para testar conexão SMTP na inicialização
@@ -40,6 +41,7 @@ app.use('/api', enderecoRouter);
 app.use('/api', cartaoRouter);
 app.use('/api', clubMarketRouter);
 app.use('/api', pagamentoRouter);
+app.use('/api', pagamentoDiretoRouter);
 app.use('/api', entregaRouter);
 
 
