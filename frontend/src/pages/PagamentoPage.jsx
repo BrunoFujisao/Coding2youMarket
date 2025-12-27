@@ -5,7 +5,8 @@ import toast from 'react-hot-toast';
 import Header from '../components/Header';
 import CVVModal from '../components/cvvmodal';
 import { meusCartoes } from '../api/cartaoAPI';
-import { verMeuCarrinho } from '../api/carrinhoAPI';
+import { verMeuCarrinho, limparCarrinho } from '../api/carrinhoAPI';
+import { criarPedido } from '../api/pedidosAPI';
 import { initMercadoPago, tokenizarCartao, detectarBandeira, formatarNumeroCartao, formatarValidade } from '../services/mercadoPagoService';
 
 const API_URL = 'https://coding2youmarket-production.up.railway.app/api';
@@ -171,6 +172,30 @@ export default function PagamentoPage() {
             const data = await response.json();
             if (data.success && data.pagamento.status === 'approved') {
                 toast.success('Pagamento aprovado!', { id: loadingToast });
+
+                // ✅ Criar pedido no banco
+                try {
+                    const carrinho = await verMeuCarrinho();
+                    await criarPedido({
+                        items: carrinho,
+                        valorTotal: resumo.total,
+                        valorFinal: resumo.total,
+                        frequencia: 'unica',
+                        pagamentoId: data.pagamento.id
+                    });
+                    console.log('✅ Pedido criado');
+                } catch (error) {
+                    console.error('Erro ao criar pedido:', error);
+                }
+
+                // ✅ Limpar carrinho após pagamento aprovado
+                try {
+                    await limparCarrinho();
+                    console.log('✅ Carrinho limpo após pagamento');
+                } catch (error) {
+                    console.error('Erro ao limpar carrinho:', error);
+                }
+
                 navigate('/confirmacao', { state: { pagamento: data.pagamento } });
             } else {
                 toast.error(`Pagamento ${data.pagamento?.status || 'recusado'}. ${data.pagamento?.statusDetail || ''}`, {

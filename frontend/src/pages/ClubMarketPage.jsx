@@ -103,26 +103,17 @@ export default function ClubMarketPage() {
     const handleAssinar = async () => {
         if (!planoSelecionado) return;
 
-        setAssinando(true);
-        const loadingToast = toast.loading('Processando assinatura...');
+        // ✅ Redirecionar para página de pagamento ao invés de assinar direto
+        const plano = planos.find(p => p.id === planoSelecionado);
 
-        try {
-            const resultado = await assinarPlano(planoSelecionado);
-
-            if (resultado.success) {
-                toast.success('Assinatura realizada com sucesso! 🎉', { id: loadingToast });
-                // Atualiza o estado local
-                const plano = planos.find(p => p.id === planoSelecionado);
-                setClubAtivo({ id: planoSelecionado, valormensal: plano.preco });
-            } else {
-                toast.error(resultado.message || 'Erro ao assinar', { id: loadingToast });
+        navigate('/pagamento', {
+            state: {
+                tipoCompra: 'club',
+                planoId: planoSelecionado,
+                valorClub: plano.preco,
+                nomePlano: plano.nome
             }
-        } catch (error) {
-            console.error('Erro ao assinar:', error);
-            toast.error('Erro ao processar assinatura', { id: loadingToast });
-        } finally {
-            setAssinando(false);
-        }
+        });
     };
 
     return (

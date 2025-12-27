@@ -31,10 +31,11 @@ router.get("/pedidos/meus", async (req, res) => {
 
     const pedidos = await getPedidosPorUsuario(usuarioId);
 
+    // ✅ Retornar array vazio ao invés de 404
     if (!pedidos || pedidos.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Nenhum pedido encontrado"
+      return res.status(200).json({
+        success: true,
+        pedidos: []
       });
     }
 

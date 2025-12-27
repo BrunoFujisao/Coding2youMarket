@@ -143,7 +143,7 @@ export default function MeusPedidosPage() {
                             onClick={() => navigate('/')}
                             className="px-6 py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition-all shadow-lg hover:shadow-xl"
                         >
-                            {t('home.continueShopping') || t('cart.continueShopping')}
+                            {t('cart.continueShopping')}
                         </button>
                     </div>
                 ) : (
