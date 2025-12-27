@@ -272,16 +272,35 @@ router.post("/pagamentos/processar", auth, async (req, res) => {
       paymentMethodId,
       email
     } = req.body;
+
+    // Validação e debug
+    console.log('📊 Dados recebidos:', { token, transactionAmount, email, installments });
+
     if (!token || !transactionAmount || !email) {
       return res.status(400).json({
         success: false,
         message: "Dados incompletos"
       });
     }
+
+    // Converter e validar valor
+    const valorNumerico = Number(transactionAmount);
+    if (isNaN(valorNumerico) || valorNumerico <= 0) {
+      console.error('❌ Valor inválido:', transactionAmount);
+      return res.status(400).json({
+        success: false,
+        message: "Valor de transação inválido"
+      });
+    }
+
+    console.log('💳 Processando pagamento...');
+    console.log('Token:', token);
+    console.log('Valor:', valorNumerico);
+
     const paymentClient = new Payment(client);
     const payment = await paymentClient.create({
       body: {
-        transaction_amount: parseFloat(transactionAmount),
+        transaction_amount: valorNumerico,
         token: token,
         description: description || "Pedido Subscrivery",
         installments: parseInt(installments) || 1,
