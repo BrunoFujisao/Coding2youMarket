@@ -283,10 +283,12 @@ router.post("/pagamentos/processar", auth, async (req, res) => {
       });
     }
 
-    // Converter e validar valor
-    const valorNumerico = Number(transactionAmount);
+    // Converter vírgula para ponto (formato brasileiro → americano)
+    const valorLimpo = String(transactionAmount).replace(',', '.');
+    const valorNumerico = Number(valorLimpo);
+
     if (isNaN(valorNumerico) || valorNumerico <= 0) {
-      console.error('❌ Valor inválido:', transactionAmount);
+      console.error('❌ Valor inválido:', transactionAmount, '→', valorNumerico);
       return res.status(400).json({
         success: false,
         message: "Valor de transação inválido"
@@ -295,8 +297,7 @@ router.post("/pagamentos/processar", auth, async (req, res) => {
 
     console.log('💳 Processando pagamento...');
     console.log('Token:', token);
-    console.log('Valor:', valorNumerico);
-
+    console.log('Valor original:', transactionAmount, '→ Convertido:', valorNumerico);
     const paymentClient = new Payment(client);
     const payment = await paymentClient.create({
       body: {
