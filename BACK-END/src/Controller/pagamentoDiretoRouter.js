@@ -44,7 +44,7 @@ router.post("/pagamentos/processar-direto", auth, async (req, res) => {
 
         // 3. Payload Simplificado
         const paymentData = {
-            transaction_amount: Number(transactionAmount),
+            transaction_amount: Number(Number(transactionAmount).toFixed(2)), // Fix: decimal precision error
             token: token,
             description: description || "Coding2You Market",
             installments: Number(installments) || 1,
