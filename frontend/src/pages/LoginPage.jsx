@@ -5,6 +5,7 @@ import { FcGoogle } from "react-icons/fc";
 import { LuEye, LuEyeOff } from "react-icons/lu";
 import { login, getUsuarioId } from "../api/auth";
 import { meusEnderecos } from "../api/enderecoAPI";
+import logo from "../assets/logobranco.jpeg";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -66,7 +67,7 @@ export default function Login() {
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="mb-8">
-            <span className="text-lg font-semibold text-verde-petroleo">☕ Subscrivery</span>
+            <img src={logo} alt="Logo" className="h-10 w-auto object-contain mix-blend-multiply" />
           </div>
           {/* Título */}
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Faça Login</h1>

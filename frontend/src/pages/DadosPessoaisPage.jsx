@@ -177,8 +177,11 @@ export default function DadosPessoaisPage() {
                                         <input
                                             type="text"
                                             value={dadosTemp.nome}
-                                            onChange={(e) => setDadosTemp({ ...dadosTemp, nome: e.target.value })}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-salvia focus:border-transparent outline-none transition-all"
+                                            onChange={(e) => {
+                                                const valor = e.target.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '');
+                                                setDadosTemp({ ...dadosTemp, nome: valor });
+                                            }}
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
                                         />
                                     ) : (
                                         <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl">

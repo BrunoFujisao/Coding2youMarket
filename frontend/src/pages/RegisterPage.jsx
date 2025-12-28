@@ -5,6 +5,7 @@ import { FcGoogle } from "react-icons/fc";
 import { LuEye, LuEyeOff } from "react-icons/lu";
 import { cadastrar } from "../api/auth";
 import { validarCPF } from "../utils/validarCPF";
+import logo from "../assets/logobranco.jpeg";
 
 
 export default function Cadastro() {
@@ -82,7 +83,7 @@ export default function Cadastro() {
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-green-100">
             {/* Logo */}
             <div className="mb-6">
-              <span className="text-lg font-semibold text-verde-petroleo">☕ Subscrivery</span>
+              <img src={logo} alt="Logo" className="h-10 w-auto object-contain mix-blend-multiply" />
             </div>
             {/* Título */}
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Cadastre-se</h1>

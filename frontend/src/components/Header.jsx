@@ -6,15 +6,19 @@ import { verMeuCarrinho } from '../api/carrinhoAPI';
 import { useCarrinho } from '../context/CarrinhoContext';
 import { minhaAssinatura } from '../api/clubMarketAPI';
 import TrocaIdioma from './TrocaIdioma';
+import logo from '../assets/logotipo1.jpg';
+
 export default function Header() {
     const { t } = useTranslation();
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const { contadorCarrinho, atualizarContador } = useCarrinho();
     const navigate = useNavigate();
     const location = useLocation();
+
     useEffect(() => {
         carregarQuantidadeCarrinho();
     }, []);
+
     const carregarQuantidadeCarrinho = async () => {
         try {
             const carrinho = await verMeuCarrinho();
@@ -27,6 +31,7 @@ export default function Header() {
             atualizarContador(0);
         }
     };
+
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -59,6 +64,7 @@ export default function Header() {
         document.addEventListener('click', handleClickOutside);
         return () => document.removeEventListener('click', handleClickOutside);
     }, [dropdownOpen]);
+
     return (
         <header className="fixed top-4 left-0 right-0 z-50 px-4 md:px-8">
             <div className="container mx-auto max-w-7xl">
@@ -67,13 +73,8 @@ export default function Header() {
                     {/* Layout Mobile */}
                     <div className="flex md:hidden items-center justify-between">
                         <Link to="/" className="flex items-center">
-                            <div className="w-8 h-8 bg-verde-salvia- rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
-                                🛒
-                            </div>
+                            <img src={logo} alt="Logo" className="h-8 w-auto object-contain rounded-full" style={{ mixBlendMode: 'multiply' }} />
                         </Link>
-                        <span className="absolute left-1/2 -translate-x-1/2 text-base font-bold text-gray-800">
-                            Subscrivery
-                        </span>
                         <div className="flex items-center gap-2">
                             <TrocaIdioma />
                             <Link to="/carrinho" className="p-2 hover:bg-white/30 rounded-full transition-colors relative">
@@ -91,13 +92,13 @@ export default function Header() {
 
                                 {dropdownOpen && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-                                        <Link to="/pedidos" className="block px-4 py-3 text-gray-800 hover:bg-verde-salvia- transition-colors" onClick={() => setDropdownOpen(false)}>
+                                        <Link to="/pedidos" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
                                             📦 {t('nav.orders')}
                                         </Link>
-                                        <button onClick={handleClubMarketClick} className="w-full text-left block px-4 py-3 text-gray-800 hover:bg-verde-salvia- transition-colors">
+                                        <button onClick={handleClubMarketClick} className="w-full text-left block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors">
                                             ⭐ {t('nav.clubMarket')}
                                         </button>
-                                        <Link to="/perfil" className="block px-4 py-3 text-gray-800 hover:bg-verde-salvia- transition-colors" onClick={() => setDropdownOpen(false)}>
+                                        <Link to="/perfil" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
                                             👤 {t('nav.profile')}
                                         </Link>
                                         <hr className="border-gray-200" />
@@ -109,24 +110,20 @@ export default function Header() {
                             </div>
                         </div>
                     </div>
+
                     {/* Layout Desktop */}
-                    <div className="hidden md:flex items-center justify-between">
+                    <div className="hidden md:flex items-center justify-between relative">
                         <Link to="/" className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-verde-salvia- rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
-                                🛒
-                            </div>
-                            <span className="text-lg font-bold text-gray-800">
-                                Subscrivery
-                            </span>
+                            <img src={logo} alt="Logo" className="h-8 w-auto object-contain rounded-full" style={{ mixBlendMode: 'multiply' }} />
                         </Link>
-                        <nav className="flex items-center gap-8">
-                            <Link to="/" className={`font-medium transition-colors pb-1 ${location.pathname === '/' || location.pathname === '/home' ? 'text-gray-800 font-semibold border-b-2 border-verde-salvia-' : 'text-gray-700 hover:text-verde-salvia-'}`}>
+                        <nav className="absolute left-1/2 -translate-x-1/2 flex items-center gap-8">
+                            <Link to="/" className={`font-medium transition-colors pb-1 ${location.pathname === '/' || location.pathname === '/home' ? 'text-gray-800 font-semibold border-b-2 border-green-500' : 'text-gray-700 hover:text-green-600'}`}>
                                 {t('nav.home')}
                             </Link>
-                            <Link to="/pedidos" className={`font-medium transition-colors pb-1 ${location.pathname === '/pedidos' ? 'text-gray-800 font-semibold border-b-2 border-verde-salvia-' : 'text-gray-700 hover:text-verde-salvia-'}`}>
+                            <Link to="/pedidos" className={`font-medium transition-colors pb-1 ${location.pathname === '/pedidos' ? 'text-gray-800 font-semibold border-b-2 border-green-500' : 'text-gray-700 hover:text-green-600'}`}>
                                 {t('nav.orders')}
                             </Link>
-                            <button onClick={handleClubMarketClick} className={`font-medium transition-colors pb-1 ${location.pathname === '/club-market' || location.pathname === '/minhas-assinaturas' ? 'text-gray-800 font-semibold border-b-2 border-verde-salvia-' : 'text-gray-700 hover:text-verde-salvia-'}`}>
+                            <button onClick={handleClubMarketClick} className={`font-medium transition-colors pb-1 ${location.pathname === '/club-market' || location.pathname === '/minhas-assinaturas' ? 'text-gray-800 font-semibold border-b-2 border-green-500' : 'text-gray-700 hover:text-green-600'}`}>
                                 {t('nav.clubMarket')}
                             </button>
                         </nav>
@@ -147,13 +144,13 @@ export default function Header() {
 
                                 {dropdownOpen && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-                                        <Link to="/pedidos" className="block px-4 py-3 text-gray-800 hover:bg-verde-salvia- transition-colors" onClick={() => setDropdownOpen(false)}>
+                                        <Link to="/pedidos" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
                                             {t('nav.orders')}
                                         </Link>
-                                        <button onClick={handleClubMarketClick} className="w-full text-left block px-4 py-3 text-gray-800 hover:bg-verde-salvia- transition-colors">
+                                        <button onClick={handleClubMarketClick} className="w-full text-left block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors">
                                             {t('nav.clubMarket')}
                                         </button>
-                                        <Link to="/perfil" className="block px-4 py-3 text-gray-800 hover:bg-verde-salvia- transition-colors" onClick={() => setDropdownOpen(false)}>
+                                        <Link to="/perfil" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
                                             {t('nav.profile')}
                                         </Link>
                                         <hr className="border-gray-200" />
@@ -167,7 +164,6 @@ export default function Header() {
                     </div>
                 </div>
             </div>
-        </header >
+        </header>
     );
 }
-

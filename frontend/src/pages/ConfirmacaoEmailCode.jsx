@@ -2,12 +2,13 @@ import BotaoVerde from "../components/botaoVerde";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { validarCodigoVerificacao } from "../api/auth";
 import { useState } from 'react';
+import logo from "../assets/logobranco.jpeg";
 
 export default function ConfirmacaoEmailCode() {
   const location = useLocation();
   const navigate = useNavigate();
 
- 
+
   const emailUsuario = location.state?.email || localStorage.getItem('email_recuperacao');
 
   const [codigo, setCodigo] = useState('');
@@ -15,7 +16,7 @@ export default function ConfirmacaoEmailCode() {
   const [mensagem, setMensagem] = useState({ tipo: '', texto: '' });
 
   const handleConfirmarClick = async () => {
-    
+
     if (!emailUsuario) {
       setMensagem({ tipo: 'erro', texto: 'E-mail não encontrado. Volte ao início.' });
       return;
@@ -32,16 +33,16 @@ export default function ConfirmacaoEmailCode() {
       const resultado = await validarCodigoVerificacao(emailUsuario, codigo);
 
       if (resultado.success) {
-       setMensagem({
+        setMensagem({
           tipo: "sucesso",
           texto: "Validação aprovada! Redirecionando..."
         });
 
-          setTimeout(() => {
-            navigate("/redefinir-senha", {
-              state: { email: emailUsuario }
-            });
-            }, 800);
+        setTimeout(() => {
+          navigate("/redefinir-senha", {
+            state: { email: emailUsuario }
+          });
+        }, 800);
       } else {
         setMensagem({ tipo: 'erro', texto: 'Código não validado' });
       }
@@ -55,7 +56,7 @@ export default function ConfirmacaoEmailCode() {
     <div style={styles.container}>
       <div style={styles.left}>
         <div style={styles.form}>
-          <span style={styles.logo}>☕ Subscrivery</span>
+          <img src={logo} alt="Logo" style={{ height: '40px', width: 'auto', objectFit: 'contain', mixBlendMode: 'multiply', marginBottom: '20px' }} />
 
           <h1 style={styles.title}>Verifique seu e-mail</h1>
 
@@ -76,8 +77,8 @@ export default function ConfirmacaoEmailCode() {
           />
 
           {mensagem.texto && (
-            <p style={{ 
-              fontSize: '12px', 
+            <p style={{
+              fontSize: '12px',
               color: mensagem.tipo === 'erro' ? '#E53E3E' : '#2F6B4F',
               textAlign: 'center',
               marginTop: '8px'
@@ -87,9 +88,9 @@ export default function ConfirmacaoEmailCode() {
           )}
 
           <div style={{ marginTop: "16px" }}>
-            <BotaoVerde 
-              mensagem={loading ? "Validando..." : "Confirmar Código"} 
-              onClick={handleConfirmarClick} 
+            <BotaoVerde
+              mensagem={loading ? "Validando..." : "Confirmar Código"}
+              onClick={handleConfirmarClick}
               disabled={loading}
             />
           </div>
