@@ -79,3 +79,4 @@ export const editarCliente = async (dados) => {
     return { success: false, message: "Erro ao conectar com o servidor" };
   }
 };
+

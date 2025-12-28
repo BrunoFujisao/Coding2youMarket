@@ -31,7 +31,7 @@ export default function CVVModal({ isOpen, onClose, onConfirm }) {
                         type="text"
                         maxLength="4"
                         placeholder="123"
-                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-green-500 focus:outline-none text-center text-2xl font-mono tracking-wider"
+                        className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-verde-salvia focus:outline-none text-center text-2xl font-mono tracking-wider"
                         value={cvv}
                         onChange={(e) => setCvv(e.target.value.replace(/\D/g, ''))}
                         autoFocus
@@ -53,7 +53,7 @@ export default function CVVModal({ isOpen, onClose, onConfirm }) {
                         onClick={handleSubmit}
                         disabled={cvv.length < 3}
                         className={`flex-1 py-3 rounded-full font-semibold text-white transition-all ${cvv.length >= 3
-                            ? 'bg-green-600 hover:bg-green-700 active:scale-95'
+                            ? 'bg-[#85B693] hover:bg-[#2F6C50] active:scale-95'
                             : 'bg-gray-300 cursor-not-allowed'
                             }`}
                     >

@@ -93,6 +93,9 @@ router.get("/pedidos/:id", async (req, res) => {
 
 // CREATE 
 router.post("/pedidos", async (req, res) => {
+  const pool = require("../Config/Db/db");
+  const { getCarrinhoPorUsuario, limparCarrinho } = require("../Model/DAO/carrinhoDao");
+
   try {
     const usuarioId = req.usuario.id;
 
@@ -113,7 +116,45 @@ router.post("/pedidos", async (req, res) => {
       });
     }
 
-    // Calcular desconto = valorTotal - valorFinal
+    // 1️⃣ Buscar itens do carrinho do usuário
+    console.log('🛒 Buscando carrinho do usuário:', usuarioId);
+    const itensCarrinho = await getCarrinhoPorUsuario(usuarioId);
+
+    if (!itensCarrinho || itensCarrinho.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Carrinho vazio. Adicione produtos antes de criar um pedido."
+      });
+    }
+
+    console.log(`📦 ${itensCarrinho.length} itens no carrinho`);
+
+    // 2️⃣ Verificar e diminuir estoque de cada produto
+    for (const item of itensCarrinho) {
+      const produtoId = item.produto.id;
+      const quantidadeComprada = item.quantidade;
+      const estoqueAtual = item.produto.estoque;
+
+      console.log(`🔍 Produto ${produtoId}: Estoque=${estoqueAtual}, Comprando=${quantidadeComprada}`);
+
+      // Verificar se há estoque suficiente
+      if (estoqueAtual < quantidadeComprada) {
+        return res.status(400).json({
+          success: false,
+          message: `Estoque insuficiente para ${item.produto.nome}. Disponível: ${estoqueAtual}, Solicitado: ${quantidadeComprada}`
+        });
+      }
+
+      // Diminuir estoque
+      const novoEstoque = estoqueAtual - quantidadeComprada;
+      await pool.query(
+        'UPDATE produtos SET estoque = $1 WHERE id_produto = $2',
+        [novoEstoque, produtoId]
+      );
+      console.log(`✅ Estoque atualizado: ${estoqueAtual} → ${novoEstoque}`);
+    }
+
+    // 3️⃣ Criar o pedido
     const descontoClub = parseFloat(valorTotal) - parseFloat(valorFinal);
 
     const pedido = await insertPedido({
@@ -123,12 +164,11 @@ router.post("/pedidos", async (req, res) => {
       diaEntrega,
       valorTotal,
       valorFinal,
-      descontoClub, // ✅ Salvar o desconto
+      descontoClub,
       dataProximaEntrega,
       dataProximaCobranca
     });
 
-    // Se insertPedido retornar false ao invés de lançar erro
     if (!pedido) {
       return res.status(500).json({
         success: false,
@@ -136,13 +176,29 @@ router.post("/pedidos", async (req, res) => {
       });
     }
 
+    console.log('✅ Pedido criado:', pedido.id);
+
+    // 4️⃣ Vincular itens ao pedido na tabela pedido_itens
+    for (const item of itensCarrinho) {
+      await pool.query(
+        `INSERT INTO pedido_itens (pedidoid, produtoid, quantidade, precounitario)
+         VALUES ($1, $2, $3, $4)`,
+        [pedido.id, item.produto.id, item.quantidade, item.produto.preco]
+      );
+    }
+    console.log(`✅ ${itensCarrinho.length} itens vinculados ao pedido`);
+
+    // 5️⃣ Limpar carrinho do usuário
+    await limparCarrinho(usuarioId);
+    console.log('✅ Carrinho limpo');
+
     return res.status(201).json({
       success: true,
       message: "Pedido criado com sucesso",
       pedido
     });
   } catch (error) {
-    console.error('Erro ao criar pedido:', error);
+    console.error('❌ Erro ao criar pedido:', error);
     return res.status(500).json({
       success: false,
       message: "Erro ao criar pedido",

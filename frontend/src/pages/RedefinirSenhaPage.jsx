@@ -98,7 +98,7 @@ export default function RedefinirSenhaPage() {
               placeholder="••••••••"
               value={novaSenha}
               onChange={(e) => setNovaSenha(e.target.value)}
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-md outline-none focus:border-green-600 transition-colors"
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-md outline-none focus:border-verde-salvia-600 transition-colors"
               required
             />
           </div>
@@ -112,7 +112,7 @@ export default function RedefinirSenhaPage() {
               placeholder="••••••••"
               value={confirmarSenha}
               onChange={(e) => setConfirmarSenha(e.target.value)}
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-md outline-none focus:border-green-600 transition-colors"
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-md outline-none focus:border-verde-salvia-600 transition-colors"
               required
             />
           </div>
@@ -130,7 +130,7 @@ export default function RedefinirSenhaPage() {
           <p
             className={`mt-4 text-center text-sm font-medium ${mensagem.tipo === "erro"
                 ? "text-red-500"
-                : "text-green-700"
+                : "text-verde-petroleo"
               }`}
           >
             {mensagem.texto}
@@ -140,3 +140,4 @@ export default function RedefinirSenhaPage() {
     </div>
   );
 }
+

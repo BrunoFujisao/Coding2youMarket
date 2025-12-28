@@ -116,7 +116,7 @@ export default function MinhasAssinaturasPage() {
             <Header />
 
             <div className="relative h-48 md:h-56 w-full mb-8 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-green-600 via-emerald-500 to-teal-600" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#85B693] to-[#2F6C50]" />
                 <div className="absolute inset-0 opacity-30">
                     <div className="absolute top-10 left-10 w-32 h-32 bg-white/20 rounded-full blur-2xl"></div>
                     <div className="absolute bottom-10 right-10 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
@@ -137,18 +137,18 @@ export default function MinhasAssinaturasPage() {
             <main className="container mx-auto px-4 md:px-8 max-w-4xl">
                 {loading ? (
                     <div className="flex justify-center items-center py-20">
-                        <div className="w-10 h-10 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-10 h-10 border-4 border-[#85B693] border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 ) : (
                     <>
                         <div className="mb-8">
                             <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                <Crown size={20} className="text-green-600" />
+                                <Crown size={20} className="text-[#85B693]" />
                                 {t('mySubscriptionsPage.currentSubscription')}
                             </h2>
 
                             {assinaturaAtual && planoAtual ? (
-                                <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-3xl p-6 text-white shadow-xl">
+                                <div className="bg-gradient-to-r from-[#85B693] to-[#2F6C50] rounded-3xl p-6 text-white shadow-xl">
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="flex items-center gap-4">
                                             <span className="text-4xl">{planoAtual.emoji}</span>
@@ -211,18 +211,18 @@ export default function MinhasAssinaturasPage() {
                                         <div
                                             key={plano.id}
                                             className={`rounded-2xl p-5 border-2 transition-all flex flex-col ${isAtual
-                                                ? 'bg-green-50 border-green-400 opacity-60'
-                                                : 'bg-white border-gray-200 hover:border-green-400 hover:shadow-lg'
-                                                } ${plano.popular && !isAtual ? 'ring-2 ring-green-500 ring-offset-2' : ''}`}
+                                                ? 'bg-[#EBF4EE] border-[#85B693] opacity-60'
+                                                : 'bg-white border-gray-200 hover:border-[#85B693] hover:shadow-lg'
+                                                } ${plano.popular && !isAtual ? 'ring-2 ring-verde-salvia ring-offset-2' : ''}`}
                                         >
                                             <div className="h-8 mb-2">
                                                 {plano.popular && !isAtual && (
-                                                    <span className="inline-block px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full">
+                                                    <span className="inline-block px-3 py-1 bg-[#85B693] text-white text-xs font-bold rounded-full">
                                                         {t('mySubscriptionsPage.popular')}
                                                     </span>
                                                 )}
                                                 {isAtual && (
-                                                    <span className="inline-block px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full">
+                                                    <span className="inline-block px-3 py-1 bg-[#85B693] text-white text-xs font-bold rounded-full">
                                                         {t('mySubscriptionsPage.currentPlan')}
                                                     </span>
                                                 )}
@@ -243,7 +243,7 @@ export default function MinhasAssinaturasPage() {
                                             <ul className="space-y-2 mb-4 flex-grow">
                                                 {plano.beneficios.map((b, i) => (
                                                     <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                                                        <Check size={16} className="text-green-500" />
+                                                        <Check size={16} className="text-[#85B693]" />
                                                         {b}
                                                     </li>
                                                 ))}
@@ -253,10 +253,10 @@ export default function MinhasAssinaturasPage() {
                                                 onClick={() => !isAtual && handleAssinar(plano.id)}
                                                 disabled={processando || assinaturaAtual || isAtual}
                                                 className={`w-full py-3 rounded-xl font-semibold transition-all mt-auto ${isAtual
-                                                    ? 'bg-green-100 text-green-600 cursor-default'
+                                                    ? 'bg-[#EBF4EE] text-[#85B693] cursor-default'
                                                     : assinaturaAtual
                                                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                                        : 'bg-green-600 text-white hover:bg-green-700'
+                                                        : 'bg-[#85B693] text-white hover:bg-[#2F6C50]'
                                                     }`}
                                             >
                                                 {isAtual ? t('mySubscriptionsPage.activePlan') : processando ? t('mySubscriptionsPage.processing') : t('mySubscriptionsPage.subscribe')}
@@ -327,3 +327,4 @@ export default function MinhasAssinaturasPage() {
         </div>
     );
 }
+

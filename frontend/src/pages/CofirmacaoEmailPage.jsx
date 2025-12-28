@@ -174,3 +174,4 @@ const styles = {
     textAlign: "center",
   },
 };
+

@@ -27,7 +27,7 @@ export default function ConfiguracoesPage() {
     const ToggleSwitch = ({ value, onChange }) => (
         <button
             onClick={onChange}
-            className={`relative w-12 h-7 rounded-full transition-all duration-300 ${value ? 'bg-green-500' : 'bg-gray-300'
+            className={`relative w-12 h-7 rounded-full transition-all duration-300 ${value ? 'bg-verde-salvia' : 'bg-gray-300'
                 }`}
         >
             <div className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow-md transition-all duration-300 ${value ? 'left-6' : 'left-1'
@@ -78,7 +78,7 @@ export default function ConfiguracoesPage() {
 
                 <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
                     <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <Bell size={20} className="text-green-600" />
+                        <Bell size={20} className="text-verde-salvia-600" />
                         {t('settingsPage.notifications.title')}
                     </h3>
 
@@ -107,7 +107,7 @@ export default function ConfiguracoesPage() {
 
                 <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
                     <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <Eye size={20} className="text-green-600" />
+                        <Eye size={20} className="text-verde-salvia-600" />
                         {t('settingsPage.appearance.title')}
                     </h3>
 
@@ -132,7 +132,7 @@ export default function ConfiguracoesPage() {
                         <select
                             value={configuracoes.idioma}
                             onChange={(e) => setConfiguracoes({ ...configuracoes, idioma: e.target.value })}
-                            className="px-3 py-2 bg-gray-100 rounded-lg text-sm text-gray-700 outline-none focus:ring-2 focus:ring-green-500"
+                            className="px-3 py-2 bg-gray-100 rounded-lg text-sm text-gray-700 outline-none focus:ring-2 focus:ring-verde-salvia"
                         >
                             <option value="pt-BR">{t('settingsPage.appearance.language.options.ptBR')}</option>
                             <option value="en-US">{t('settingsPage.appearance.language.options.enUS')}</option>
@@ -143,7 +143,7 @@ export default function ConfiguracoesPage() {
 
                 <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
                     <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <Smartphone size={20} className="text-green-600" />
+                        <Smartphone size={20} className="text-verde-salvia-600" />
                         {t('settingsPage.system.title')}
                     </h3>
 
@@ -209,3 +209,4 @@ export default function ConfiguracoesPage() {
         </div>
     );
 }
+

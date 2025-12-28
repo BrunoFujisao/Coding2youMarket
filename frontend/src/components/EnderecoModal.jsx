@@ -64,8 +64,8 @@ export default function EnderecoModal({ isOpen, onClose, onConfirmar }) {
                             className={`
                 flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all
                 ${enderecoSelecionado?.id === endereco.id
-                                    ? 'border-green-500 bg-green-50'
-                                    : 'border-gray-200 hover:border-green-300'
+                                    ? 'border-verde-salvia bg-verde-salvia-50'
+                                    : 'border-gray-200 hover:border-verde-salvia-300'
                                 }
               `}
                         >
@@ -75,7 +75,7 @@ export default function EnderecoModal({ isOpen, onClose, onConfirmar }) {
                                 value={endereco.id}
                                 checked={enderecoSelecionado?.id === endereco.id}
                                 onChange={() => setEnderecoSelecionado(endereco)}
-                                className="w-5 h-5 text-green-600 focus:ring-green-500 mt-1"
+                                className="w-5 h-5 text-verde-salvia-600 focus:ring-verde-salvia mt-1"
                             />
                             <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
@@ -90,7 +90,7 @@ export default function EnderecoModal({ isOpen, onClose, onConfirmar }) {
                     ))}
                 </div>
                 {/* Botão Novo Endereço */}
-                <button className="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 font-medium hover:border-green-500 hover:text-green-600 transition-all flex items-center justify-center gap-2 mb-6">
+                <button className="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 font-medium hover:border-verde-salvia hover:text-verde-salvia-600 transition-all flex items-center justify-center gap-2 mb-6">
                     <Plus size={20} />
                     {t('address.addNew') || 'Novo endereço'}
                 </button>

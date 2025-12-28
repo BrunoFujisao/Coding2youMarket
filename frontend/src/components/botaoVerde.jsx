@@ -10,7 +10,7 @@ const styles = {
   botao: {
     width: "100%",
     height: "48px",
-    backgroundColor: "#2F6B4F",
+    backgroundColor: "#85B693", // Verde Sálvia - tom claro
     color: "#FFFFFF",
     border: "none",
     borderRadius: "12px",
@@ -34,4 +34,4 @@ export default function Login() {
       />
     </div>
   );
-} */ 
+} */

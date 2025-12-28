@@ -101,7 +101,7 @@ export default function HomePage() {
         <div className="relative z-10 h-full container mx-auto px-4 md:px-8 flex flex-col justify-center max-w-7xl">
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-white max-w-xl">
             {t('home.clubBanner.title')}{' '}
-            <span className="text-green-400">{t('home.clubBanner.subtitle')}</span>
+            <span className="text-verde-salvia-400">{t('home.clubBanner.subtitle')}</span>
           </h1>
           <button
             onClick={() => setShowClubModal(true)}
@@ -164,7 +164,7 @@ export default function HomePage() {
               {categoriaAtiva && (
                 <button
                   onClick={() => setCategoriaAtiva(null)}
-                  className="text-green-600 hover:text-green-700 font-medium text-sm hover:underline"
+                  className="text-verde-salvia-600 hover:text-verde-petroleo font-medium text-sm hover:underline"
                 >
                   {t('home.viewAll')}
                 </button>
@@ -173,7 +173,7 @@ export default function HomePage() {
           </div>
           {loading ? (
             <div className="text-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-verde-salvia-600 mx-auto"></div>
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
@@ -187,7 +187,7 @@ export default function HomePage() {
               <p className="text-lg">{t('home.noProducts')}</p>
               <button
                 onClick={() => { setFiltro(''); setCategoriaAtiva(null) }}
-                className="mt-4 text-green-600 font-medium hover:underline"
+                className="mt-4 text-verde-salvia-600 font-medium hover:underline"
               >
                 Limpar filtros
               </button>
@@ -202,7 +202,7 @@ export default function HomePage() {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             {/* Modal Header */}
-            <div className="relative bg-gradient-to-r from-green-600 to-emerald-500 p-6 rounded-t-3xl">
+            <div className="relative bg-gradient-to-r from-verde-salvia-600 to-verde-petroleo p-6 rounded-t-3xl">
               <button
                 onClick={() => setShowClubModal(false)}
                 className="absolute top-4 right-4 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition-all"
@@ -220,7 +220,7 @@ export default function HomePage() {
             <div className="p-6">
               <div className="grid md:grid-cols-3 gap-4">
                 {/* Plano Entrada */}
-                <div className="bg-gray-50 rounded-2xl p-5 border-2 border-gray-200 hover:border-green-300 transition-all">
+                <div className="bg-gray-50 rounded-2xl p-5 border-2 border-gray-200 hover:border-verde-salvia-300 transition-all">
                   <div className="text-center mb-4">
                     <span className="text-3xl">🌱</span>
                     <h3 className="text-lg font-bold text-gray-800 mt-2">Entrada</h3>
@@ -231,7 +231,7 @@ export default function HomePage() {
                   </div>
                   <ul className="space-y-2 text-sm text-gray-600 mb-4">
                     <li className="flex items-center gap-2">
-                      <span className="text-green-500">✓</span> Frete grátis
+                      <span className="text-verde-salvia">✓</span> Frete grátis
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-gray-400">○</span> Sem desconto
@@ -245,8 +245,8 @@ export default function HomePage() {
                 </div>
 
                 {/* Plano Intermediário */}
-                <div className="bg-green-50 rounded-2xl p-5 border-2 border-green-400 shadow-lg relative">
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full">
+                <div className="bg-verde-salvia-50 rounded-2xl p-5 border-2 border-verde-salvia-400 shadow-lg relative">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-verde-salvia text-white text-xs font-bold rounded-full">
                     POPULAR
                   </div>
                   <div className="text-center mb-4">
@@ -254,19 +254,19 @@ export default function HomePage() {
                     <h3 className="text-lg font-bold text-gray-800 mt-2">Intermediário</h3>
                   </div>
                   <div className="text-center mb-4">
-                    <span className="text-3xl font-bold text-green-600">R$ 19,90</span>
+                    <span className="text-3xl font-bold text-verde-salvia-600">R$ 19,90</span>
                     <span className="text-gray-500 text-sm">/mês</span>
                   </div>
                   <ul className="space-y-2 text-sm text-gray-600 mb-4">
                     <li className="flex items-center gap-2">
-                      <span className="text-green-500">✓</span> Frete grátis
+                      <span className="text-verde-salvia">✓</span> Frete grátis
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="text-green-500">✓</span> 10% de desconto
+                      <span className="text-verde-salvia">✓</span> 10% de desconto
                     </li>
                   </ul>
                   <div className="text-center">
-                    <span className="inline-block px-3 py-1 bg-green-500 text-white rounded-full text-sm font-medium">
+                    <span className="inline-block px-3 py-1 bg-verde-salvia text-white rounded-full text-sm font-medium">
                       10% desconto
                     </span>
                   </div>
@@ -284,10 +284,10 @@ export default function HomePage() {
                   </div>
                   <ul className="space-y-2 text-sm text-gray-600 mb-4">
                     <li className="flex items-center gap-2">
-                      <span className="text-green-500">✓</span> Frete grátis
+                      <span className="text-verde-salvia">✓</span> Frete grátis
                     </li>
                     <li className="flex items-center gap-2">
-                      <span className="text-green-500">✓</span> 25% de desconto
+                      <span className="text-verde-salvia">✓</span> 25% de desconto
                     </li>
                   </ul>
                   <div className="text-center">
@@ -305,7 +305,7 @@ export default function HomePage() {
                     setShowClubModal(false);
                     navigate('/club-market');
                   }}
-                  className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-500 text-white font-bold rounded-full hover:shadow-lg hover:scale-105 transition-all"
+                  className="px-8 py-3 bg-gradient-to-r from-verde-salvia-600 to-verde-petroleo text-white font-bold rounded-full hover:shadow-lg hover:scale-105 transition-all"
                 >
                   Ver Todos os Planos →
                 </button>

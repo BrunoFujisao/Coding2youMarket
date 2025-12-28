@@ -101,3 +101,4 @@ export const buscarCartoes = async () => {
         return { success: false, cartoes: [] };
     }
 };
+

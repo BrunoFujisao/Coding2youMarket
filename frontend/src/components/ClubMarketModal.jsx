@@ -95,3 +95,4 @@ export default function ClubMarketModal({ isOpen, onClose }) {
         </div>
     );
 }
+

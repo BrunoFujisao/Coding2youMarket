@@ -153,7 +153,7 @@ export default function AdminPanel() {
     if (loading && !metrics) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-verde-salvia-600"></div>
             </div>
         );
     }
@@ -161,7 +161,7 @@ export default function AdminPanel() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Admin Header - Verde */}
-            <div className="bg-gradient-to-r from-green-600 to-green-800 text-white py-8 px-4 shadow-lg">
+            <div className="bg-gradient-to-r from-[#85B693] to-[#2F6C50] text-white py-8 px-4 shadow-lg">
                 <div className="container mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
@@ -209,7 +209,7 @@ export default function AdminPanel() {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`flex items-center gap-2 px-4 py-3 font-medium transition border-b-2 whitespace-nowrap text-sm ${activeTab === tab.id
-                                        ? 'border-green-600 text-green-600 bg-green-50'
+                                        ? 'border-verde-salvia-600 text-verde-salvia-600 bg-verde-salvia-50'
                                         : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                         }`}
                                 >
@@ -229,10 +229,10 @@ export default function AdminPanel() {
                     <div>
                         {/* Metric Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                            <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+                            <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-verde-salvia">
                                 <div className="flex items-center justify-between mb-2">
-                                    <div className="p-2 bg-green-100 rounded-lg">
-                                        <DollarSign className="text-green-600" size={24} />
+                                    <div className="p-2 bg-verde-salvia-100 rounded-lg">
+                                        <DollarSign className="text-verde-salvia-600" size={24} />
                                     </div>
                                 </div>
                                 <h3 className="text-2xl font-bold text-gray-800">
@@ -293,7 +293,7 @@ export default function AdminPanel() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="bg-white rounded-xl shadow-md p-6">
                                 <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                    <TrendingUp className="text-green-600" size={20} />
+                                    <TrendingUp className="text-verde-salvia-600" size={20} />
                                     Vendas (7 dias)
                                 </h3>
                                 <div className="space-y-2">
@@ -320,7 +320,7 @@ export default function AdminPanel() {
                                                 <span className="text-xs font-bold text-gray-400">#{idx + 1}</span>
                                                 <span className="text-sm">{p.nome}</span>
                                             </div>
-                                            <span className="text-sm font-semibold text-green-600">{p.quantidade_vendida} un.</span>
+                                            <span className="text-sm font-semibold text-verde-salvia-600">{p.quantidade_vendida} un.</span>
                                         </div>
                                     )) : <p className="text-center text-gray-400 py-4">Sem dados</p>}
                                 </div>
@@ -364,7 +364,7 @@ export default function AdminPanel() {
                                                         autoFocus
                                                     />
                                                 ) : (
-                                                    <span className={`px-2 py-1 rounded text-xs font-medium ${p.estoque < 10 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                                                    <span className={`px-2 py-1 rounded text-xs font-medium ${p.estoque < 10 ? 'bg-red-100 text-red-800' : 'bg-verde-salvia-100 text-green-800'
                                                         }`}>
                                                         {p.estoque}
                                                     </span>
@@ -373,7 +373,7 @@ export default function AdminPanel() {
                                             <td className="px-6 py-4">
                                                 <button
                                                     onClick={() => setEditandoEstoque(editandoEstoque === p.id ? null : p.id)}
-                                                    className="text-green-600 hover:text-green-800 text-sm font-medium"
+                                                    className="text-verde-salvia-600 hover:text-green-800 text-sm font-medium"
                                                 >
                                                     {editandoEstoque === p.id ? 'Cancelar' : 'Editar'}
                                                 </button>
@@ -413,7 +413,7 @@ export default function AdminPanel() {
                                                 <td className="px-6 py-4 text-sm font-medium">#{p.id}</td>
                                                 <td className="px-6 py-4 text-sm">{p.usuario_nome}</td>
                                                 <td className="px-6 py-4 text-sm">R$ {parseFloat(p.valortotal).toFixed(2)}</td>
-                                                <td className="px-6 py-4 text-sm font-semibold text-green-600">R$ {parseFloat(p.valorfinal || p.valortotal).toFixed(2)}</td>
+                                                <td className="px-6 py-4 text-sm font-semibold text-verde-salvia-600">R$ {parseFloat(p.valorfinal || p.valortotal).toFixed(2)}</td>
                                                 <td className="px-6 py-4 text-sm text-red-600">
                                                     {desconto > 0 ? `- R$ ${desconto.toFixed(2)}` : 'R$ 0.00'}
                                                 </td>
@@ -471,7 +471,7 @@ export default function AdminPanel() {
                                                 )}
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className={`px-2 py-1 rounded text-xs font-medium ${u.ativo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                                <span className={`px-2 py-1 rounded text-xs font-medium ${u.ativo ? 'bg-verde-salvia-100 text-green-800' : 'bg-red-100 text-red-800'
                                                     }`}>
                                                     {u.ativo ? 'Ativo' : 'Inativo'}
                                                 </span>
@@ -487,3 +487,4 @@ export default function AdminPanel() {
         </div>
     );
 }
+

@@ -47,15 +47,15 @@ export default function SegurancaPage() {
             <main className="container mx-auto px-4 md:px-8 max-w-3xl -mt-4">
                 {loading ? (
                     <div className="bg-white rounded-3xl shadow-lg p-8 text-center">
-                        <div className="animate-spin w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+                        <div className="animate-spin w-12 h-12 border-4 border-verde-salvia-600 border-t-transparent rounded-full mx-auto mb-4"></div>
                         <p className="text-gray-500">{t('securityPage.loading')}</p>
                     </div>
                 ) : (
                     <>
                         <div className="bg-white rounded-2xl shadow-lg p-6 mb-4">
                             <div className="flex items-center gap-4 mb-4">
-                                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                                    <Mail className="text-green-700" size={24} />
+                                <div className="w-12 h-12 bg-verde-salvia-100 rounded-xl flex items-center justify-center">
+                                    <Mail className="text-verde-petroleo" size={24} />
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-gray-800">{t('securityPage.emailCard.title')}</h3>
@@ -68,8 +68,8 @@ export default function SegurancaPage() {
                                     <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">{t('securityPage.emailCard.label')}</p>
                                     <p className="font-medium text-gray-800">{cliente?.email || t('securityPage.emailCard.notProvided')}</p>
                                 </div>
-                                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                                    <svg className="w-5 h-5 text-green-700" fill="currentColor" viewBox="0 0 20 20">
+                                <div className="w-10 h-10 bg-verde-salvia-100 rounded-full flex items-center justify-center">
+                                    <svg className="w-5 h-5 text-verde-petroleo" fill="currentColor" viewBox="0 0 20 20">
                                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                     </svg>
                                 </div>
@@ -78,8 +78,8 @@ export default function SegurancaPage() {
 
                         <div className="bg-white rounded-2xl shadow-lg p-6 mb-4">
                             <div className="flex items-center gap-4 mb-4">
-                                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                                    <Lock className="text-green-700" size={24} />
+                                <div className="w-12 h-12 bg-verde-salvia-100 rounded-xl flex items-center justify-center">
+                                    <Lock className="text-verde-petroleo" size={24} />
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-gray-800">{t('securityPage.passwordCard.title')}</h3>
@@ -100,20 +100,20 @@ export default function SegurancaPage() {
 
                         <button
                             onClick={() => navigate("/confirmacaoEmail")}
-                            className="w-full bg-green-700 hover:bg-green-800 text-white font-semibold py-4 px-6 rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3 mb-4"
+                            className="w-full bg-[#2F6C50] hover:bg-[#85B693] text-white font-semibold py-4 px-6 rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3 mb-4"
                         >
                             <Lock size={20} />
                             {t('securityPage.changePassword')}
                             <ChevronRight size={20} />
                         </button>
 
-                        <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-start gap-3">
-                            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <Shield className="text-green-700" size={16} />
+                        <div className="bg-[#85B693] border border-[#2F6C50] rounded-xl p-4 flex items-start gap-3">
+                            <div className="w-8 h-8 bg-[#2F6C50] rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <Shield className="text-[#2F6C50]" size={16} />
                             </div>
                             <div>
-                                <p className="text-green-800 font-medium text-sm">{t('securityPage.securityTip.title')}</p>
-                                <p className="text-green-700 text-sm mt-1">
+                                <p className="text-[#2F6C50] font-medium text-sm">{t('securityPage.securityTip.title')}</p>
+                                <p className="text-[#2F6C50] text-sm mt-1">
                                     {t('securityPage.securityTip.description')}
                                 </p>
                             </div>
@@ -133,3 +133,4 @@ export default function SegurancaPage() {
         </div>
     );
 }
+

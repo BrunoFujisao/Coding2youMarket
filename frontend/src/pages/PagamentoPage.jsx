@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, CreditCard, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, CreditCard, Plus, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Header from '../components/Header';
+import SumarioOrdem from '../components/SumarioOrdem';
 import CVVModal from '../components/cvvmodal';
-import { meusCartoes } from '../api/cartaoAPI';
+import { meusCartoes, deletarCartao } from '../api/cartaoAPI';
 import { verMeuCarrinho, limparCarrinho } from '../api/carrinhoAPI';
+import { meusEnderecos } from '../api/enderecoAPI';
 import { criarPedido } from '../api/pedidosAPI';
+import { minhaAssinatura } from '../api/clubMarketAPI';
 import { initMercadoPago, tokenizarCartao, detectarBandeira, formatarNumeroCartao, formatarValidade } from '../services/mercadoPagoService';
 
 const API_URL = 'https://coding2youmarket-production.up.railway.app/api';
@@ -23,6 +26,7 @@ export default function PagamentoPage() {
     const [loading, setLoading] = useState(true);
     const [resumo, setResumo] = useState(null);
     const [mostrarCVVModal, setMostrarCVVModal] = useState(false);
+    const [enderecoSelecionado, setEnderecoSelecionado] = useState(null);
     const [novoCartao, setNovoCartao] = useState({
         numero: '',
         nome: '',
@@ -34,6 +38,7 @@ export default function PagamentoPage() {
     useEffect(() => {
         initMercadoPago(MP_PUBLIC_KEY);
         carregarCartoes();
+        carregarEnderecos();
         calcularResumo();
     }, []);
     const carregarCartoes = async () => {
@@ -49,6 +54,34 @@ export default function PagamentoPage() {
             setLoading(false);
         }
     };
+
+    const carregarEnderecos = async () => {
+        try {
+            // ✅ Se enderecoId veio do state (modal frequência), usar ele
+            if (dadosCompra.enderecoId) {
+                setEnderecoSelecionado(dadosCompra.enderecoId);
+                console.log('📍 Endereço vindo do state:', dadosCompra.enderecoId);
+                return;
+            }
+
+            // Caso contrário, buscar endereços do usuário
+            const { success, enderecos } = await meusEnderecos();
+            console.log('📦 Response enderecos:', { success, enderecos });
+
+            if (success && enderecos && enderecos.length > 0) {
+                // Usar o primeiro endereço como padrão
+                setEnderecoSelecionado(enderecos[0].id);
+                console.log('📍 Endereço selecionado:', enderecos[0].id, enderecos[0]);
+            } else {
+                console.warn('⚠️ Nenhum endereço encontrado');
+            }
+        } catch (error) {
+            console.error('❌ Erro ao carregar endereços:', error);
+        }
+    };
+
+
+
 
     const calcularResumo = async () => {
         try {
@@ -80,10 +113,40 @@ export default function PagamentoPage() {
                 const quantidade = item.quantidade || 0;
                 return acc + (preco * quantidade);
             }, 0);
-            const descontoClub = 0;
-            const frete = subtotal > 0 ? 10.23 : 0;
-            const total = subtotal - descontoClub + frete;
-            setResumo({ subtotal, descontoClub, frete, total });
+
+            const valorFrete = 10.23;
+            let descontoClub = 0;
+            let percentualDesconto = 0;
+
+            // ✅ Buscar assinatura Club Market do usuário (se houver)
+            try {
+                const assinatura = await minhaAssinatura();
+                console.log('🔍 Assinatura club (PagamentoPage):', assinatura);
+
+                if (assinatura && assinatura.id) {
+                    // ✅ Desconto no FRETE (sempre frete grátis para membros Club)
+                    descontoClub += valorFrete;
+
+                    // ✅ Aplicar desconto nos produtos baseado no club_marketid
+                    const clubId = assinatura.id;
+
+                    if (clubId === 3) {
+                        percentualDesconto = 0.25; // Premium: 25%
+                    } else if (clubId === 1) {
+                        percentualDesconto = 0.10; // Intermediário: 10%
+                    } else if (clubId === 2) {
+                        percentualDesconto = 0; // Entrada: só frete grátis
+                    }
+
+                    // Somar desconto dos produtos ao desconto do frete
+                    descontoClub += (subtotal * percentualDesconto);
+                }
+            } catch (error) {
+                console.log('Usuário sem assinatura Club ou erro ao buscar:', error);
+            }
+
+            const total = subtotal - descontoClub + valorFrete;
+            setResumo({ subtotal, descontoClub, frete: valorFrete, total });
         } catch (error) {
             console.error('Erro ao calcular resumo:', error);
             setResumo({ subtotal: 0, descontoClub: 0, frete: 0, total: 0 });
@@ -94,9 +157,76 @@ export default function PagamentoPage() {
         setCartaoAtivo((prev) => (prev + 1) % cartoes.length);
     };
 
+
     const handleCartaoAnterior = () => {
         setCartaoAtivo((prev) => (prev - 1 + cartoes.length) % cartoes.length);
     };
+
+    const handleDeletarCartao = async (cartaoId) => {
+        // Criar toast de confirmação customizado
+        toast.custom((t) => (
+            <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm border-2 border-red-500">
+                <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Trash2 size={24} className="text-red-600" />
+                    </div>
+                    <div className="flex-1">
+                        <h3 className="font-bold text-gray-800 mb-2">Excluir cartão?</h3>
+                        <p className="text-sm text-gray-600 mb-4">
+                            Esta ação não pode ser desfeita.
+                        </p>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => {
+                                    toast.dismiss(t.id);
+                                    executarExclusao(cartaoId);
+                                }}
+                                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors"
+                            >
+                                Excluir
+                            </button>
+                            <button
+                                onClick={() => toast.dismiss(t.id)}
+                                className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        ), { duration: Infinity, position: 'top-center' });
+    };
+
+    const executarExclusao = async (cartaoId) => {
+        const loadingToast = toast.loading('Excluindo cartão...');
+        try {
+            console.log('🗑️ Deletando cartão ID:', cartaoId);
+            const resultado = await deletarCartao(cartaoId);
+            console.log('✅ Resultado:', resultado);
+
+            if (resultado.success) {
+                toast.success('Cartão excluído com sucesso!', { id: loadingToast });
+
+                // Recarregar lista de cartões
+                await carregarCartoes();
+
+                // Se tinha mais de 1 cartão, voltar pro primeiro
+                // Se era o último, o estado vazio já vai aparecer
+                if (cartoes.length > 1) {
+                    setCartaoAtivo(0);
+                }
+            } else {
+                toast.error(resultado.message || 'Erro ao excluir cartão', { id: loadingToast });
+            }
+        } catch (error) {
+            console.error('❌ Erro ao excluir cartão:', error);
+            toast.error('Erro ao excluir cartão. Tente novamente.', { id: loadingToast });
+        }
+    };
+
+
+
 
     const handleAdicionarCartao = async () => {
         if (!novoCartao.numero || !novoCartao.nome || !novoCartao.validade || !novoCartao.cvv) {
@@ -199,17 +329,71 @@ export default function PagamentoPage() {
                 } else {
                     // ✅ Criar pedido no banco (apenas para compras normais)
                     try {
+                        if (!enderecoSelecionado) {
+                            toast.error('Endereço não encontrado. Cadastre um endereço antes de finalizar a compra.');
+                            return;
+                        }
+
+                        console.log('🛒 Criando pedido no banco...');
                         const carrinho = await verMeuCarrinho();
-                        await criarPedido({
+                        console.log('📦 Carrinho:', carrinho);
+
+                        // ✅ Calcular próxima entrega baseado na frequência
+                        const frequencia = dadosCompra.frequencia || 'unica';
+                        let dataProximaEntrega = null;
+                        let dataProximaCobranca = null;
+
+                        if (frequencia !== 'unica') {
+                            const hoje = new Date();
+                            const proximaEntrega = new Date(hoje);
+
+                            // Calcular baseado na frequência
+                            switch (frequencia) {
+                                case 'semanal':
+                                    proximaEntrega.setDate(hoje.getDate() + 7);
+                                    break;
+                                case 'quinzenal':
+                                    proximaEntrega.setDate(hoje.getDate() + 15);
+                                    break;
+                                case 'mensal':
+                                    proximaEntrega.setMonth(hoje.getMonth() + 1);
+                                    break;
+                            }
+
+                            dataProximaEntrega = proximaEntrega.toISOString();
+
+                            // Próxima cobrança: 1 dia antes da entrega
+                            const proximaCobranca = new Date(proximaEntrega);
+                            proximaCobranca.setDate(proximaEntrega.getDate() - 1);
+                            dataProximaCobranca = proximaCobranca.toISOString();
+
+                            console.log('📅 Próxima entrega:', dataProximaEntrega);
+                            console.log('💳 Próxima cobrança:', dataProximaCobranca);
+                        }
+
+                        const pedidoData = {
+                            enderecoId: enderecoSelecionado,
                             items: carrinho,
-                            valorTotal: resumo.total,
+                            valorTotal: resumo.subtotal + resumo.frete,
                             valorFinal: resumo.total,
-                            frequencia: 'unica',
+                            descontoClub: resumo.descontoClub || 0,
+                            frequencia: frequencia,
+                            dataProximaEntrega,
+                            dataProximaCobranca,
                             pagamentoId: data.pagamento.id
-                        });
-                        console.log('✅ Pedido criado');
+                        };
+
+
+                        console.log('📋 Dados do pedido:', pedidoData);
+                        const resultadoPedido = await criarPedido(pedidoData);
+                        console.log('✅ Pedido criado com sucesso:', resultadoPedido);
+
+                        if (!resultadoPedido.success) {
+                            throw new Error(resultadoPedido.message || 'Erro ao criar pedido');
+                        }
                     } catch (error) {
-                        console.error('Erro ao criar pedido:', error);
+                        console.error('❌ Erro ao criar pedido:', error);
+                        toast.error('Pagamento aprovado, mas houve erro ao registrar o pedido. Entre em contato com suporte.');
                     }
 
                     // ✅ Limpar carrinho após pagamento aprovado
@@ -243,7 +427,7 @@ export default function PagamentoPage() {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <div className="w-16 h-16 border-4 border-verde-salvia-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                     <p className="text-gray-600">Carregando...</p>
                 </div>
             </div>
@@ -270,7 +454,7 @@ export default function PagamentoPage() {
             <main className="container mx-auto px-4 md:px-8 max-w-5xl">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        {cartoes.length > 0 && (
+                        {cartoes.length > 0 ? (
                             <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
                                 <div className="relative">
                                     <div className="w-full aspect-[1.586] bg-gradient-to-br from-gray-900 to-gray-700 rounded-2xl p-6 text-white shadow-2xl relative overflow-hidden">
@@ -294,6 +478,14 @@ export default function PagamentoPage() {
                                             </div>
                                         </div>
                                         <div className="absolute top-6 right-20 text-2xl">📡</div>
+                                        {/* Botão Deletar */}
+                                        <button
+                                            onClick={() => handleDeletarCartao(cartoes[cartaoAtivo].id)}
+                                            className="absolute bottom-6 right-6 p-2 bg-red-500 hover:bg-red-600 rounded-full text-white transition-all shadow-lg"
+                                            title="Excluir cartão"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
                                     </div>
                                     {cartoes.length > 1 && (
                                         <div className="flex justify-center gap-2 mt-4">
@@ -315,10 +507,18 @@ export default function PagamentoPage() {
                                     )}
                                 </div>
                             </div>
+                        ) : (
+                            <div className="bg-white rounded-3xl shadow-lg p-8 mb-6 text-center">
+                                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <CreditCard size={40} className="text-gray-400" />
+                                </div>
+                                <h3 className="text-lg font-bold text-gray-800 mb-2">Nenhum cartão cadastrado</h3>
+                                <p className="text-gray-500 text-sm">Adicione um cartão para continuar com o pagamento</p>
+                            </div>
                         )}
                         <button
                             onClick={() => setAdicionandoCartao(!adicionandoCartao)}
-                            className="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 font-medium hover:border-green-500 hover:text-green-600 transition-all flex items-center justify-center gap-2 mb-6"
+                            className="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 font-medium hover:border-verde-salvia hover:text-verde-salvia-600 transition-all flex items-center justify-center gap-2 mb-6"
                         >
                             <Plus size={20} />
                             Adicionar cartão
@@ -332,7 +532,7 @@ export default function PagamentoPage() {
                                         type="text"
                                         placeholder="1234 1234 1234 1234"
                                         maxLength="19"
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-salvia focus:border-transparent outline-none"
                                         value={novoCartao.numero}
                                         onChange={(e) => setNovoCartao({ ...novoCartao, numero: formatarNumeroCartao(e.target.value) })}
                                     />
@@ -342,7 +542,7 @@ export default function PagamentoPage() {
                                     <input
                                         type="text"
                                         placeholder="NOME COMPLETO"
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none uppercase"
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-salvia focus:border-transparent outline-none uppercase"
                                         value={novoCartao.nome}
                                         onChange={(e) => setNovoCartao({ ...novoCartao, nome: e.target.value.toUpperCase() })}
                                     />
@@ -354,7 +554,7 @@ export default function PagamentoPage() {
                                             type="text"
                                             placeholder="MM/AA"
                                             maxLength="5"
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-salvia focus:border-transparent outline-none"
                                             value={novoCartao.validade}
                                             onChange={(e) => setNovoCartao({ ...novoCartao, validade: formatarValidade(e.target.value) })}
                                         />
@@ -365,7 +565,7 @@ export default function PagamentoPage() {
                                             type="text"
                                             placeholder="123"
                                             maxLength="4"
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-salvia focus:border-transparent outline-none"
                                             value={novoCartao.cvv}
                                             onChange={(e) => setNovoCartao({ ...novoCartao, cvv: e.target.value.replace(/\D/g, '') })}
                                         />
@@ -376,7 +576,7 @@ export default function PagamentoPage() {
                                             type="text"
                                             placeholder="CPF"
                                             maxLength="14"
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none text-xs"
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-salvia focus:border-transparent outline-none text-xs"
                                             value={novoCartao.cpf}
                                             onChange={(e) => setNovoCartao({ ...novoCartao, cpf: e.target.value.replace(/\D/g, '') })}
                                         />
@@ -385,7 +585,7 @@ export default function PagamentoPage() {
                                 <button
                                     onClick={handleAdicionarCartao}
                                     disabled={salvandoCartao}
-                                    className={`w-full py-3 rounded-full font-semibold text-white transition-all shadow-lg ${salvandoCartao ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 active:scale-95'
+                                    className={`w-full py-3 rounded-full font-semibold text-white transition-all shadow-lg ${salvandoCartao ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#85B693] hover:bg-[#2F6C50] active:scale-95'
                                         }`}
                                 >
                                     {salvandoCartao ? 'Salvando...' : 'Salvar Cartão'}
@@ -394,38 +594,11 @@ export default function PagamentoPage() {
                         )}
                     </div>
                     <div className="hidden md:block">
-                        <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
-                            <h3 className="font-bold text-gray-800 mb-4">Resumo do pedido</h3>
-                            {resumo && (
-                                <div className="space-y-3 mb-6">
-                                    <div className="flex justify-between text-gray-600">
-                                        <span>Subtotal</span>
-                                        <span>R$ {resumo.subtotal.toFixed(2).replace('.', ',')}</span>
-                                    </div>
-                                    <div className="flex justify-between text-green-600">
-                                        <span>Desconto Clube+</span>
-                                        <span>- R$ {resumo.descontoClub.toFixed(2).replace('.', ',')}</span>
-                                    </div>
-                                    <div className="flex justify-between text-gray-600">
-                                        <span>Frete</span>
-                                        <span>R$ {resumo.frete.toFixed(2).replace('.', ',')}</span>
-                                    </div>
-                                    <div className="h-px bg-gray-200"></div>
-                                    <div className="flex justify-between text-lg font-bold text-gray-800">
-                                        <span>Total</span>
-                                        <span className="text-green-700">R$ {resumo.total.toFixed(2).replace('.', ',')}</span>
-                                    </div>
-                                </div>
-                            )}
-                            <button
-                                onClick={handleContinuar}
-                                disabled={processandoPagamento}
-                                className={`w-full py-3 rounded-full font-semibold text-white transition-all shadow-lg ${processandoPagamento ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-gray-800 active:scale-95'
-                                    }`}
-                            >
-                                {processandoPagamento ? 'Processando...' : 'Continuar'}
-                            </button>
-                        </div>
+                        <SumarioOrdem
+                            resumo={resumo}
+                            onCriarAssinatura={handleContinuar}
+                            loading={processandoPagamento}
+                        />
                     </div>
                 </div>
                 <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-lg z-40">

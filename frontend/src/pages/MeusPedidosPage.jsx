@@ -31,7 +31,7 @@ export default function MeusPedidosPage() {
 
     const getStatusColor = (status) => {
         const colors = {
-            'ativa': 'bg-green-100 text-green-700 border-green-200',
+            'ativa': 'bg-verde-salvia-100 text-verde-petroleo border-verde-salvia-200',
             'pausada': 'bg-yellow-100 text-yellow-700 border-yellow-200',
             'cancelada': 'bg-red-100 text-red-700 border-red-200',
             'entregue': 'bg-blue-100 text-blue-700 border-blue-200',
@@ -106,7 +106,7 @@ export default function MeusPedidosPage() {
 
             {/* Hero Section */}
             <div className="relative h-64 md:h-80 w-full mb-8 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-green-600 via-green-500 to-emerald-600" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#85B693] via-[#2F6C50] to-[#2F6C50]" />
                 <div className="absolute inset-0 opacity-30">
                     <div className="absolute top-10 left-10 w-32 h-32 bg-white/20 rounded-full blur-2xl"></div>
                     <div className="absolute bottom-10 right-10 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
@@ -129,7 +129,7 @@ export default function MeusPedidosPage() {
             <main className="container mx-auto px-4 md:px-8 max-w-4xl -mt-4">
                 {loading ? (
                     <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-                        <div className="animate-spin w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                        <div className="animate-spin w-12 h-12 border-4 border-verde-salvia border-t-transparent rounded-full mx-auto mb-4"></div>
                         <p className="text-gray-500">Carregando seus pedidos...</p>
                     </div>
                 ) : pedidos.length === 0 ? (
@@ -141,7 +141,7 @@ export default function MeusPedidosPage() {
                         <p className="text-gray-500 mb-6">{t('orders.emptyDesc')}</p>
                         <button
                             onClick={() => navigate('/')}
-                            className="px-6 py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition-all shadow-lg hover:shadow-xl"
+                            className="px-6 py-3 bg-[#85B693] text-white font-semibold rounded-xl hover:bg-[#2F6C50] transition-all shadow-lg hover:shadow-xl"
                         >
                             {t('cart.continueShopping')}
                         </button>
@@ -213,7 +213,7 @@ export default function MeusPedidosPage() {
                                             <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-5 py-4 border-b border-gray-200">
                                                 <div className="flex flex-wrap justify-between items-center gap-3">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                                                        <div className="w-10 h-10 bg-verde-salvia-100 rounded-xl flex items-center justify-center">
                                                             <span className="text-lg">📋</span>
                                                         </div>
                                                         <div>
@@ -244,7 +244,7 @@ export default function MeusPedidosPage() {
                                                     </div>
                                                     <div>
                                                         <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">{t('orders.totalValue')}</p>
-                                                        <p className="font-bold text-green-600 text-lg">{formatCurrency(pedido.valorfinal || pedido.valortotal || 0)}</p>
+                                                        <p className="font-bold text-verde-salvia-600 text-lg">{formatCurrency(pedido.valorfinal || pedido.valortotal || 0)}</p>
                                                     </div>
                                                 </div>
 
@@ -262,7 +262,7 @@ export default function MeusPedidosPage() {
                                                                 </span>
                                                             ))}
                                                             {pedido.itens.length > 5 && (
-                                                                <span className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
+                                                                <span className="px-3 py-1.5 bg-verde-salvia-100 text-verde-petroleo rounded-lg text-sm font-medium">
                                                                     +{pedido.itens.length - 5} itens
                                                                 </span>
                                                             )}
@@ -273,7 +273,7 @@ export default function MeusPedidosPage() {
 
                                             {/* Botão Cancelar - Só para assinaturas recorrentes */}
                                             {(pedido.status === 'ativa' || pedido.status === 'pausada') &&
-                                                (pedido.frequencia === 'semanal' || pedido.frequencia === 'mensal') && (
+                                                (pedido.frequencia === 'semanal' || pedido.frequencia === 'quinzenal' || pedido.frequencia === 'mensal') && (
                                                     <div className="px-5 pb-5">
                                                         <button
                                                             onClick={() => handleCancelarPedido(pedido.id)}
@@ -308,3 +308,4 @@ export default function MeusPedidosPage() {
         </div>
     );
 }
+

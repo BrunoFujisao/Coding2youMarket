@@ -126,3 +126,4 @@ export const buscarCep = async (cep) => {
         return { success: false, message: "Erro ao buscar CEP" };
     }
 };
+

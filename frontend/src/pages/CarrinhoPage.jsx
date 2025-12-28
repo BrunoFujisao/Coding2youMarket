@@ -138,20 +138,29 @@ export default function CarrinhoPage() {
     const handleCriarAssinatura = () => {
         setModalFrequenciaAberto(true);
     };
-    const handleConfirmarFrequencia = (frequencia) => {
-        setDadosFrequencia(frequencia);
+    const handleConfirmarFrequencia = (dados) => {
+        console.log('📦 Dados da frequência:', dados);
         setModalFrequenciaAberto(false);
-        setModalEnderecoAberto(true); // Abre modal de endereço
+
+        // ✅ Navegar diretamente para pagamento com todos os dados
+        navigate('/pagamento', {
+            state: {
+                frequencia: dados.tipo === 'unica' ? 'unica' : dados.frequencia,
+                enderecoId: dados.endereco?.id,
+                diaPreferencial: dados.diaPreferencial,
+                tipoCompra: dados.tipo
+            }
+        });
     };
+
     const handleConfirmarEndereco = (endereco) => {
+        // Não é mais necessário, pula o modal de endereço
         setModalEnderecoAberto(false);
-        // Navega para página de pagamento
-        navigate('/pagamento');
     };
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-verde-salvia-600"></div>
             </div>
         );
     }
@@ -198,7 +207,7 @@ export default function CarrinhoPage() {
                         <p className="text-gray-500 mb-6">{t('cart.emptyDesc')}</p>
                         <button
                             onClick={() => navigate('/')}
-                            className="px-6 py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-colors"
+                            className="px-6 py-3 bg-[#85B693] text-white font-semibold rounded-full hover:bg-[#2F6C50] transition-colors"
                         >
                             {t('cart.continueShopping')}
                         </button>

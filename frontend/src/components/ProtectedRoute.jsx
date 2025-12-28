@@ -31,7 +31,7 @@ export default function ProtectedRoute({ children }) {
                             <div className="space-y-3">
                                 <a
                                     href="/login"
-                                    className="block w-full py-3 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-all"
+                                    className="block w-full py-3 bg-[#85B693] text-white font-semibold rounded-full hover:bg-[#2F6C50] transition-all"
                                 >
                                     Fazer Login
                                 </a>

@@ -61,7 +61,7 @@ export default function FrequenciaModal({ isOpen, onClose, onConfirmar }) {
     const getIconeApelido = (apelido) => {
         const apelidoLower = (apelido || '').toLowerCase();
         if (apelidoLower.includes('casa') || apelidoLower.includes('home')) {
-            return <Home size={18} className="text-green-600" />;
+            return <Home size={18} className="text-verde-salvia-600" />;
         }
         if (apelidoLower.includes('trabalho') || apelidoLower.includes('work') || apelidoLower.includes('empresa')) {
             return <Briefcase size={18} className="text-blue-600" />;
@@ -121,8 +121,8 @@ export default function FrequenciaModal({ isOpen, onClose, onConfirmar }) {
                                 className={`
                                     p-3 md:p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-1 md:gap-2
                                     ${tipoCompra === 'assinatura'
-                                        ? 'border-green-500 bg-green-50 text-green-700'
-                                        : 'border-gray-200 text-gray-600 hover:border-green-300'
+                                        ? 'border-verde-salvia bg-verde-salvia-50 text-verde-petroleo'
+                                        : 'border-gray-200 text-gray-600 hover:border-verde-salvia-300'
                                     }
                                 `}
                             >
@@ -135,8 +135,8 @@ export default function FrequenciaModal({ isOpen, onClose, onConfirmar }) {
                                 className={`
                                     p-3 md:p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-1 md:gap-2
                                     ${tipoCompra === 'unica'
-                                        ? 'border-green-500 bg-green-50 text-green-700'
-                                        : 'border-gray-200 text-gray-600 hover:border-green-300'
+                                        ? 'border-verde-salvia bg-verde-salvia-50 text-verde-petroleo'
+                                        : 'border-gray-200 text-gray-600 hover:border-verde-salvia-300'
                                     }
                                 `}
                             >
@@ -149,13 +149,13 @@ export default function FrequenciaModal({ isOpen, onClose, onConfirmar }) {
                         {/* Botão para escolher endereço */}
                         <div className="mb-6">
                             <h3 className="font-semibold text-sm md:text-base text-gray-700 mb-3 flex items-center gap-2">
-                                <MapPin size={18} className="text-green-600" />
+                                <MapPin size={18} className="text-verde-salvia-600" />
                                 {t('frequency.deliveryAddress')}
                             </h3>
 
                             {loadingEnderecos ? (
                                 <div className="p-4 text-center text-gray-500 text-sm">
-                                    <div className="animate-spin w-6 h-6 border-2 border-green-500 border-t-transparent rounded-full mx-auto mb-2"></div>
+                                    <div className="animate-spin w-6 h-6 border-2 border-verde-salvia border-t-transparent rounded-full mx-auto mb-2"></div>
                                     {t('frequency.loadingAddresses')}
                                 </div>
                             ) : enderecos.length === 0 ? (
@@ -165,17 +165,17 @@ export default function FrequenciaModal({ isOpen, onClose, onConfirmar }) {
                             ) : (
                                 <button
                                     onClick={() => setShowEnderecoModal(true)}
-                                    className="w-full p-4 border-2 border-gray-200 rounded-xl hover:border-green-300 transition-all flex items-center gap-3 text-left"
+                                    className="w-full p-4 border-2 border-gray-200 rounded-xl hover:border-verde-salvia-300 transition-all flex items-center gap-3 text-left"
                                 >
                                     {enderecoSelecionado ? (
                                         <>
-                                            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <div className="w-10 h-10 bg-verde-salvia-100 rounded-lg flex items-center justify-center flex-shrink-0">
                                                 {getIconeApelido(enderecoSelecionado.apelido)}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-1">
                                                     {enderecoSelecionado.apelido && (
-                                                        <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
+                                                        <span className="text-xs font-semibold text-verde-petroleo bg-verde-salvia-100 px-2 py-0.5 rounded-full">
                                                             {enderecoSelecionado.apelido}
                                                         </span>
                                                     )}
@@ -219,8 +219,8 @@ export default function FrequenciaModal({ isOpen, onClose, onConfirmar }) {
                                             className={`
                                                 flex items-center gap-3 p-3 md:p-4 rounded-xl border-2 cursor-pointer transition-all
                                                 ${frequenciaSelecionada === opcao.value
-                                                    ? 'border-green-500 bg-green-50'
-                                                    : 'border-gray-200 hover:border-green-300'
+                                                    ? 'border-verde-salvia bg-verde-salvia-50'
+                                                    : 'border-gray-200 hover:border-verde-salvia-300'
                                                 }
                                             `}
                                         >
@@ -230,7 +230,7 @@ export default function FrequenciaModal({ isOpen, onClose, onConfirmar }) {
                                                 value={opcao.value}
                                                 checked={frequenciaSelecionada === opcao.value}
                                                 onChange={(e) => setFrequenciaSelecionada(e.target.value)}
-                                                className="w-4 h-4 md:w-5 md:h-5 text-green-600 focus:ring-green-500"
+                                                className="w-4 h-4 md:w-5 md:h-5 text-verde-salvia-600 focus:ring-verde-salvia"
                                             />
                                             <div className="flex-1">
                                                 <p className="font-semibold text-sm md:text-base text-gray-800">{opcao.label}</p>
@@ -250,7 +250,7 @@ export default function FrequenciaModal({ isOpen, onClose, onConfirmar }) {
                                             type="date"
                                             value={diaPreferencial}
                                             onChange={(e) => setDiaPreferencial(e.target.value)}
-                                            className="w-full pl-9 md:pl-10 pr-4 py-2.5 md:py-3 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+                                            className="w-full pl-9 md:pl-10 pr-4 py-2.5 md:py-3 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-salvia focus:border-transparent outline-none"
                                         />
                                     </div>
                                     <p className="text-[10px] md:text-xs text-gray-500 mt-2">
@@ -297,8 +297,8 @@ export default function FrequenciaModal({ isOpen, onClose, onConfirmar }) {
                                     className={`
                                         w-full p-4 rounded-xl border-2 transition-all flex items-center gap-3 text-left
                                         ${enderecoSelecionado?.id === endereco.id
-                                            ? 'border-green-500 bg-green-50'
-                                            : 'border-gray-200 hover:border-green-300'
+                                            ? 'border-verde-salvia bg-verde-salvia-50'
+                                            : 'border-gray-200 hover:border-verde-salvia-300'
                                         }
                                     `}
                                 >
@@ -309,7 +309,7 @@ export default function FrequenciaModal({ isOpen, onClose, onConfirmar }) {
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1">
                                             {endereco.apelido && (
-                                                <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
+                                                <span className="text-xs font-semibold text-verde-petroleo bg-verde-salvia-100 px-2 py-0.5 rounded-full">
                                                     {endereco.apelido}
                                                 </span>
                                             )}
@@ -327,7 +327,7 @@ export default function FrequenciaModal({ isOpen, onClose, onConfirmar }) {
                                         </p>
                                     </div>
                                     {enderecoSelecionado?.id === endereco.id && (
-                                        <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <div className="w-6 h-6 bg-verde-salvia rounded-full flex items-center justify-center flex-shrink-0">
                                             <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                             </svg>

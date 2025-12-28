@@ -3,6 +3,7 @@ import { Plus, Minus, ShoppingCart } from 'lucide-react';
 import toast from 'react-hot-toast';
 const API_URL = 'https://coding2youmarket-production.up.railway.app/api';
 import { useCarrinho } from '../context/CarrinhoContext';
+import { getProdutoImagem } from '../assets/imagens';
 export default function ProductCard({ produto }) {
     const [quantidade, setQuantidade] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -59,9 +60,9 @@ export default function ProductCard({ produto }) {
             {/* Imagem - ASPECT RATIO FIXO */}
             <div className="relative w-full aspect-square bg-gray-50 p-4">
                 <img
-                    src={produto.imagemUrl || 'https://via.placeholder.com/300?text=Produto'}
+                    src={getProdutoImagem(produto.nome) || produto.imagemUrl || 'https://via.placeholder.com/300?text=Produto'}
                     alt={produto.nome}
-                    className="w-full h-full object-cover rounded-lg"
+                    className="w-full h-full object-cover rounded- lg"
                 />
             </div>
             {/* Infos */}
@@ -70,7 +71,7 @@ export default function ProductCard({ produto }) {
                     {produto.nome}
                 </h3>
                 <div className="flex items-baseline gap-1 mb-4">
-                    <span className="text-lg md:text-xl font-bold text-green-700">
+                    <span className="text-lg md:text-xl font-bold text-verde-petroleo">
                         R$ {produto.preco.toFixed(2).replace('.', ',')}
                     </span>
                     <span className="text-xs text-gray-400">/un</span>
@@ -81,14 +82,14 @@ export default function ProductCard({ produto }) {
                     <div className="flex items-center bg-gray-100 rounded-full p-1 gap-1">
                         <button
                             onClick={() => setQuantidade(q => Math.max(1, q - 1))}
-                            className="w-7 h-7 flex items-center justify-center bg-white rounded-full shadow-sm text-gray-600 hover:text-green-600 transition-colors"
+                            className="w-7 h-7 flex items-center justify-center bg-white rounded-full shadow-sm text-gray-600 hover:text-verde-salvia-600 transition-colors"
                         >
                             <Minus size={14} />
                         </button>
                         <span className="w-6 text-center text-sm font-medium text-gray-700">{quantidade}</span>
                         <button
                             onClick={() => setQuantidade(q => q + 1)}
-                            className="w-7 h-7 flex items-center justify-center bg-white rounded-full shadow-sm text-gray-600 hover:text-green-600 transition-colors"
+                            className="w-7 h-7 flex items-center justify-center bg-white rounded-full shadow-sm text-gray-600 hover:text-verde-salvia-600 transition-colors"
                         >
                             <Plus size={14} />
                         </button>
@@ -99,7 +100,7 @@ export default function ProductCard({ produto }) {
                         disabled={loading || produto.estoque === 0}
                         className={`
                             w-10 h-10 flex items-center justify-center rounded-full shadow-md text-white transition-all
-                            ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 active:scale-95'}
+                            ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#85B693] hover:bg-[#2F6C50] active:scale-95'}
                         `}
                     >
                         {loading ? (

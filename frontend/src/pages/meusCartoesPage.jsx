@@ -306,7 +306,7 @@ export default function MeusCartoesPage() {
                     onClick={() => setAdicionandoCartao(!adicionandoCartao)}
                     className={`w-full py-4 border-2 border-dashed rounded-xl font-medium transition-all flex items-center justify-center gap-2 mb-6 ${adicionandoCartao
                         ? 'border-red-300 text-red-600 hover:border-red-400'
-                        : 'border-gray-300 text-gray-600 hover:border-green-500 hover:text-green-600'
+                        : 'border-gray-300 text-gray-600 hover:border-verde-salvia hover:text-verde-salvia-600'
                         }`}
                 >
                     {adicionandoCartao ? (
@@ -333,7 +333,7 @@ export default function MeusCartoesPage() {
                             <input
                                 type="text"
                                 placeholder="1234 1234 1234 1234"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-salvia focus:border-transparent outline-none"
                                 value={novoCartao.numero}
                                 onChange={(e) => setNovoCartao({ ...novoCartao, numero: formatarNumeroCartao(e.target.value) })}
                                 maxLength={19}
@@ -345,7 +345,7 @@ export default function MeusCartoesPage() {
                             <input
                                 type="text"
                                 placeholder="NOME COMO NO CARTÃO"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none uppercase"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-salvia focus:border-transparent outline-none uppercase"
                                 value={novoCartao.nome}
                                 onChange={(e) => setNovoCartao({ ...novoCartao, nome: e.target.value.toUpperCase() })}
                             />
@@ -359,7 +359,7 @@ export default function MeusCartoesPage() {
                                 <input
                                     type="text"
                                     placeholder="MM/AA"
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-salvia focus:border-transparent outline-none"
                                     value={novoCartao.validade}
                                     onChange={(e) => setNovoCartao({ ...novoCartao, validade: formatarValidade(e.target.value) })}
                                     maxLength={5}
@@ -371,7 +371,7 @@ export default function MeusCartoesPage() {
                                     type="text"
                                     placeholder="123"
                                     maxLength={4}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-salvia focus:border-transparent outline-none"
                                     value={novoCartao.cvv}
                                     onChange={(e) => setNovoCartao({ ...novoCartao, cvv: e.target.value.replace(/\D/g, '') })}
                                 />
@@ -381,7 +381,7 @@ export default function MeusCartoesPage() {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Bandeira</label>
                             <select
-                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none bg-white"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-salvia focus:border-transparent outline-none bg-white"
                                 value={novoCartao.bandeira}
                                 onChange={(e) => setNovoCartao({ ...novoCartao, bandeira: e.target.value })}
                             >
@@ -450,3 +450,4 @@ export default function MeusCartoesPage() {
         </div>
     );
 }
+

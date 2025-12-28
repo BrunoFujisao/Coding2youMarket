@@ -93,21 +93,21 @@ export default function SuportePage() {
                     ))}
                 </div>
 
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-5 mb-8">
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-verde-salvia-200 rounded-2xl p-5 mb-8">
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                            <Headphones size={24} className="text-green-600" />
+                        <div className="w-12 h-12 bg-verde-salvia-100 rounded-full flex items-center justify-center">
+                            <Headphones size={24} className="text-verde-salvia-600" />
                         </div>
                         <div>
                             <h4 className="font-semibold text-green-800">{t('supportPage.businessHours.title')}</h4>
-                            <p className="text-sm text-green-700">{t('supportPage.businessHours.schedule')}</p>
+                            <p className="text-sm text-verde-petroleo">{t('supportPage.businessHours.schedule')}</p>
                         </div>
                     </div>
                 </div>
 
                 <div className="bg-white rounded-3xl shadow-lg p-6 mb-8">
                     <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <HelpCircle size={20} className="text-green-600" />
+                        <HelpCircle size={20} className="text-verde-salvia-600" />
                         {t('supportPage.faq.title')}
                     </h3>
 
@@ -123,7 +123,7 @@ export default function SuportePage() {
                                 >
                                     <span className="font-medium text-gray-800 text-sm pr-4">{item.question}</span>
                                     {faqAberto === index ? (
-                                        <ChevronUp size={20} className="text-green-600 flex-shrink-0" />
+                                        <ChevronUp size={20} className="text-verde-salvia-600 flex-shrink-0" />
                                     ) : (
                                         <ChevronDown size={20} className="text-gray-400 flex-shrink-0" />
                                     )}
@@ -140,12 +140,12 @@ export default function SuportePage() {
 
                 <div className="bg-white rounded-3xl shadow-lg p-6">
                     <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <Mail size={20} className="text-green-600" />
+                        <Mail size={20} className="text-verde-salvia-600" />
                         {t('supportPage.contactForm.title')}
                     </h3>
 
                     {mensagemEnviada && (
-                        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm">
+                        <div className="mb-4 p-4 bg-verde-salvia-50 border border-verde-salvia-200 rounded-xl text-verde-petroleo text-sm">
                             {t('supportPage.contactForm.successMessage')}
                         </div>
                     )}
@@ -154,13 +154,13 @@ export default function SuportePage() {
                         value={mensagem}
                         onChange={(e) => setMensagem(e.target.value)}
                         placeholder={t('supportPage.contactForm.placeholder')}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all resize-none h-32"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-salvia focus:border-transparent outline-none transition-all resize-none h-32"
                     />
 
                     <button
                         onClick={handleEnviarMensagem}
                         disabled={!mensagem.trim() || enviando}
-                        className="mt-4 w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-full hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="mt-4 w-full py-4 bg-gradient-to-r from-verde-salvia-600 to-emerald-600 text-white font-semibold rounded-full hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {enviando ? (
                             <>
@@ -179,3 +179,4 @@ export default function SuportePage() {
         </div>
     );
 }
+

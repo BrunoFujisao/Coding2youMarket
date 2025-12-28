@@ -80,15 +80,15 @@ export default function ClubMarketPage() {
         const styles = {
             gray: {
                 bg: 'bg-gray-50',
-                border: planoSelecionado === plano.id ? 'border-green-500' : 'border-gray-200',
+                border: planoSelecionado === plano.id ? 'border-verde-salvia' : 'border-gray-200',
                 badge: 'bg-gray-200 text-gray-700',
                 preco: 'text-gray-800'
             },
             green: {
-                bg: 'bg-green-50',
-                border: planoSelecionado === plano.id ? 'border-green-600' : 'border-green-400',
-                badge: 'bg-green-500 text-white',
-                preco: 'text-green-600'
+                bg: 'bg-verde-salvia-50',
+                border: planoSelecionado === plano.id ? 'border-verde-salvia-600' : 'border-verde-salvia-400',
+                badge: 'bg-verde-salvia text-white',
+                preco: 'text-verde-salvia-600'
             },
             amber: {
                 bg: 'bg-gradient-to-b from-amber-50 to-orange-50',
@@ -122,7 +122,7 @@ export default function ClubMarketPage() {
 
             {/* Hero Section */}
             <div className="relative h-72 md:h-96 w-full mb-8 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-green-600 via-emerald-500 to-teal-600" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#85B693] to-[#2F6C50]" />
                 <div className="absolute inset-0 opacity-30">
                     <div className="absolute top-10 left-10 w-40 h-40 bg-white/20 rounded-full blur-3xl"></div>
                     <div className="absolute bottom-10 right-10 w-60 h-60 bg-white/10 rounded-full blur-3xl"></div>
@@ -157,14 +157,14 @@ export default function ClubMarketPage() {
                             >
                                 {/* Badge Popular */}
                                 {plano.popular && (
-                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-green-500 text-white text-xs font-bold rounded-full shadow-lg">
+                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#85B693] text-white text-xs font-bold rounded-full shadow-lg">
                                         {t('clubMarketPage.mostPopular')}
                                     </div>
                                 )}
 
                                 {/* Seleção Indicator */}
                                 {planoSelecionado === plano.id && (
-                                    <div className="absolute top-4 right-4 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                    <div className="absolute top-4 right-4 w-6 h-6 bg-[#85B693] rounded-full flex items-center justify-center">
                                         <span className="text-white text-sm">✓</span>
                                     </div>
                                 )}
@@ -197,7 +197,7 @@ export default function ClubMarketPage() {
                                 <ul className="space-y-3 flex-grow">
                                     {plano.beneficios.map((beneficio, idx) => (
                                         <li key={idx} className="flex items-start gap-3">
-                                            <span className={`text-lg ${beneficio.ativo ? 'text-green-500' : 'text-gray-300'}`}>
+                                            <span className={`text-lg ${beneficio.ativo ? 'text-[#85B693]' : 'text-gray-300'}`}>
                                                 {beneficio.ativo ? '✓' : '○'}
                                             </span>
                                             <span className={`text-sm ${beneficio.ativo ? 'text-gray-700' : 'text-gray-400'}`}>
@@ -227,7 +227,7 @@ export default function ClubMarketPage() {
                         onClick={handleAssinar}
                         disabled={!planoSelecionado || assinando || clubAtivo}
                         className={`px-10 py-4 rounded-full font-bold text-lg transition-all ${planoSelecionado && !assinando && !clubAtivo
-                            ? 'bg-gradient-to-r from-green-600 to-emerald-500 text-white hover:shadow-xl hover:scale-105 cursor-pointer'
+                            ? 'bg-gradient-to-r from-[#85B693] to-[#2F6C50] text-white hover:shadow-xl hover:scale-105 cursor-pointer'
                             : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                             }`}
                     >
@@ -236,15 +236,15 @@ export default function ClubMarketPage() {
 
                     <div className="mt-6 flex flex-wrap justify-center gap-6 text-sm text-gray-500">
                         <div className="flex items-center gap-2">
-                            <span className="text-green-500">✓</span>
+                            <span className="text-[#85B693]">✓</span>
                             {t('clubMarketPage.cta.securePayment')}
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="text-green-500">✓</span>
+                            <span className="text-[#85B693]">✓</span>
                             {t('clubMarketPage.cta.cancelAnytime')}
                         </div>
                         <div className="flex items-center gap-2">
-                            <span className="text-green-500">✓</span>
+                            <span className="text-[#85B693]">✓</span>
                             {t('clubMarketPage.cta.dedicatedSupport')}
                         </div>
                     </div>
@@ -273,7 +273,7 @@ export default function ClubMarketPage() {
                 <div className="container mx-auto px-4 md:px-8 max-w-6xl mb-8">
                     {loading ? (
                         <div className="text-center py-8">
-                            <div className="animate-spin w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full mx-auto"></div>
+                            <div className="animate-spin w-12 h-12 border-4 border-[#85B693] border-t-transparent rounded-full mx-auto"></div>
                         </div>
                     ) : clubAtivo ? (
                         <div className="bg-purple-50 border-2 border-purple-300 rounded-2xl p-6 text-center">
@@ -296,7 +296,7 @@ export default function ClubMarketPage() {
                             onClick={handleAssinar}
                             disabled={!planoSelecionado || assinando}
                             className={`w-full md:w-auto px-12 py-5 font-bold text-xl rounded-full shadow-2xl transition-all transform hover:scale-105 active:scale-95 ${planoSelecionado && !assinando
-                                ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700'
+                                ? 'bg-gradient-to-r from-[#85B693] to-[#2F6C50] text-white hover:from-[#6AA67D] hover:to-[#25563F]'
                                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                 }`}
                         >
@@ -308,3 +308,4 @@ export default function ClubMarketPage() {
         </div>
     );
 }
+

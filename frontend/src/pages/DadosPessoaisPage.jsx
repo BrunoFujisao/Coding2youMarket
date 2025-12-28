@@ -118,14 +118,14 @@ export default function DadosPessoaisPage() {
             <main className="container mx-auto px-4 md:px-8 max-w-3xl">
                 {loading ? (
                     <div className="flex justify-center items-center py-20">
-                        <div className="w-10 h-10 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-10 h-10 border-4 border-verde-salvia-600 border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 ) : !usuario ? (
                     <div className="bg-white rounded-3xl shadow-lg p-6 text-center">
                         <p className="text-gray-600">{t('personalDataPage.errorLoading')}</p>
                         <button
                             onClick={() => window.location.reload()}
-                            className="mt-4 px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition-all"
+                            className="mt-4 px-6 py-2 bg-[#85B693] text-white rounded-full hover:bg-[#2F6C50] transition-all"
                         >
                             {t('personalDataPage.tryAgain')}
                         </button>
@@ -143,7 +143,7 @@ export default function DadosPessoaisPage() {
                                         />
                                     </div>
                                     {editando && (
-                                        <button className="absolute bottom-0 right-0 w-10 h-10 bg-gradient-to-r from-green-600 to-emerald-600 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                                        <button className="absolute bottom-0 right-0 w-10 h-10 bg-gradient-to-r from-verde-salvia-600 to-emerald-600 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
                                             <Camera size={18} className="text-white" />
                                         </button>
                                     )}
@@ -164,7 +164,7 @@ export default function DadosPessoaisPage() {
 
                         <div className="bg-white rounded-3xl shadow-lg p-6 mb-6">
                             <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2">
-                                <User size={20} className="text-green-600" />
+                                <User size={20} className="text-verde-salvia-600" />
                                 {t('personalDataPage.personalInfo')}
                             </h3>
 
@@ -178,7 +178,7 @@ export default function DadosPessoaisPage() {
                                             type="text"
                                             value={dadosTemp.nome}
                                             onChange={(e) => setDadosTemp({ ...dadosTemp, nome: e.target.value })}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-salvia focus:border-transparent outline-none transition-all"
                                         />
                                     ) : (
                                         <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl">
@@ -213,7 +213,7 @@ export default function DadosPessoaisPage() {
                                             type="text"
                                             value={dadosTemp.telefone}
                                             onChange={(e) => setDadosTemp({ ...dadosTemp, telefone: formatarTelefone(e.target.value) })}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-salvia focus:border-transparent outline-none transition-all"
                                             maxLength={15}
                                         />
                                     ) : (
@@ -233,7 +233,7 @@ export default function DadosPessoaisPage() {
                                             type="text"
                                             value={dadosTemp.cpf}
                                             onChange={(e) => setDadosTemp({ ...dadosTemp, cpf: formatarCPF(e.target.value) })}
-                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+                                            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-verde-salvia focus:border-transparent outline-none transition-all"
                                             maxLength={14}
                                         />
                                     ) : (
@@ -258,7 +258,7 @@ export default function DadosPessoaisPage() {
                                 <button
                                     onClick={handleSalvar}
                                     disabled={salvando}
-                                    className="flex-1 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-full hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
+                                    className="flex-1 py-4 bg-gradient-to-r from-verde-salvia-600 to-emerald-600 text-white font-semibold rounded-full hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
                                 >
                                     {salvando ? (
                                         <>
@@ -294,3 +294,4 @@ export default function DadosPessoaisPage() {
         </div>
     );
 }
+

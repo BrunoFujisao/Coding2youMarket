@@ -6,8 +6,8 @@ export default function Modal({ tipo, titulo, mensagem, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 text-center animate-fadeIn">
-        
-        <div className={`text-4xl mb-3 ${isErro ? "text-red-500" : "text-green-600"}`}>
+
+        <div className={`text-4xl mb-3 ${isErro ? "text-red-500" : "text-verde-salvia-600"}`}>
           {isErro ? "❌" : "✅"}
         </div>
 
@@ -21,11 +21,10 @@ export default function Modal({ tipo, titulo, mensagem, onClose }) {
 
         <button
           onClick={onClose}
-          className={`w-full py-2 rounded-md font-semibold text-white transition ${
-            isErro
+          className={`w-full py-2 rounded-md font-semibold text-white transition ${isErro
               ? "bg-red-500 hover:bg-red-600"
-              : "bg-green-600 hover:bg-green-700"
-          }`}
+              : "bg-[#85B693] hover:bg-[#2F6C50]"
+            }`}
         >
           OK
         </button>
@@ -33,3 +32,4 @@ export default function Modal({ tipo, titulo, mensagem, onClose }) {
     </div>
   );
 }
+

@@ -41,7 +41,7 @@ export default function SegurancaPrivacidadePage() {
                 </div>
                 <button
                     onClick={() => navigate("/confirmacaoEmail")}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition"
+                    className="w-full bg-[#85B693] hover:bg-[#2F6C50] text-white font-semibold py-2 px-4 rounded transition"
                 >
                     {t('securityPrivacyPage.sendCode')}
                 </button>
@@ -49,3 +49,4 @@ export default function SegurancaPrivacidadePage() {
         </div>
     );
 }
+

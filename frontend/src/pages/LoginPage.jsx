@@ -66,13 +66,13 @@ export default function Login() {
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="mb-8">
-            <span className="text-lg font-semibold text-green-700">☕ Subscrivery</span>
+            <span className="text-lg font-semibold text-verde-petroleo">☕ Subscrivery</span>
           </div>
           {/* Título */}
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Faça Login</h1>
           <p className="text-sm text-gray-600 mb-6">
             Ainda não possui uma conta?{" "}
-            <Link to="/register" className="text-green-700 font-semibold underline hover:text-green-800">
+            <Link to="/register" className="text-verde-petroleo font-semibold underline hover:text-green-800">
               Criar Conta
             </Link>
           </p>
@@ -80,7 +80,7 @@ export default function Login() {
           {(mensagem.texto || erro) && (
             <div
               className={`p-3 rounded-lg mb-4 text-sm font-semibold text-center ${mensagem.tipo === "sucesso"
-                ? "bg-green-50 text-green-700"
+                ? "bg-verde-salvia-50 text-verde-petroleo"
                 : "bg-red-50 text-red-600"
                 }`}
             >
@@ -92,7 +92,7 @@ export default function Login() {
           <input
             type="email"
             placeholder="example@gmail.com"
-            className="w-full h-11 rounded-lg border border-gray-300 bg-gray-50 px-3 mb-4 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="w-full h-11 rounded-lg border border-gray-300 bg-gray-50 px-3 mb-4 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-verde-salvia focus:border-transparent"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -102,7 +102,7 @@ export default function Login() {
             <input
               type={verSenha ? "text" : "password"}
               placeholder="********"
-              className="w-full h-11 rounded-lg border border-gray-300 bg-gray-50 pl-3 pr-10 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full h-11 rounded-lg border border-gray-300 bg-gray-50 pl-3 pr-10 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-verde-salvia focus:border-transparent"
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
             />
@@ -119,7 +119,7 @@ export default function Login() {
               <input type="checkbox" className="w-4 h-4 accent-green-700" />
               <span>Lembre-se de mim</span>
             </label>
-            <Link to="/confirmacaoEmail" className="text-xs text-green-700 font-semibold hover:underline">
+            <Link to="/confirmacaoEmail" className="text-xs text-verde-petroleo font-semibold hover:underline">
               Esqueceu a senha?
             </Link>
           </div>
@@ -143,7 +143,7 @@ export default function Login() {
         </div>
       </div>
       {/* Lado Direito - Hero (Escondido no mobile) */}
-      <div className="hidden md:flex flex-1 relative bg-green-700 items-center justify-center p-20 overflow-hidden">
+      <div className="hidden md:flex flex-1 relative items-center justify-center p-20 overflow-hidden" style={{ backgroundColor: '#2F6C50' }}>
         {/* Blob Effect */}
         <div className="absolute -top-20 -right-20 w-[500px] h-[500px] rounded-full bg-white/10 blur-3xl"></div>
         {/* Suporte */}

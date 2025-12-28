@@ -82,13 +82,13 @@ export default function Cadastro() {
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-green-100">
             {/* Logo */}
             <div className="mb-6">
-              <span className="text-lg font-semibold text-green-700">☕ Subscrivery</span>
+              <span className="text-lg font-semibold text-verde-petroleo">☕ Subscrivery</span>
             </div>
             {/* Título */}
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Cadastre-se</h1>
             <p className="text-sm text-gray-600 mb-6">
               Já possui uma conta?{" "}
-              <Link to="/" className="text-green-700 font-semibold underline hover:text-green-800">
+              <Link to="/" className="text-verde-petroleo font-semibold underline hover:text-green-800">
                 Fazer Login
               </Link>
             </p>
@@ -96,7 +96,7 @@ export default function Cadastro() {
             {(mensagem.texto || erro) && (
               <div
                 className={`p-3 rounded-lg mb-4 text-sm font-semibold text-center ${mensagem.tipo === "sucesso"
-                  ? "bg-green-50 text-green-700 border border-green-200"
+                  ? "bg-verde-salvia-50 text-verde-petroleo border border-verde-salvia-200"
                   : "bg-red-50 text-red-600 border border-red-200"
                   }`}
               >
@@ -107,7 +107,7 @@ export default function Cadastro() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Nome</label>
             <input
               type="text"
-              className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 mb-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+              className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 mb-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-verde-salvia focus:border-transparent transition-all"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
             />
@@ -117,7 +117,7 @@ export default function Cadastro() {
               type="text"
               placeholder="000.000.000-00"
               maxLength={14}
-              className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 mb-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+              className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 mb-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-verde-salvia focus:border-transparent transition-all"
               value={cpf}
               onChange={(e) => setCpf(e.target.value)}
             />
@@ -125,7 +125,7 @@ export default function Cadastro() {
             <label className="block text-sm font-medium text-gray-700 mb-2">E-mail</label>
             <input
               type="email"
-              className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 mb-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+              className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 mb-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-verde-salvia focus:border-transparent transition-all"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -134,7 +134,7 @@ export default function Cadastro() {
             <input
               type="text"
               placeholder="(DDD) 00000-0000" maxLength={15}
-              className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 mb-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+              className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 mb-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-verde-salvia focus:border-transparent transition-all"
               value={telefone}
               onChange={(e) => setTelefone(e.target.value)}
             />
@@ -143,7 +143,7 @@ export default function Cadastro() {
             <div className="relative mb-3">
               <input
                 type={verSenha ? "text" : "password"}
-                className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-3 pr-10 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-3 pr-10 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-verde-salvia focus:border-transparent transition-all"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
               />
@@ -159,7 +159,7 @@ export default function Cadastro() {
             <div className="relative mb-4">
               <input
                 type={verSenha ? "text" : "password"}
-                className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-3 pr-10 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white pl-3 pr-10 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-verde-salvia focus:border-transparent transition-all"
                 value={confirmarSenha}
                 onChange={(e) => setConfirmarSenha(e.target.value)}
               />
@@ -192,7 +192,7 @@ export default function Cadastro() {
           <div className="mt-6 text-center">
             <p className="text-xs text-gray-500">
               Ao criar uma conta, você concorda com nossos{" "}
-              <span className="text-green-700 font-semibold cursor-pointer hover:underline">
+              <span className="text-verde-petroleo font-semibold cursor-pointer hover:underline">
                 Termos de Uso
               </span>
             </p>
@@ -200,7 +200,7 @@ export default function Cadastro() {
         </div>
       </div>
       {/* Lado Direito - Hero (Escondido no mobile) */}
-      <div className="hidden md:flex flex-1 relative bg-green-700 items-center justify-center p-20 overflow-hidden">
+      <div className="hidden md:flex flex-1 relative items-center justify-center p-20 overflow-hidden" style={{ backgroundColor: '#2F6C50' }}>
         {/* Blob Effect */}
         <div className="absolute -top-20 -right-20 w-[500px] h-[500px] rounded-full bg-white/10 blur-3xl"></div>
         {/* Suporte */}

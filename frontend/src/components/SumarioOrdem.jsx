@@ -41,12 +41,12 @@ export default function SumarioOrdem({ resumo, onCriarAssinatura, loading }) {
 
                 {/* Club Discount - DESTAQUE! */}
                 {descontoClub > 0 && (
-                    <div className="flex justify-between items-center bg-green-50 -mx-2 px-2 py-2 rounded-lg">
+                    <div className="flex justify-between items-center bg-verde-salvia-50 -mx-2 px-2 py-2 rounded-lg">
                         <div className="flex items-center gap-2">
                             <span className="text-xl">⭐</span>
-                            <span className="text-green-700 font-medium">{t('cart.clubDiscount')}</span>
+                            <span className="text-verde-petroleo font-medium">{t('cart.clubDiscount')}</span>
                         </div>
-                        <span className="font-bold text-green-700">
+                        <span className="font-bold text-verde-petroleo">
                             - R$ {descontoClub.toFixed(2).replace('.', ',')}
                         </span>
                     </div>
@@ -58,14 +58,14 @@ export default function SumarioOrdem({ resumo, onCriarAssinatura, loading }) {
                 {/* Total FINAL */}
                 <div className="flex justify-between text-xl font-bold text-gray-900">
                     <span>{t('cart.total')}</span>
-                    <span className="text-green-700">
+                    <span className="text-verde-petroleo">
                         R$ {total.toFixed(2).replace('.', ',')}
                     </span>
                 </div>
 
                 {/* Badge de economia */}
                 {descontoClub > 0 && (
-                    <div className="bg-gradient-to-r from-green-100 to-emerald-100 border border-green-300 rounded-lg p-3 text-center">
+                    <div className="bg-gradient-to-r from-green-100 to-emerald-100 border border-verde-salvia-300 rounded-lg p-3 text-center">
                         <p className="text-sm text-green-800">
                             💰 <strong>Você economizou R$ {descontoClub.toFixed(2).replace('.', ',')}</strong> com o Club+!
                         </p>

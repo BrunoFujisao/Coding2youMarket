@@ -24,7 +24,7 @@ export default function ItemCarrinho({ item, onAtualizarQuantidade, onRemover })
                     {item.produto?.nome || 'Produto'}
                 </h3>
                 <p className="text-xs text-gray-500 mt-1">Em estoque</p>
-                <p className="text-lg font-bold text-green-700 mt-1">
+                <p className="text-lg font-bold text-verde-petroleo mt-1">
                     R$ {(item.produto?.preco || 0).toFixed(2).replace('.', ',')}
                 </p>
             </div>
@@ -42,7 +42,7 @@ export default function ItemCarrinho({ item, onAtualizarQuantidade, onRemover })
                 <div className="flex items-center bg-gray-100 rounded-full p-1 gap-1">
                     <button
                         onClick={handleDecrement}
-                        className="w-7 h-7 flex items-center justify-center bg-white rounded-full shadow-sm text-gray-600 hover:text-green-600 transition-colors"
+                        className="w-7 h-7 flex items-center justify-center bg-white rounded-full shadow-sm text-gray-600 hover:text-verde-salvia-600 transition-colors"
                         disabled={item.quantidade === 1}
                     >
                         <Minus size={14} />
@@ -52,7 +52,7 @@ export default function ItemCarrinho({ item, onAtualizarQuantidade, onRemover })
                     </span>
                     <button
                         onClick={handleIncrement}
-                        className="w-7 h-7 flex items-center justify-center bg-white rounded-full shadow-sm text-gray-600 hover:text-green-600 transition-colors"
+                        className="w-7 h-7 flex items-center justify-center bg-white rounded-full shadow-sm text-gray-600 hover:text-verde-salvia-600 transition-colors"
                     >
                         <Plus size={14} />
                     </button>
