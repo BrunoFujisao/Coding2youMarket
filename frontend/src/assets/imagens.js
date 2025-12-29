@@ -310,10 +310,14 @@ export const getProdutoImagem = (nomeProduto) => {
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos
         .replace(/\s+/g, ''); // Remove espaços
 
-    // Tenta encontrar por palavras-chave
-    for (const [key, imagem] of Object.entries(produtosImagens)) {
+    // Ordena as chaves por tamanho decrescente para priorizar matches mais específicos
+    // Isso evita que "maca" seja encontrado antes de "macarrao"
+    const chavesOrdenadas = Object.keys(produtosImagens).sort((a, b) => b.length - a.length);
+
+    // Tenta encontrar por palavras-chave (do mais específico para o menos)
+    for (const key of chavesOrdenadas) {
         if (nomeNormalizado.includes(key)) {
-            return imagem;
+            return produtosImagens[key];
         }
     }
 
