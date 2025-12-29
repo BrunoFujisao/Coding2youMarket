@@ -1,16 +1,12 @@
 
 
-// =============================================
 // BANNERS
-// =============================================
 import banner1 from './Banners - Subscrivery/banner 1.jpg';
 import banner2 from './Banners - Subscrivery/banner 2.jpeg';
 import banner3 from './Banners - Subscrivery/banner 3.png';
 import mulherPerfil from './Banners - Subscrivery/mulher do perfil.jpg';
 
-// =============================================
 // CATEGORIAS
-// =============================================
 import categoriaBebidas from './Categorias - Subscrivery/bebidas.jpg';
 import categoriaCarnes from './Categorias - Subscrivery/carnes.jpg';
 import categoriaHortfruit from './Categorias - Subscrivery/hortfruit.jpg';
@@ -21,9 +17,7 @@ import categoriaGraos from './Categorias - Subscrivery/graos.jpeg';
 import categoriaLimpeza from './Categorias - Subscrivery/limpeza.jpeg';
 import categoriaTodos from './Categorias - Subscrivery/todos.jpeg';
 
-// =============================================
 // LOGOS
-// =============================================
 import logo from './logo.jpeg';
 import logoBranco from './logobranco.jpeg';
 import logotipo from './logotipo.jpeg';
@@ -33,9 +27,7 @@ import logoMonocromatica from './Logo Subscrivery/Logo Monocromática.png';
 import logoPrincipal from './Logo Subscrivery/Logo Principal.png';
 import logoPrincipal2 from './Logo Subscrivery/Logo Principal 2.png';
 
-// =============================================
 // FRUTAS / HORTIFRUTI
-// =============================================
 import maca from './maca.jpeg';
 import banana from './bananaprata.webp';
 import bananaFoto from './banana.jpg';
@@ -47,9 +39,7 @@ import morango from './morango.jpg';
 import pera from './pera.jpg';
 import maracuja from './maracuja.webp';
 
-// =============================================
 // BEBIDAS
-// =============================================
 import aguaSemGas from './agua sem gas.jpeg';
 import cocaCola from './coca cola.jpeg';
 import cerveja from './cerveja.jpeg';
@@ -57,9 +47,7 @@ import energetico from './energetico.jpeg';
 import sucoLaranja from './suco de laranja.jpeg';
 import cha from './cha.jpeg';
 
-// =============================================
 // MERCEARIA / GRÃOS
-// =============================================
 import arroz from './arroz.jpeg';
 import acucar from './açucar.jpeg';
 import cafe from './cafe.jpeg';
@@ -73,15 +61,11 @@ import oleo from './oleo.jpeg';
 import graos from './graos.jpeg';
 import sal from './sal.jpeg';
 
-// =============================================
 // LATICÍNIOS
-// =============================================
 import leite from './leite.jpeg';
 import iogurte from './iogurte.jpeg';
 
-// =============================================
 // LIMPEZA
-// =============================================
 import detergente from './detergente.webp';
 import amaciante from './amaciante.webp';
 import aguaSanitaria from './agua sanitaria.jpeg';
@@ -90,28 +74,20 @@ import limpeza from './limpeza.jpeg';
 import papelHigienico from './papel higienico.jpeg';
 import esponja from './esponja .jpeg';
 
-// =============================================
 // HIGIENE PESSOAL
-// =============================================
 import higiene from './higiene.jpeg';
 import shampoo from './shampoo.jpg';
 import pastaDente from './pasta de dente.jpeg';
 import sabonete from './sabonete .jpeg';
 
-// =============================================
 // OUTROS
-// =============================================
 import todos from './todos.jpeg';
 
-// =============================================
 // EXPORTS - BANNERS
-// =============================================
 export const banners = [banner1, banner2, banner3];
 export { mulherPerfil };
 
-// =============================================
 // EXPORTS - LOGOS
-// =============================================
 export const logos = {
     logo,
     logoBranco,
@@ -123,9 +99,7 @@ export const logos = {
     logoPrincipal2
 };
 
-// =============================================
 // EXPORTS - CATEGORIAS
-// =============================================
 export const categoriasImagens = {
     'Bebidas': categoriaBebidas,
     'Carnes': categoriaCarnes,
@@ -137,12 +111,11 @@ export const categoriasImagens = {
     'Limpeza': categoriaLimpeza,
     'Higiene': higiene,
     'Todas': categoriaTodos,
-    'Todos': categoriaTodos
+    'Todos': categoriaTodos,
+    'All': categoriaTodos // English support
 };
 
-// =============================================
 // EXPORTS - PRODUTOS POR CATEGORIA
-// =============================================
 export const produtosImagens = {
     // Frutas/Hortifruti
     'maca': maca,
@@ -211,9 +184,7 @@ export const produtosImagens = {
     'sabonete': sabonete
 };
 
-// =============================================
 // EXPORTS - IMAGENS INDIVIDUAIS (para uso direto)
-// =============================================
 export {
     // Banners
     banner1,
@@ -300,9 +271,9 @@ export {
     macarraoPng
 };
 
-// =============================================
+
 // FUNÇÃO HELPER - BUSCAR IMAGEM DO PRODUTO
-// =============================================
+
 export const getProdutoImagem = (nomeProduto) => {
     if (!nomeProduto) return null;
 
@@ -324,9 +295,9 @@ export const getProdutoImagem = (nomeProduto) => {
     return null; // Retorna null se não encontrar
 };
 
-// =============================================
+
 // EXPORT DEFAULT
-// =============================================
+
 export default {
     banners,
     logos,
