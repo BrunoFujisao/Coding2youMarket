@@ -593,16 +593,6 @@ export default function PagamentoPage() {
                         />
                     </div>
                 </div>
-                <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 shadow-lg z-40">
-                    <button
-                        onClick={handleContinuar}
-                        disabled={processandoPagamento}
-                        className={`w-full py-3 rounded-full font-semibold text-white transition-all shadow-lg ${processandoPagamento ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-gray-800 active:scale-95'
-                            }`}
-                    >
-                        {processandoPagamento ? 'Processando...' : `Continuar R$ ${resumo?.total.toFixed(2).replace('.', ',') || '0,00'}`}
-                    </button>
-                </div>
             </main>
             <CVVModal
                 isOpen={mostrarCVVModal}
