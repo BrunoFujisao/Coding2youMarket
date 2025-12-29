@@ -283,10 +283,7 @@ export default function MeusCartoesPage() {
                                     <p className="text-gray-500 mb-1">Nome no Cartão</p>
                                     <p className="font-medium text-gray-800">{getNome(cartoes[cartaoAtivo])}</p>
                                 </div>
-                                <div>
-                                    <p className="text-gray-500 mb-1">Validade</p>
-                                    <p className="font-medium text-gray-800">{getValidade(cartoes[cartaoAtivo])}</p>
-                                </div>
+                                {/* Validade oculta - não armazenada (MP gerencia via token) */}
                             </div>
                         </div>
                     </div>

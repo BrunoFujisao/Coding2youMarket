@@ -28,9 +28,14 @@ const pagamentoRouter = require('./Controller/pagamentoRouter');
 const pagamentoDiretoRouter = require('./Controller/pagamentoDiretoRouter');
 const entregaRouter = require('./Controller/entregaRouter');
 const adminRouter = require('./Controller/adminRouter');
+const cronRouter = require('./Controller/cronRouter');
 
 // Carregar emailService para testar conexão SMTP na inicialização
 require('./Services/emailService');
+
+// Inicializar CRON de entregas recorrentes
+const { iniciarCron } = require('./services/cronService');
+iniciarCron();
 
 // REGISTRAR ROTAS
 app.use('/api', authRouter);
@@ -45,6 +50,7 @@ app.use('/api', pagamentoRouter);
 app.use('/api', pagamentoDiretoRouter);
 app.use('/api', entregaRouter);
 app.use('/api', adminRouter);
+app.use('/api/cron', cronRouter);
 
 
 
