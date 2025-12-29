@@ -39,10 +39,21 @@ export default function HomePage() {
     verificarExibicaoModal();
   }, []);
 
-  const verificarExibicaoModal = () => {
+  const verificarExibicaoModal = async () => {
     // Prevenir execução duplicada usando ref
     if (modalChecked.current) return;
     modalChecked.current = true;
+
+    // Verificar se usuário já tem assinatura ativa
+    try {
+      const assinatura = await minhaAssinatura();
+      if (assinatura) {
+        // Usuário já tem assinatura, não mostrar modal
+        return;
+      }
+    } catch (error) {
+      console.log('Usuário sem assinatura');
+    }
 
     const jaViu = localStorage.getItem('clubModalVisto');
 
@@ -53,7 +64,7 @@ export default function HomePage() {
     } else {
       // Chance de 30% de mostrar novamente  
       const chance = Math.random();
-      if (chance < 0.8) {
+      if (chance < 0.3) {
         setTimeout(() => setShowClubModal(true), 3000);
       }
     }

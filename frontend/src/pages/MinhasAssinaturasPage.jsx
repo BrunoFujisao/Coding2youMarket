@@ -122,7 +122,7 @@ export default function MinhasAssinaturasPage() {
                     <div className="absolute bottom-10 right-10 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
                 </div>
 
-                <div className="relative z-10 h-full container mx-auto px-4 md:px-8 flex items-center max-w-7xl pt-16 md:pt-20">
+                <div className="relative z-10 h-full container mx-auto px-4 md:px-8 flex items-center max-w-7xl">
                     <button onClick={() => navigate(-1)} className="p-2 hover:bg-white/20 rounded-full mr-4 transition-all">
                         <ArrowLeft className="text-white" size={24} />
                     </button>
