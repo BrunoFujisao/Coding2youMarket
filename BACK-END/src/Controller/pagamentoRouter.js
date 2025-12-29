@@ -162,13 +162,13 @@ router.post("/pagamentos/processar-direto", auth, async (req, res) => {
       installments: Number(installments) || 1,
       payment_method_id: paymentMethodId || "master",
       payer: {
-        // ⚠️ EM SANDBOX, USAR EMAIL DE TEST USER VÁLIDO
-        email: "test_user_123456789@testuser.com",
-        first_name: "Test",
-        last_name: "User",
+        // ✅ PRODUÇÃO: Usar email real do comprador
+        email: email,  // Email vem do frontend
+        first_name: "Cliente",
+        last_name: "Subscrivery",
         identification: {
           type: "CPF",
-          number: "19119119100"
+          number: "19119119100"  // CPF genérico
         }
       },
       binary_mode: true // ✅ IMPORTANTE: Retorna approved ou rejected direto
