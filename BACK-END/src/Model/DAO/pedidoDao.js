@@ -97,7 +97,7 @@ async function getPedidosPorUsuario(usuarioId) {
 
     // Buscar todos os pedidos do usuário
     const { rows: pedidos } = await pool.query(
-        'SELECT * FROM pedidos WHERE usuarioId = $1 ORDER BY id DESC',
+        'SELECT * FROM pedidos WHERE usuarioid = $1 ORDER BY id DESC',
         [usuarioId]
     );
 
