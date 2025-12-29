@@ -161,6 +161,7 @@ export const produtosImagens = {
     'graos': graos,
     'sal': sal,
     'salrefinado': sal,
+    'salrefinado1kg': sal,
     'refinado': sal,
 
     // Laticínios
