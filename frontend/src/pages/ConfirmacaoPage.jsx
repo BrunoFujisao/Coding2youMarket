@@ -30,7 +30,7 @@ export default function ConfirmacaoPage() {
         <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
             <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
                 {/* Animação de Confetti */}
-                <div className="relative h-48 bg-gradient-to-br from-verde-salvia to-green-600 flex items-center justify-center overflow-hidden">
+                <div className="relative h-48 bg-gradient-to-br from-[#2F6C50] to-[#1a4d33] flex items-center justify-center overflow-hidden">
                     <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
                     <div className="absolute bottom-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
 
@@ -78,7 +78,7 @@ export default function ConfirmacaoPage() {
                     </div>
                 </div>
                 {/* Texto extra */}
-                <p className="text-center text-gray-600 text-sm mt-4">
+                <p className="text-center text-gray-600 text-sm mt-8 px-4">
                     Enviamos uma confirmação por email 📧
                 </p>
             </div>
@@ -94,3 +94,4 @@ export default function ConfirmacaoPage() {
         </div>
     );
 }
+

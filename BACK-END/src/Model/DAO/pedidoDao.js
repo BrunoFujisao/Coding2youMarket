@@ -95,12 +95,31 @@ async function getPedidoPorId(id) {
 async function getPedidosPorUsuario(usuarioId) {
     if (!usuarioId) return false;
 
-    const { rows } = await pool.query(
+    // Buscar todos os pedidos do usuário
+    const { rows: pedidos } = await pool.query(
         'SELECT * FROM pedidos WHERE usuarioId = $1 ORDER BY id DESC',
         [usuarioId]
     );
 
-    return rows;
+    // Para cada pedido, buscar os itens
+    for (let pedido of pedidos) {
+        const { rows: itens } = await pool.query(
+            `SELECT 
+                pi.id,
+                pi.quantidade,
+                pi.precounitario,
+                p.nome,
+                p.imagemurl
+            FROM pedido_itens pi
+            LEFT JOIN produtos p ON pi.produtoid = p.id
+            WHERE pi.pedidoid = $1
+            ORDER BY pi.id`,
+            [pedido.id]
+        );
+        pedido.itens = itens;
+    }
+
+    return pedidos;
 }
 
 async function getPedidosAtivos() {

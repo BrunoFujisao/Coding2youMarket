@@ -593,7 +593,7 @@ export default function PagamentoPage() {
                             </div>
                         )}
                     </div>
-                    <div className="hidden md:block">
+                    <div className="">
                         <SumarioOrdem
                             resumo={resumo}
                             onCriarAssinatura={handleContinuar}
@@ -608,7 +608,7 @@ export default function PagamentoPage() {
                         className={`w-full py-3 rounded-full font-semibold text-white transition-all shadow-lg ${processandoPagamento ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-gray-800 active:scale-95'
                             }`}
                     >
-                        {processandoPagamento ? 'Processando...' : `Continuar - R$ ${resumo?.total.toFixed(2).replace('.', ',') || '0,00'}`}
+                        {processandoPagamento ? 'Processando...' : `Continuar R$ ${resumo?.total.toFixed(2).replace('.', ',') || '0,00'}`}
                     </button>
                 </div>
             </main>
@@ -620,3 +620,4 @@ export default function PagamentoPage() {
         </div>
     );
 }
+

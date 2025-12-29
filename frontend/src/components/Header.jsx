@@ -77,7 +77,6 @@ export default function Header() {
                             <span className="text-base font-bold text-gray-800">Subscrivery</span>
                         </Link>
                         <div className="flex items-center gap-2">
-                            <TrocaIdioma />
                             <Link to="/carrinho" className="p-2 hover:bg-white/30 rounded-full transition-colors relative">
                                 <ShoppingCart size={20} className="text-gray-700" />
                                 {contadorCarrinho > 0 && (
@@ -102,6 +101,14 @@ export default function Header() {
                                         <Link to="/perfil" className="block px-4 py-3 text-gray-800 hover:bg-green-50 transition-colors" onClick={() => setDropdownOpen(false)}>
                                             👤 {t('nav.profile')}
                                         </Link>
+                                        <hr className="border-gray-200" />
+                                        {/* Idioma movido para cá */}
+                                        <div className="px-4 py-3 hover:bg-verde-salvia- transition-colors">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm text-gray-600">🌐</span>
+                                                <TrocaIdioma />
+                                            </div>
+                                        </div>
                                         <hr className="border-gray-200" />
                                         <button onClick={handleLogout} className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition-colors font-medium">
                                             🚪 {t('nav.logout')}

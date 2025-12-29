@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Package, Calendar, DollarSign, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Package, Calendar, DollarSign, ChevronRight, ArrowLeft, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import Header from "../components/Header";
@@ -13,6 +13,7 @@ export default function MeusPedidosPage() {
     const [pedidos, setPedidos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [processando, setProcessando] = useState(false);
+    const [expandedOrders, setExpandedOrders] = useState({}); // Controla quais pedidos estão expandidos
 
     useEffect(() => {
         const carregarPedidos = async () => {
@@ -71,6 +72,13 @@ export default function MeusPedidosPage() {
             style: 'currency',
             currency: 'BRL'
         }).format(value);
+    };
+
+    const toggleOrderDetails = (pedidoId) => {
+        setExpandedOrders(prev => ({
+            ...prev,
+            [pedidoId]: !prev[pedidoId]
+        }));
     };
 
     const handleCancelarPedido = async (pedidoId) => {
@@ -169,7 +177,7 @@ export default function MeusPedidosPage() {
                                                     {formatCurrency(club.valorfinal)} {t('orders.perMonth')}
                                                 </p>
                                             </div>
-                                            <span className={`px - 4 py - 1.5 rounded - full text - sm font - semibold border ${getStatusColor(club.status)} `}>
+                                            <span className={`px-4 py-1.5 rounded-full text-sm font-semibold border ${getStatusColor(club.status)}`}>
                                                 {getStatusLabel(club.status)}
                                             </span>
                                         </div>
@@ -221,7 +229,7 @@ export default function MeusPedidosPage() {
                                                             <p className="font-bold text-gray-800">#{pedido.id}</p>
                                                         </div>
                                                     </div>
-                                                    <span className={`px - 4 py - 1.5 rounded - full text - sm font - semibold border ${getStatusColor(pedido.status)} `}>
+                                                    <span className={`px-4 py-1.5 rounded-full text-sm font-semibold border ${getStatusColor(pedido.status)}`}>
                                                         {getStatusLabel(pedido.status)}
                                                     </span>
                                                 </div>
@@ -229,6 +237,16 @@ export default function MeusPedidosPage() {
 
                                             {/* Body do Card */}
                                             <div className="p-5">
+                                                {/* Badge "Pedido Único" se não for assinatura */}
+                                                {(!pedido.dataproximaentrega || pedido.frequencia === 'unica') && (
+                                                    <div className="mb-4 inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-lg">
+                                                        <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                                        </svg>
+                                                        <span className="text-sm font-semibold text-blue-700">Pedido Único</span>
+                                                    </div>
+                                                )}
+
                                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                                                     <div>
                                                         <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">{t('orders.orderDate')}</p>
@@ -251,42 +269,64 @@ export default function MeusPedidosPage() {
                                                 {/* Itens do Pedido */}
                                                 {pedido.itens && pedido.itens.length > 0 && (
                                                     <div className="mt-4 pt-4 border-t border-gray-100">
-                                                        <p className="text-xs text-gray-500 uppercase tracking-wide mb-3">Itens do Pedido</p>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {pedido.itens.slice(0, 5).map((item, idx) => (
-                                                                <span
-                                                                    key={idx}
-                                                                    className="px-3 py-1.5 bg-gray-100 rounded-lg text-sm text-gray-700"
-                                                                >
-                                                                    {item.quantidade}x {item.nome || item.produto?.nome || `Item ${idx + 1} `}
-                                                                </span>
-                                                            ))}
-                                                            {pedido.itens.length > 5 && (
-                                                                <span className="px-3 py-1.5 bg-verde-salvia-100 text-verde-petroleo rounded-lg text-sm font-medium">
-                                                                    +{pedido.itens.length - 5} itens
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            {/* Botão Cancelar - Só para assinaturas recorrentes */}
-                                            {(pedido.status === 'ativa' || pedido.status === 'pausada') &&
-                                                (pedido.frequencia === 'semanal' || pedido.frequencia === 'quinzenal' || pedido.frequencia === 'mensal') && (
-                                                    <div className="px-5 pb-5">
                                                         <button
-                                                            onClick={() => handleCancelarPedido(pedido.id)}
-                                                            disabled={processando}
-                                                            className="w-full py-2.5 text-red-600 hover:bg-red-50 rounded-xl font-medium transition-all flex items-center justify-center gap-2 border border-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                            onClick={() => toggleOrderDetails(pedido.id)}
+                                                            className="w-full flex items-center justify-between px-2 py-2 hover:bg-gray-50 rounded-lg transition-colors"
                                                         >
-                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                            </svg>
-                                                            {processando ? 'Cancelando...' : 'Cancelar Assinatura'}
+                                                            <span className="text-sm font-medium text-gray-700">
+                                                                Ver Detalhes ({pedido.itens.length} {pedido.itens.length === 1 ? 'item' : 'itens'})
+                                                            </span>
+                                                            <ChevronDown
+                                                                size={20}
+                                                                className={`text-gray-600 transition-transform ${expandedOrders[pedido.id] ? 'rotate-180' : ''}`}
+                                                            />
                                                         </button>
+
+                                                        {/* Itens Expandidos */}
+                                                        {expandedOrders[pedido.id] && (
+                                                            <div className="mt-3 space-y-2">
+                                                                {pedido.itens.map((item, idx) => (
+                                                                    <div
+                                                                        key={idx}
+                                                                        className="flex justify-between items-center px-3 py-2.5 bg-gray-50 rounded-lg"
+                                                                    >
+                                                                        <div className="flex-1">
+                                                                            <p className="font-medium text-gray-800 text-sm">
+                                                                                {item.nome || item.produto?.nome || `Item ${idx + 1}`}
+                                                                            </p>
+                                                                            <p className="text-xs text-gray-500 mt-0.5">
+                                                                                Quantidade: {item.quantidade}x
+                                                                            </p>
+                                                                        </div>
+                                                                        <div className="text-right">
+                                                                            <p className="font-semibold text-verde-petroleo">
+                                                                                {formatCurrency(item.precounitario || item.preco || 0)}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 )}
+
+                                                {/* Botão Cancelar - Só para assinaturas recorrentes */}
+                                                {(pedido.status === 'ativa' || pedido.status === 'pausada') &&
+                                                    (pedido.frequencia === 'semanal' || pedido.frequencia === 'quinzenal' || pedido.frequencia === 'mensal') && (
+                                                        <div className="mt-5">
+                                                            <button
+                                                                onClick={() => handleCancelarPedido(pedido.id)}
+                                                                disabled={processando}
+                                                                className="w-full py-2.5 text-red-600 hover:bg-red-50 rounded-xl font-medium transition-all flex items-center justify-center gap-2 border border-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                            >
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                                </svg>
+                                                                {processando ? 'Cancelando...' : 'Cancelar Assinatura'}
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -308,4 +348,3 @@ export default function MeusPedidosPage() {
         </div>
     );
 }
-

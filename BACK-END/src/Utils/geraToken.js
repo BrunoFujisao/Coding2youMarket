@@ -12,14 +12,13 @@ function geraToken(cliente) {
       clubMember: cliente.clubMember,
       club_marketid: cliente.club_marketid,
       ativo: cliente.ativo,
-      role: cliente.role || 'user' // ✅ Adicionar role ao token
+      role: cliente.role || 'user'
     },
     process.env.JWT_SECRET,
     {
-      expiresIn: "1h"
+      expiresIn: "7d"
     }
   );
 }
 
 module.exports = geraToken;
-

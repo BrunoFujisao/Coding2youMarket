@@ -115,23 +115,23 @@ export default function MinhasAssinaturasPage() {
         <div className="min-h-screen bg-gray-50 pb-24">
             <Header />
 
-            <div className="relative h-48 md:h-56 w-full mb-8 overflow-hidden">
+            <div className="relative h-36 md:h-48 w-full mb-8 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-[#85B693] to-[#2F6C50]" />
                 <div className="absolute inset-0 opacity-30">
                     <div className="absolute top-10 left-10 w-32 h-32 bg-white/20 rounded-full blur-2xl"></div>
                     <div className="absolute bottom-10 right-10 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
                 </div>
 
-                <div className="relative z-10 h-full container mx-auto px-4 md:px-8 flex items-center max-w-7xl pt-20">
+                <div className="relative z-10 h-full container mx-auto px-4 md:px-8 flex items-center max-w-7xl pt-16 md:pt-20">
                     <button onClick={() => navigate(-1)} className="p-2 hover:bg-white/20 rounded-full mr-4 transition-all">
                         <ArrowLeft className="text-white" size={24} />
                     </button>
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">{t('mySubscriptionsPage.title')}</h1>
-                        <p className="text-white/80 text-sm mt-1">{t('mySubscriptionsPage.subtitle')}</p>
+                        <h1 className="text-xl md:text-3xl font-bold text-white drop-shadow-lg">{t('mySubscriptionsPage.title')}</h1>
+                        <p className="text-white/80 text-xs md:text-sm mt-1">{t('mySubscriptionsPage.subtitle')}</p>
                     </div>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 h-8 bg-gray-50 rounded-t-3xl"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-6 md:h-8 bg-gray-50 rounded-t-3xl"></div>
             </div>
 
             <main className="container mx-auto px-4 md:px-8 max-w-4xl">
@@ -148,18 +148,18 @@ export default function MinhasAssinaturasPage() {
                             </h2>
 
                             {assinaturaAtual && planoAtual ? (
-                                <div className="bg-gradient-to-r from-[#85B693] to-[#2F6C50] rounded-3xl p-6 text-white shadow-xl">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="flex items-center gap-4">
-                                            <span className="text-4xl">{planoAtual.emoji}</span>
+                                <div className="bg-gradient-to-r from-[#85B693] to-[#2F6C50] rounded-3xl p-4 md:p-6 text-white shadow-xl">
+                                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 gap-3">
+                                        <div className="flex items-center gap-3 md:gap-4">
+                                            <span className="text-3xl md:text-4xl">{planoAtual.emoji}</span>
                                             <div>
-                                                <h3 className="text-xl font-bold">{planoAtual.nome}</h3>
-                                                <p className="text-white/80 text-sm">Club Market</p>
+                                                <h3 className="text-lg md:text-xl font-bold">{planoAtual.nome}</h3>
+                                                <p className="text-white/80 text-xs md:text-sm">Club Market</p>
                                             </div>
                                         </div>
-                                        <div className="text-right">
-                                            <p className="text-3xl font-bold">R$ {planoAtual.preco.toFixed(2).replace('.', ',')}</p>
-                                            <p className="text-white/80 text-sm">{t('mySubscriptionsPage.perMonth')}</p>
+                                        <div className="text-left md:text-right">
+                                            <p className="text-2xl md:text-3xl font-bold">R$ {planoAtual.preco.toFixed(2).replace('.', ',')}</p>
+                                            <p className="text-white/80 text-xs md:text-sm">{t('mySubscriptionsPage.perMonth')}</p>
                                         </div>
                                     </div>
 

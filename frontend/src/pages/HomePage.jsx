@@ -1,4 +1,5 @@
 
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Filter } from "lucide-react";
@@ -8,6 +9,7 @@ import ProductCard from "../components/ProductCard";
 import CategoryCard from "../components/CategoryCard";
 import ClubMarketModal from "../components/ClubMarketModal";
 import { listarProdutos } from '../api/produtoAPI';
+import { minhaAssinatura } from '../api/clubMarketAPI';
 import { banners, getProdutoImagem } from '../assets/imagens';
 
 // Dados mockados para testar (remover depois que a API funcionar)
@@ -104,7 +106,19 @@ export default function HomePage() {
             <span className="text-verde-salvia-400">{t('home.clubBanner.subtitle')}</span>
           </h1>
           <button
-            onClick={() => setShowClubModal(true)}
+            onClick={async () => {
+              try {
+                const assinatura = await minhaAssinatura();
+                if (assinatura) {
+                  navigate('/minhas-assinaturas');
+                } else {
+                  setShowClubModal(true);
+                }
+              } catch (error) {
+                console.error('Erro ao verificar assinatura:', error);
+                setShowClubModal(true);
+              }
+            }}
             className="bg-white/20 backdrop-blur-sm border border-white/30 px-6 py-3 rounded-full text-white font-semibold hover:bg-white/30 transition-all w-max shadow-lg"
           >
             {t('home.clubBanner.cta')}

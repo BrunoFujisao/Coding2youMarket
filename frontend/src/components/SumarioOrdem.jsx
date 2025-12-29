@@ -77,7 +77,7 @@ export default function SumarioOrdem({ resumo, onCriarAssinatura, loading }) {
                 onClick={onCriarAssinatura}
                 disabled={loading || total === 0}
                 className={`
-          w-full py-3 rounded-full font-semibold text-white transition-all shadow-md
+          hidden md:block w-full py-3 rounded-full font-semibold text-white transition-all shadow-md
           ${loading || total === 0
                         ? 'bg-gray-400 cursor-not-allowed'
                         : 'bg-gray-900 hover:bg-gray-800 active:scale-95'
@@ -89,3 +89,4 @@ export default function SumarioOrdem({ resumo, onCriarAssinatura, loading }) {
         </div>
     );
 }
+
