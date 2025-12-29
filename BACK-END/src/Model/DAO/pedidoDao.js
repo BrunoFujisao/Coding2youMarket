@@ -111,21 +111,40 @@ async function getPedidosPorUsuario(usuarioId) {
         await Promise.all(
             pedidos.map(async (pedido) => {
                 try {
+                    // Buscar itens do pedido
                     const { rows: itens } = await pool.query(
                         `SELECT 
-                            pi.id,
-                            pi.quantidade,
-                            pi.precounitario,
-                            pi.produtoid,
-                            p.nome,
-                            p.imagemurl
-                        FROM pedido_itens pi
-                        LEFT JOIN produtos p ON pi.produtoid = p.id
-                        WHERE pi.pedidoid = $1
-                        ORDER BY pi.id`,
+                            id,
+                            quantidade,
+                            precounitario,
+                            produtoid
+                        FROM pedido_itens
+                        WHERE pedidoid = $1
+                        ORDER BY id`,
                         [pedido.id]
                     );
-                    pedido.itens = itens || [];
+
+                    // Se houver itens, buscar nomes dos produtos
+                    if (itens && itens.length > 0) {
+                        const produtoIds = itens.map(item => item.produtoid);
+                        const { rows: produtos } = await pool.query(
+                            `SELECT id, nome 
+                            FROM produtos 
+                            WHERE id = ANY($1)`,
+                            [produtoIds]
+                        );
+
+                        // Mapear nomes dos produtos para os itens
+                        pedido.itens = itens.map(item => {
+                            const produto = produtos.find(p => p.id === item.produtoid);
+                            return {
+                                ...item,
+                                nome: produto?.nome || `Produto ${item.produtoid}`
+                            };
+                        });
+                    } else {
+                        pedido.itens = [];
+                    }
                 } catch (error) {
                     console.error(`Erro ao buscar itens do pedido ${pedido.id}:`, error);
                     pedido.itens = []; // Fallback para array vazio
