@@ -80,10 +80,10 @@ async function processarPedidoRecorrente(pedido) {
             pedido.valortotal,
             pedido.valorfinal || pedido.valortotal,
             pedido.frequencia,
-            'pendente' // ← Status pendente para user confirmar
+            'ativa' // ← Novo pedido ativo para processamento
         ]);
 
-        console.log(`   ✅ Novo pedido criado #${novoPedido.id} com status 'pendente'`);
+        console.log(`   ✅ Novo pedido criado #${novoPedido.id} com status 'ativa'`);
 
         // c) Copiar todos os itens do pedido original para o novo
         for (const item of itens) {
