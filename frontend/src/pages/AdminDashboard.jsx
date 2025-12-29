@@ -352,21 +352,36 @@ export default function AdminPanel() {
                                             <td className="px-6 py-4 text-sm">R$ {parseFloat(p.preco).toFixed(2)}</td>
                                             <td className="px-6 py-4">
                                                 {editandoEstoque === p.id ? (
-                                                    <input
-                                                        type="number"
-                                                        defaultValue={p.estoque}
-                                                        className="w-20 px-2 py-1 border rounded"
-                                                        onKeyPress={(e) => {
-                                                            if (e.key === 'Enter') {
-                                                                atualizarEstoque(p.id, e.target.value);
-                                                            }
-                                                        }}
-                                                        autoFocus
-                                                    />
+                                                    <div className="flex items-center gap-2">
+                                                        <input
+                                                            id={`estoque-${p.id}`}
+                                                            type="number"
+                                                            defaultValue={p.estoque}
+                                                            min="0"
+                                                            className="w-20 px-2 py-1 border rounded focus:ring-2 focus:ring-verde-salvia-500 focus:border-verde-salvia-500"
+                                                            onKeyPress={(e) => {
+                                                                if (e.key === 'Enter') {
+                                                                    atualizarEstoque(p.id, e.target.value);
+                                                                }
+                                                            }}
+                                                            autoFocus
+                                                        />
+                                                        <button
+                                                            onClick={() => {
+                                                                const input = document.getElementById(`estoque-${p.id}`);
+                                                                atualizarEstoque(p.id, input.value);
+                                                            }}
+                                                            className="px-3 py-1 bg-verde-salvia-600 text-white text-xs rounded hover:bg-verde-salvia-700 font-medium"
+                                                        >
+                                                            Salvar
+                                                        </button>
+                                                    </div>
                                                 ) : (
-                                                    <span className={`px-2 py-1 rounded text-xs font-medium ${p.estoque < 10 ? 'bg-red-100 text-red-800' : 'bg-verde-salvia-100 text-green-800'
+                                                    <span className={`px-2 py-1 rounded text-xs font-medium ${p.estoque === 0 ? 'bg-red-100 text-red-800 border border-red-300' :
+                                                            p.estoque < 10 ? 'bg-yellow-100 text-yellow-800' :
+                                                                'bg-verde-salvia-100 text-green-800'
                                                         }`}>
-                                                        {p.estoque}
+                                                        {p.estoque === 0 ? '⚠️ SEM ESTOQUE' : p.estoque}
                                                     </span>
                                                 )}
                                             </td>
