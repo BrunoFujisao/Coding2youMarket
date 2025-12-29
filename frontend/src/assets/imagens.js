@@ -29,6 +29,9 @@ import logoBranco from './logobranco.jpeg';
 import logotipo from './logotipo.jpeg';
 import logotipo1 from './logotipo1.jpg';
 import iconePrincipal from './01.png';
+import logoMonocromatica from './Logo Subscrivery/Logo Monocromática.png';
+import logoPrincipal from './Logo Subscrivery/Logo Principal.png';
+import logoPrincipal2 from './Logo Subscrivery/Logo Principal 2.png';
 
 // =============================================
 // FRUTAS / HORTIFRUTI
@@ -64,6 +67,7 @@ import bolacha from './bolacha .jpeg';
 import farinhaTrigo from './farinha de trigo.jpeg';
 import feijaoPreto from './feijao preto.jpeg';
 import macarrao from './macarrao.jpeg';
+import macarraoPng from './macarrao.png';
 import molhoTomate from './molho de tomate.jpeg';
 import oleo from './oleo.jpeg';
 import graos from './graos.jpeg';
@@ -90,8 +94,9 @@ import esponja from './esponja .jpeg';
 // HIGIENE PESSOAL
 // =============================================
 import higiene from './higiene.jpeg';
-import shampoo from './shampoo.jpeg';
+import shampoo from './shampoo.jpg';
 import pastaDente from './pasta de dente.jpeg';
+import sabonete from './sabonete .jpeg';
 
 // =============================================
 // OUTROS
@@ -112,7 +117,10 @@ export const logos = {
     logoBranco,
     logotipo,
     logotipo1,
-    iconePrincipal
+    iconePrincipal,
+    logoMonocromatica,
+    logoPrincipal,
+    logoPrincipal2
 };
 
 // =============================================
@@ -199,7 +207,8 @@ export const produtosImagens = {
     'higiene': higiene,
     'shampoo': shampoo,
     'pastadente': pastaDente,
-    'creme dental': pastaDente
+    'creme dental': pastaDente,
+    'sabonete': sabonete
 };
 
 // =============================================
@@ -279,9 +288,16 @@ export {
     higiene,
     shampoo,
     pastaDente,
+    sabonete,
+
+    // Logos Subscrivery
+    logoMonocromatica,
+    logoPrincipal,
+    logoPrincipal2,
 
     // Outros
-    todos
+    todos,
+    macarraoPng
 };
 
 // =============================================
