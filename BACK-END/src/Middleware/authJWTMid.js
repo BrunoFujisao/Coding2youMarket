@@ -6,7 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 async function auth(req, res, next) {
 
-  if (req.originalUrl === '/api/pagamentos/webhook' || req.originalUrl === '/api/cron/verificar' || req.originalUrl === '/api/cron/processar-agora') {
+  if (req.originalUrl === '/api/pagamentos/webhook') {
     return next();
   }
 
