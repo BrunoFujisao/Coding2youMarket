@@ -71,10 +71,9 @@ async function processarPedidoRecorrente(pedido) {
         status,
         datainicio,
         dataproximaentrega,
-        dataproximacobranca,
-        createdat
+        dataproximacobranca
       ) 
-      VALUES ($1, $2, $3, $4, $5, NOW(), NULL, NULL, NOW())
+      VALUES ($1, $2, $3, $4, $5, NOW(), NULL, NULL)
       RETURNING *
     `, [
             pedido.usuarioid,
