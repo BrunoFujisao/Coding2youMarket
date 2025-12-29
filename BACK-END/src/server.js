@@ -34,7 +34,7 @@ const cronRouter = require('./Controller/cronRouter');
 require('./Services/emailService');
 
 // Inicializar CRON de entregas recorrentes
-const { iniciarCron } = require('./services/cronService');
+const { iniciarCron } = require('./Services/cronService');
 iniciarCron();
 
 // REGISTRAR ROTAS

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { processarEntregasRecorrentes } = require('../services/cronService');
+const { processarEntregasRecorrentes } = require('../Services/cronService');
 const auth = require('../Middleware/authJWTMid');
 
 /**
