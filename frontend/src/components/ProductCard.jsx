@@ -27,7 +27,7 @@ export default function ProductCard({ produto }) {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    produtoId: produto.id_produto,
+                    produtoId: produto.id,
                     quantidade
                 })
             });
