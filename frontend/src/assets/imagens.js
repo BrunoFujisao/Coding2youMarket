@@ -67,6 +67,7 @@ import macarrao from './macarrao.jpeg';
 import molhoTomate from './molho de tomate.jpeg';
 import oleo from './oleo.jpeg';
 import graos from './graos.jpeg';
+import sal from './sal.jpeg';
 
 // =============================================
 // LATICÍNIOS
@@ -83,6 +84,7 @@ import aguaSanitaria from './agua sanitaria.jpeg';
 import sabaoEmPo from './sabao em po .jpeg';
 import limpeza from './limpeza.jpeg';
 import papelHigienico from './papel higienico.jpeg';
+import esponja from './esponja .jpeg';
 
 // =============================================
 // HIGIENE PESSOAL
@@ -176,6 +178,7 @@ export const produtosImagens = {
     'molhotomate': molhoTomate,
     'oleo': oleo,
     'graos': graos,
+    'sal': sal,
 
     // Laticínios
     'leite': leite,
@@ -190,6 +193,7 @@ export const produtosImagens = {
     'limpeza': limpeza,
     'papelhigienico': papelHigienico,
     'papel': papelHigienico,
+    'esponja': esponja,
 
     // Higiene Pessoal
     'higiene': higiene,
@@ -256,6 +260,7 @@ export {
     molhoTomate,
     oleo,
     graos,
+    sal,
 
     // Laticínios
     leite,
@@ -268,6 +273,7 @@ export {
     sabaoEmPo,
     limpeza,
     papelHigienico,
+    esponja,
 
     // Higiene
     higiene,
