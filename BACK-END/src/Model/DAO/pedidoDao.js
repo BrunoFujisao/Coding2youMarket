@@ -95,31 +95,48 @@ async function getPedidoPorId(id) {
 async function getPedidosPorUsuario(usuarioId) {
     if (!usuarioId) return false;
 
-    // Buscar todos os pedidos do usuário
-    const { rows: pedidos } = await pool.query(
-        'SELECT * FROM pedidos WHERE usuarioid = $1 ORDER BY id DESC',
-        [usuarioId]
-    );
-
-    // Para cada pedido, buscar os itens
-    for (let pedido of pedidos) {
-        const { rows: itens } = await pool.query(
-            `SELECT 
-                pi.id,
-                pi.quantidade,
-                pi.precounitario,
-                p.nome,
-                p.imagemurl
-            FROM pedido_itens pi
-            LEFT JOIN produtos p ON pi.produtoid = p.id
-            WHERE pi.pedidoid = $1
-            ORDER BY pi.id`,
-            [pedido.id]
+    try {
+        // Buscar todos os pedidos do usuário
+        const { rows: pedidos } = await pool.query(
+            'SELECT * FROM pedidos WHERE usuarioid = $1 ORDER BY id DESC',
+            [usuarioId]
         );
-        pedido.itens = itens;
-    }
 
-    return pedidos;
+        // Se não houver pedidos, retornar array vazio
+        if (!pedidos || pedidos.length === 0) {
+            return [];
+        }
+
+        // Para cada pedido, buscar os itens usando Promise.all
+        await Promise.all(
+            pedidos.map(async (pedido) => {
+                try {
+                    const { rows: itens } = await pool.query(
+                        `SELECT 
+                            pi.id,
+                            pi.quantidade,
+                            pi.precounitario,
+                            p.nome,
+                            p.imagemurl
+                        FROM pedido_itens pi
+                        LEFT JOIN produtos p ON pi.produtoid = p.id
+                        WHERE pi.pedidoid = $1
+                        ORDER BY pi.id`,
+                        [pedido.id]
+                    );
+                    pedido.itens = itens || [];
+                } catch (error) {
+                    console.error(`Erro ao buscar itens do pedido ${pedido.id}:`, error);
+                    pedido.itens = []; // Fallback para array vazio
+                }
+            })
+        );
+
+        return pedidos;
+    } catch (error) {
+        console.error('Erro em getPedidosPorUsuario:', error);
+        throw error;
+    }
 }
 
 async function getPedidosAtivos() {
